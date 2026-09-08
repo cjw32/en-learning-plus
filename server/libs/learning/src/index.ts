@@ -1,0 +1,22 @@
+export const LEARNING_LIBRARY_VERSION = 'learning.v1' as const;
+
+export * from './review/legacy-learning-state.backfill';
+export * from './review/legacy-review-initializer.service';
+export * from './common/learning-errors';
+export * from './common/owned-resource.service';
+export * from './learning.module';
+export * from './learner-profile/learner-profile.types';
+export * from './learner-profile/learner-profile.service';
+export * from './materials/learning-material.provider';
+export * from './materials/word-book-material.provider';
+export * from './review/review-schedule.service';
+export * from './review/sm2-review-scheduler';
+export * from './exercises/exercise.service';
+export * from './exercises/exercise-targeting.service';
+export * from './grading/deterministic-grader';
+export * from './grading/grading.service';
+export * from './attempts/attempt.service';
+export * from './materials/course-material.provider';
+export * from './materials/grammar-material.provider';
+export * from './materials/learning-material.service';
+export * from './privacy/learning-data-deletion.service';

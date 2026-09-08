@@ -1,0 +1,27 @@
+{
+  "ANSWER": {
+    "allowedTools": ["get_learner_profile", "search_learning_materials"],
+    "forbiddenTools": ["get_due_words", "create_exercise", "grade_answer", "save_attempt"],
+    "toolOrder": ["get_learner_profile", "search_learning_materials"]
+  },
+  "CORRECTION": {
+    "allowedTools": ["get_learner_profile", "search_learning_materials"],
+    "forbiddenTools": ["get_due_words", "create_exercise", "grade_answer", "save_attempt"],
+    "toolOrder": ["get_learner_profile", "search_learning_materials"]
+  },
+  "CREATE_EXERCISE": {
+    "allowedTools": ["get_learner_profile", "get_due_words", "search_learning_materials", "create_exercise"],
+    "forbiddenTools": ["grade_answer", "save_attempt"],
+    "toolOrder": ["get_learner_profile", "get_due_words", "search_learning_materials", "create_exercise"]
+  },
+  "GRADE_ANSWER": {
+    "allowedTools": ["grade_answer", "save_attempt"],
+    "forbiddenTools": ["get_learner_profile", "get_due_words", "search_learning_materials", "create_exercise"],
+    "toolOrder": ["grade_answer", "save_attempt"]
+  },
+  "REVIEW_RECOMMENDATION": {
+    "allowedTools": ["get_learner_profile", "get_due_words"],
+    "forbiddenTools": ["search_learning_materials", "create_exercise", "grade_answer", "save_attempt"],
+    "toolOrder": ["get_learner_profile", "get_due_words"]
+  }
+}

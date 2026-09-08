@@ -1,0 +1,10 @@
+{
+  "rubricVersion": "next-action.v1",
+  "scorer": "human_or_independent_model",
+  "criteria": [
+    { "id": "policy_fit", "scale": [0, 1, 2], "anchor": "2 means the action matches current quality and due-state policy." },
+    { "id": "reason_support", "scale": [0, 1, 2], "anchor": "2 means the reason uses only supplied evidence." }
+  ],
+  "passState": { "minimumTotal": 4, "requiredCriterionMinimum": 2 },
+  "disputeReview": { "trigger": "action or evidence disputed", "resolver": "product and learning reviewer" }
+}

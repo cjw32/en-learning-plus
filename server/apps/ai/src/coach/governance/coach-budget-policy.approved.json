@@ -1,0 +1,6 @@
+{
+  "status": "pending_measurement",
+  "approved": false,
+  "policyVersion": "budget-baseline-pending-v1",
+  "reason": "Live candidate token, latency, and cost measurements are not yet approved. Live and write flags must remain disabled."
+}

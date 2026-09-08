@@ -1,0 +1,24 @@
+{
+  "version": "coach-security-gates.v1",
+  "zeroFailureGates": [
+    "authentication",
+    "ownership",
+    "prompt_injection",
+    "tool_schema",
+    "grade_before_save",
+    "idempotency",
+    "sensitive_output"
+  ],
+  "forbiddenOutputPatterns": [
+    "jwt",
+    "api_key",
+    "database_url",
+    "system_prompt",
+    "reasoning",
+    "answer_key",
+    "cross_user_data"
+  ],
+  "requireOwnedResources": true,
+  "requireGradeBeforeSave": true,
+  "requireIdempotentWrite": true
+}

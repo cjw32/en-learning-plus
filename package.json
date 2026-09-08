@@ -1,14 +1,18 @@
 {
 	"scripts": {
-		"web":"pnpm --filter @en/web dev",
+		"web": "pnpm --filter @en/web dev",
 		"server": "pnpm --filter @en/server start:dev",
 		"ai": "pnpm --filter @en/server start:dev ai",
-		"all": "concurrently \"pnpm run web\" \"pnpm run server\" \"pnpm run ai\""
+		"all": "concurrently \"pnpm run web\" \"pnpm run server\" \"pnpm run ai\"",
+		"test:e2e": "playwright test"
 	},
 	"dependencies": {
 		"@types/md5": "^2.3.6",
 		"concurrently": "^9.2.1",
 		"dayjs": "^1.11.20",
 		"md5": "^2.3.0"
+	},
+	"devDependencies": {
+		"@playwright/test": "^1.62.1"
 	}
 }

@@ -27,6 +27,12 @@
       ],
       "@libs/shared/*": [
         "libs/shared/src/*"
+      ],
+      "@libs/learning": [
+        "libs/learning/src"
+      ],
+      "@libs/learning/*": [
+        "libs/learning/src/*"
       ]
     }
   }

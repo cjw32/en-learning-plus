@@ -21,27 +21,229 @@ enum TradeStatus {
   TRADE_SUCCESS // 交易成功 可退款
   TRADE_FINISHED // 交易结束 不可退款
 }
+
+enum CefrLevel {
+  A1
+  A2
+  B1
+  B2
+  C1
+  C2
+}
+
+enum LearnerLevelSource {
+  USER_DECLARED
+}
+
+enum LearnerGoalType {
+  GENERAL
+  EXAM
+  BUSINESS
+  TRAVEL
+  CUSTOM
+}
+
+enum LearningTargetType {
+  WORD
+  ERROR_TYPE
+}
+
+enum LearningReviewState {
+  NEW
+  LEARNING
+  REVIEW
+  MASTERED
+}
+
+enum CoachConversationStatus {
+  ACTIVE
+  DELETING
+  DELETED
+  EXPIRED
+}
+
+enum CoachMessageRole {
+  USER
+  COACH
+}
+
+enum CoachRequestInputType {
+  MESSAGE
+  EXERCISE_SUBMISSION
+  RECOMMENDATION
+}
+
+enum CoachIntent {
+  ANSWER
+  CORRECTION
+  CREATE_EXERCISE
+  GRADE_ANSWER
+  REVIEW_RECOMMENDATION
+  UNKNOWN
+}
+
+enum CoachRequestStatus {
+  CREATED
+  QUEUED
+  RUNNING
+  COMPLETED
+  CANCELLED
+  TIMED_OUT
+  BUDGET_EXCEEDED
+  FAILED
+}
+
+enum CoachResponseType {
+  ANSWER
+  CORRECTION
+  EXERCISE
+  GRADING
+  RECOMMENDATION
+  DEGRADED
+}
+
+enum CoachErrorCode {
+  AUTH_REQUIRED
+  TOKEN_INVALID
+  FORBIDDEN
+  RESOURCE_NOT_FOUND
+  VALIDATION_FAILED
+  SCHEMA_INVALID
+  MATERIAL_NOT_AVAILABLE
+  MODEL_UNAVAILABLE
+  TOOL_TIMEOUT
+  REQUEST_TIMEOUT
+  BUDGET_EXCEEDED
+  RATE_LIMITED
+  IDEMPOTENCY_CONFLICT
+  STATE_CONFLICT
+  CANCELLED
+  INTERNAL_ERROR
+}
+
+enum ExerciseType {
+  MULTIPLE_CHOICE
+  FILL_BLANK
+  TRANSLATION
+  SITUATIONAL_DIALOGUE
+}
+
+enum ExerciseDifficulty {
+  A1
+  A2
+  B1
+  B2
+  C1
+  C2
+  UNKNOWN
+}
+
+enum ExerciseStatus {
+  DRAFT
+  READY
+  SUBMITTED
+  GRADED
+  SAVED
+  EXPIRED
+  CANCELLED
+}
+
+enum ExerciseSubmissionStatus {
+  RECEIVED
+  GRADING
+  GRADED_VALID
+  GRADING_FAILED
+  SAVED
+}
+
+enum CoachStepName {
+  CLASSIFY_INTENT
+  GET_LEARNER_PROFILE
+  GET_DUE_WORDS
+  SEARCH_LEARNING_MATERIALS
+  CREATE_EXERCISE
+  GRADE_ANSWER
+  SAVE_ATTEMPT
+  GENERATE_ANSWER
+  RECOMMEND
+  VALIDATE_RESULT
+  FINALIZE
+}
+
+enum CoachToolName {
+  GET_LEARNER_PROFILE
+  GET_DUE_WORDS
+  SEARCH_LEARNING_MATERIALS
+  CREATE_EXERCISE
+  GRADE_ANSWER
+  SAVE_ATTEMPT
+}
+
+enum CoachStepStatus {
+  STARTED
+  SUCCEEDED
+  FAILED
+  SKIPPED
+  CANCELLED
+  TIMED_OUT
+}
+
+enum CoachFeedbackRating {
+  UP
+  DOWN
+}
+
+enum CoachFeedbackCategory {
+  INCORRECT
+  TOO_HARD
+  TOO_EASY
+  IRRELEVANT
+  UNSAFE
+  OTHER
+}
+
+enum CoachDeletionScope {
+  CONVERSATION
+  COACH_DATA
+}
+
+enum CoachDeletionStatus {
+  ACCEPTED
+  PURGING
+  COMPLETED
+}
+
 //用户表
 model User {
-  id              String           @id @default(cuid()) // 用户ID
-  name            String // 用户名
-  email           String?          @unique // 邮箱
-  phone           String           @unique // 手机号
-  address         String? // 地址
-  password        String // 密码
-  avatar          String? // 头像
-  bio             String? // 签名  新增字段
-  isTimingTask    Boolean          @default(false) // 是否开启定时任务 新增字段
-  timingTaskTime  String           @default("00:00:00") //定时任务时间默认晚上0点开始，每隔24小时执行一次 新增字段
-  wordNumber      Int              @default(0) // 单词数量
-  dayNumber       Int              @default(0) // 打卡天数
-  createdAt       DateTime         @default(now()) // 创建时间
-  updatedAt       DateTime         @updatedAt // 更新时间
-  lastLoginAt     DateTime? // 最后登录时间
-  wordBookRecords WordBookRecord[]
-  paymentRecords  PaymentRecord[]
-  courseRecords   CourseRecord[]
-  visitors        Visitor[] //User别忘记关联
+  id                   String                @id @default(cuid()) // 用户ID
+  name                 String // 用户名
+  email                String?               @unique // 邮箱
+  phone                String                @unique // 手机号
+  address              String? // 地址
+  password             String // 密码
+  avatar               String? // 头像
+  bio                  String? // 签名  新增字段
+  isTimingTask         Boolean               @default(false) // 是否开启定时任务 新增字段
+  timingTaskTime       String                @default("00:00:00") //定时任务时间默认晚上0点开始，每隔24小时执行一次 新增字段
+  wordNumber           Int                   @default(0) // 单词数量
+  dayNumber            Int                   @default(0) // 打卡天数
+  createdAt            DateTime              @default(now()) // 创建时间
+  updatedAt            DateTime              @updatedAt // 更新时间
+  lastLoginAt          DateTime? // 最后登录时间
+  wordBookRecords      WordBookRecord[]
+  paymentRecords       PaymentRecord[]
+  courseRecords        CourseRecord[]
+  visitors             Visitor[] //User别忘记关联
+  learnerProfile       LearnerProfile?
+  learningItemStates   LearningItemState[]
+  learningReviewEvents LearningReviewEvent[]
+  coachConversations   CoachConversation[]
+  coachRequests        CoachRequest[]
+  exercises            Exercise[]
+  exerciseSubmissions  ExerciseSubmission[]
+  learningAttempts     LearningAttempt[]
+  coachFeedback        CoachFeedback[]
+  traceSubjectMapping  TraceSubjectMapping?
 }
 
 //记录已操作的单词
@@ -51,7 +253,7 @@ model WordBookRecord {
   isMaster  Boolean  @default(false) // 是否掌握
   createdAt DateTime @default(now()) // 创建时间
   updatedAt DateTime @updatedAt // 更新时间
-  userId    String // 用户ID 
+  userId    String // 用户ID
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   word      WordBook @relation(fields: [wordId], references: [id], onDelete: Cascade)
 
@@ -60,29 +262,31 @@ model WordBookRecord {
 
 //单词表
 model WordBook {
-  id              String           @id @default(cuid()) // 单词ID
-  word            String // 单词
-  phonetic        String? // 音标
-  definition      String? // 定义
-  translation     String? // 翻译
-  pos             String? // 词性
-  collins         String? // 柯林斯
-  oxford          String? // 牛津
-  tag             String? // 标签
-  bnc             String? // BNC 英国国家语料库
-  frq             String? // FRQ 频率
-  exchange        String? // 同义词
-  gk              Boolean? // 高考
-  zk              Boolean? // 中考
-  gre             Boolean? // GRE
-  toefl           Boolean? // TOEFL 
-  ielts           Boolean? // IELTS 
-  cet6            Boolean? // 大学英语六级
-  cet4            Boolean? // 大学英语四级
-  ky              Boolean? // 考研
-  createdAt       DateTime         @default(now()) // 创建时间
-  updatedAt       DateTime         @updatedAt // 更新时间
-  wordBookRecords WordBookRecord[]
+  id                  String               @id @default(cuid()) // 单词ID
+  word                String // 单词
+  phonetic            String? // 音标
+  definition          String? // 定义
+  translation         String? // 翻译
+  pos                 String? // 词性
+  collins             String? // 柯林斯
+  oxford              String? // 牛津
+  tag                 String? // 标签
+  bnc                 String? // BNC 英国国家语料库
+  frq                 String? // FRQ 频率
+  exchange            String? // 同义词
+  gk                  Boolean? // 高考
+  zk                  Boolean? // 中考
+  gre                 Boolean? // GRE
+  toefl               Boolean? // TOEFL
+  ielts               Boolean? // IELTS
+  cet6                Boolean? // 大学英语六级
+  cet4                Boolean? // 大学英语四级
+  ky                  Boolean? // 考研
+  createdAt           DateTime             @default(now()) // 创建时间
+  updatedAt           DateTime             @updatedAt // 更新时间
+  wordBookRecords     WordBookRecord[]
+  learningItemStates  LearningItemState[]
+  exerciseItemTargets ExerciseItemTarget[]
 
   @@index([word])
   @@index([tag])
@@ -104,6 +308,7 @@ model PaymentRecord {
   updatedAt     DateTime       @updatedAt // 更新时间
   user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   courseRecords CourseRecord[]
+
   @@index([tradeNo])
 }
 
@@ -123,22 +328,389 @@ model CourseRecord {
 }
 
 model Course {
-  id            String         @id @default(cuid()) // 课程ID
-  name          String // 课程名
-  value         String // 课程value
-  description   String? // 课程描述
-  teacher       String // 教师
-  url           String // 课程url
-  price         Decimal // 课程价格
-  createdAt     DateTime       @default(now()) // 创建时间
-  updatedAt     DateTime       @updatedAt // 更新时间
-  courseRecords CourseRecord[]
+  id              String           @id @default(cuid()) // 课程ID
+  name            String // 课程名
+  value           String // 课程value
+  description     String? // 课程描述
+  teacher         String // 教师
+  url             String // 课程url
+  price           Decimal // 课程价格
+  createdAt       DateTime         @default(now()) // 创建时间
+  updatedAt       DateTime         @updatedAt // 更新时间
+  courseRecords   CourseRecord[]
+  learnerProfiles LearnerProfile[]
 }
+
+model LearnerProfile {
+  id             String              @id @default(cuid())
+  userId         String              @unique
+  cefrLevel      CefrLevel?
+  levelSource    LearnerLevelSource?
+  goalType       LearnerGoalType?
+  goalText       String?             @db.VarChar(500)
+  activeCourseId String?
+  timezone       String              @default("Asia/Shanghai") @db.VarChar(64)
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+  user           User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  activeCourse   Course?             @relation(fields: [activeCourseId], references: [id], onDelete: SetNull)
+
+  @@index([activeCourseId])
+}
+
+model LearningItemState {
+  id              String                @id @default(cuid())
+  userId          String
+  targetType      LearningTargetType
+  targetKey       String                @db.VarChar(128)
+  wordId          String?
+  reviewState     LearningReviewState   @default(NEW)
+  repetitionCount Int                   @default(0)
+  easeFactor      Decimal               @default(2.5) @db.Decimal(4, 2)
+  intervalDays    Int                   @default(0)
+  dueAt           DateTime?
+  lastReviewedAt  DateTime?
+  lastQuality     Int?
+  lastAttemptId   String?
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime              @updatedAt
+  user            User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  word            WordBook?             @relation(fields: [wordId], references: [id], onDelete: Cascade)
+  lastAttempt     LearningAttempt?      @relation("LatestItemAttempt", fields: [lastAttemptId], references: [id], onDelete: SetNull)
+  reviewEvents    LearningReviewEvent[]
+
+  @@unique([userId, targetType, targetKey])
+  @@index([userId, targetType, dueAt])
+  @@index([wordId])
+}
+
+model LearningReviewEvent {
+  id            String             @id @default(cuid())
+  userId        String
+  itemStateId   String
+  attemptId     String
+  targetType    LearningTargetType
+  targetKey     String             @db.VarChar(128)
+  itemScore     Int
+  quality       Int
+  previousState Json
+  nextState     Json
+  createdAt     DateTime           @default(now())
+  user          User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  itemState     LearningItemState  @relation(fields: [itemStateId], references: [id], onDelete: Cascade)
+  attempt       LearningAttempt    @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+
+  @@unique([attemptId, targetType, targetKey])
+  @@index([userId, createdAt])
+  @@index([itemStateId, createdAt])
+}
+
+model CoachConversation {
+  id                 String                  @id @default(cuid())
+  userId             String
+  title              String?                 @db.VarChar(120)
+  status             CoachConversationStatus @default(ACTIVE)
+  checkpointThreadId String                  @unique @db.VarChar(128)
+  lastActivityAt     DateTime                @default(now())
+  expiresAt          DateTime
+  deletedAt          DateTime?
+  createdAt          DateTime                @default(now())
+  updatedAt          DateTime                @updatedAt
+  user               User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages           CoachMessage[]
+  requests           CoachRequest[]
+  exercises          Exercise[]
+
+  @@index([userId, status, lastActivityAt])
+}
+
+model CoachMessage {
+  id                  String            @id @default(cuid())
+  conversationId      String
+  requestId           String?
+  role                CoachMessageRole
+  content             String?
+  resultSchemaVersion String?           @db.VarChar(64)
+  structuredResult    Json?
+  createdAt           DateTime          @default(now())
+  conversation        CoachConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  request             CoachRequest?     @relation(fields: [requestId], references: [id], onDelete: SetNull)
+
+  @@index([conversationId, createdAt, id])
+  @@index([requestId])
+}
+
+model CoachRequest {
+  id                       String                @id @default(cuid())
+  userId                   String
+  conversationId           String
+  clientRequestKey         String                @db.VarChar(128)
+  requestBodyHash          String                @db.VarChar(128)
+  inputPayload             Json
+  retryOfRequestId         String?
+  inputType                CoachRequestInputType
+  intent                   CoachIntent?
+  status                   CoachRequestStatus    @default(CREATED)
+  exerciseId               String?
+  answerVersion            String?               @db.VarChar(128)
+  promptVersion            String?               @db.VarChar(128)
+  modelVersion             String?               @db.VarChar(128)
+  budgetVersion            String?               @db.VarChar(128)
+  deadlineAt               DateTime
+  finalResultSchemaVersion String?               @db.VarChar(64)
+  finalResult              Json?
+  errorCode                CoachErrorCode?
+  cancelRequestedAt        DateTime?
+  queuedAt                 DateTime?
+  startedAt                DateTime?
+  firstTokenAt             DateTime?
+  finishedAt               DateTime?
+  createdAt                DateTime              @default(now())
+  updatedAt                DateTime              @updatedAt
+  user                     User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  conversation             CoachConversation     @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  retryOfRequest           CoachRequest?         @relation("CoachRequestRetries", fields: [retryOfRequestId], references: [id], onDelete: SetNull)
+  retries                  CoachRequest[]        @relation("CoachRequestRetries")
+  exercise                 Exercise?             @relation("RequestExerciseContext", fields: [exerciseId], references: [id], onDelete: SetNull)
+  generatedExercise        Exercise?             @relation("ExerciseGenerationRequest")
+  messages                 CoachMessage[]
+  gradedSubmission         ExerciseSubmission?   @relation("SubmissionGradeRequest")
+  savedAttempt             LearningAttempt?      @relation("AttemptSaveRequest")
+  trace                    CoachTrace?
+  feedback                 CoachFeedback[]
+
+  @@unique([userId, clientRequestKey])
+  @@index([conversationId, status, createdAt])
+  @@index([retryOfRequestId])
+  @@index([exerciseId])
+}
+
+model Exercise {
+  id                    String               @id @default(cuid())
+  userId                String
+  conversationId        String
+  requestId             String               @unique
+  type                  ExerciseType
+  status                ExerciseStatus       @default(DRAFT)
+  cefrDifficulty        ExerciseDifficulty
+  instructions          String               @db.VarChar(2000)
+  personalizationReason String               @db.VarChar(2000)
+  schemaVersion         String               @db.VarChar(64)
+  citations             Json
+  expiresAt             DateTime
+  createdAt             DateTime             @default(now())
+  updatedAt             DateTime             @updatedAt
+  user                  User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  conversation          CoachConversation    @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  request               CoachRequest         @relation("ExerciseGenerationRequest", fields: [requestId], references: [id], onDelete: Cascade)
+  contextualRequests    CoachRequest[]       @relation("RequestExerciseContext")
+  items                 ExerciseItem[]
+  submissions           ExerciseSubmission[]
+  attempts              LearningAttempt[]
+
+  @@index([userId, status, createdAt])
+  @@index([conversationId])
+}
+
+model ExerciseItem {
+  id              String                   @id @default(cuid())
+  exerciseId      String
+  position        Int
+  prompt          String
+  choices         Json?
+  answerKey       Json
+  gradingRubric   Json
+  maxScore        Int
+  citations       Json
+  exercise        Exercise                 @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+  targets         ExerciseItemTarget[]
+  submissionItems ExerciseSubmissionItem[]
+
+  @@unique([exerciseId, position])
+}
+
+model ExerciseItemTarget {
+  exerciseItemId String
+  targetType     LearningTargetType
+  targetKey      String             @db.VarChar(128)
+  wordId         String?
+  weight         Decimal            @db.Decimal(5, 4)
+  exerciseItem   ExerciseItem       @relation(fields: [exerciseItemId], references: [id], onDelete: Cascade)
+  word           WordBook?          @relation(fields: [wordId], references: [id], onDelete: Cascade)
+
+  @@id([exerciseItemId, targetType, targetKey])
+  @@index([wordId])
+}
+
+model ExerciseSubmission {
+  id                   String                   @id @default(cuid())
+  userId               String
+  exerciseId           String
+  gradeRequestId       String                   @unique
+  answerVersion        String                   @db.VarChar(128)
+  clientIdempotencyKey String                   @db.VarChar(128)
+  answers              Json
+  status               ExerciseSubmissionStatus @default(RECEIVED)
+  score                Int?
+  gradingHash          String?                  @db.VarChar(128)
+  resultSchemaVersion  String?                  @db.VarChar(64)
+  gradingResult        Json?
+  createdAt            DateTime                 @default(now())
+  updatedAt            DateTime                 @updatedAt
+  user                 User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  exercise             Exercise                 @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+  gradeRequest         CoachRequest             @relation("SubmissionGradeRequest", fields: [gradeRequestId], references: [id], onDelete: Cascade)
+  items                ExerciseSubmissionItem[]
+  attempt              LearningAttempt?
+
+  @@unique([userId, exerciseId, answerVersion])
+  @@unique([userId, clientIdempotencyKey])
+  @@index([exerciseId, status])
+}
+
+model ExerciseSubmissionItem {
+  id              String             @id @default(cuid())
+  submissionId    String
+  exerciseItemId  String
+  answer          Json
+  isCorrect       Boolean?
+  score           Int?
+  correction      String
+  explanation     String
+  errorTypes      Json
+  targetQualities Json
+  submission      ExerciseSubmission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  exerciseItem    ExerciseItem       @relation(fields: [exerciseItemId], references: [id], onDelete: Cascade)
+
+  @@unique([submissionId, exerciseItemId])
+  @@index([exerciseItemId])
+}
+
+model LearningAttempt {
+  id               String                @id @default(cuid())
+  userId           String
+  exerciseId       String
+  submissionId     String                @unique
+  saveRequestId    String                @unique
+  score            Int
+  errorTypes       Json
+  gradingHash      String                @db.VarChar(128)
+  savedAt          DateTime              @default(now())
+  user             User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  exercise         Exercise              @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+  submission       ExerciseSubmission    @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  saveRequest      CoachRequest          @relation("AttemptSaveRequest", fields: [saveRequestId], references: [id], onDelete: Cascade)
+  reviewEvents     LearningReviewEvent[]
+  latestItemStates LearningItemState[]   @relation("LatestItemAttempt")
+
+  @@unique([userId, exerciseId, submissionId])
+  @@index([userId, savedAt])
+}
+
+model CoachTrace {
+  id                  String               @id
+  requestId           String               @unique
+  traceSubjectId      String?
+  promptVersion       String               @db.VarChar(128)
+  promptHash          String               @db.VarChar(128)
+  modelProvider       String               @db.VarChar(64)
+  modelName           String               @db.VarChar(128)
+  modelVersion        String               @db.VarChar(128)
+  resultSchemaVersion String               @db.VarChar(64)
+  budgetVersion       String               @db.VarChar(128)
+  ttftMs              Int?
+  totalDurationMs     Int?
+  inputTokens         Int                  @default(0)
+  outputTokens        Int                  @default(0)
+  estimatedCost       Decimal              @default(0) @db.Decimal(18, 8)
+  currency            String               @db.VarChar(8)
+  schemaFailureCount  Int                  @default(0)
+  retryCount          Int                  @default(0)
+  terminalStatus      CoachRequestStatus
+  resultType          CoachResponseType?
+  recommendation      Json?
+  createdAt           DateTime             @default(now())
+  expiresAt           DateTime
+  request             CoachRequest         @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  traceSubject        TraceSubjectMapping? @relation(fields: [traceSubjectId], references: [traceSubjectId], onDelete: SetNull)
+  steps               CoachStepTrace[]
+
+  @@index([traceSubjectId, createdAt])
+  @@index([expiresAt])
+}
+
+model CoachDeletionTombstone {
+  id            String              @id
+  subjectHash   String              @db.VarChar(128)
+  resourceHash  String              @db.VarChar(128)
+  scope         CoachDeletionScope
+  status        CoachDeletionStatus @default(ACCEPTED)
+  requestedAt   DateTime
+  hiddenAt      DateTime
+  purgeDeadline DateTime
+  completedAt   DateTime?
+  expiresAt     DateTime
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+
+  @@unique([subjectHash, scope, resourceHash])
+  @@index([status, purgeDeadline])
+  @@index([expiresAt])
+}
+
+model CoachStepTrace {
+  id                 String          @id @default(cuid())
+  traceId            String
+  sequence           Int
+  stepName           CoachStepName
+  toolName           CoachToolName?
+  status             CoachStepStatus
+  durationMs         Int?
+  inputTokens        Int             @default(0)
+  outputTokens       Int             @default(0)
+  schemaFailureCount Int             @default(0)
+  retryCount         Int             @default(0)
+  errorCode          CoachErrorCode?
+  redactedMetadata   Json?
+  createdAt          DateTime        @default(now())
+  trace              CoachTrace      @relation(fields: [traceId], references: [id], onDelete: Cascade)
+
+  @@unique([traceId, sequence])
+}
+
+model CoachFeedback {
+  id                   String                 @id @default(cuid())
+  userId               String
+  requestId            String
+  clientIdempotencyKey String                 @db.VarChar(128)
+  requestBodyHash      String                 @db.VarChar(128)
+  rating               CoachFeedbackRating
+  category             CoachFeedbackCategory?
+  comment              String?                @db.VarChar(1000)
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime               @updatedAt
+  expiresAt            DateTime
+  user                 User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  request              CoachRequest           @relation(fields: [requestId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, requestId])
+  @@unique([userId, clientIdempotencyKey])
+  @@index([expiresAt])
+}
+
+model TraceSubjectMapping {
+  traceSubjectId String       @id
+  userId         String       @unique
+  createdAt      DateTime     @default(now())
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  traces         CoachTrace[]
+}
+
 //访客表(UV)
 model Visitor {
   id                 String             @id @default(cuid()) // 访客ID
   anonymousId        String             @unique // 匿名ID
-  userId             String?            // 用户ID
+  userId             String? // 用户ID
   user               User?              @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt          DateTime           @default(now()) // 创建时间
   updatedAt          DateTime           @updatedAt // 更新时间

@@ -1,0 +1,10 @@
+{
+  "rubricVersion": "grading.v1",
+  "scorer": "human_or_independent_model",
+  "criteria": [
+    { "id": "score_reasonableness", "scale": [0, 1, 2], "anchor": "2 means item and total scores agree with the controlled rubric." },
+    { "id": "error_classification", "scale": [0, 1, 2], "anchor": "2 means error types match the demonstrated errors." }
+  ],
+  "passState": { "minimumTotal": 3, "requiredCriterionMinimum": 1 },
+  "disputeReview": { "trigger": "score differs by more than one anchor", "resolver": "independent human adjudicator" }
+}

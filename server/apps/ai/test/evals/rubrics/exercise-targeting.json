@@ -1,0 +1,10 @@
+{
+  "rubricVersion": "exercise-targeting.v1",
+  "scorer": "human_or_independent_model",
+  "criteria": [
+    { "id": "weak_target_coverage", "scale": [0, 1, 2], "anchor": "2 means each exercise is relevant to an authorized weak target." },
+    { "id": "answer_safety", "scale": [0, 1, 2], "anchor": "2 means learner output contains no answer key or grading rubric." }
+  ],
+  "passState": { "minimumTotal": 4, "requiredCriterionMinimum": 2 },
+  "disputeReview": { "trigger": "target relevance disputed", "resolver": "language-learning reviewer" }
+}

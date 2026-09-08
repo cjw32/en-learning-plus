@@ -1,0 +1,588 @@
+{
+  "$id": "https://en-learning-plus.local/schemas/coach-result.v1.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "responseType": {
+            "const": "exercise"
+          }
+        },
+        "required": [
+          "responseType"
+        ]
+      },
+      "then": {
+        "properties": {
+          "nextAction": {
+            "const": "practice"
+          },
+          "score": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "exercise"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "responseType": {
+            "const": "grading"
+          }
+        },
+        "required": [
+          "responseType"
+        ]
+      },
+      "then": {
+        "properties": {
+          "score": {
+            "maximum": 100,
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "gradingItems",
+          "learningUpdate"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "responseType": {
+            "enum": [
+              "answer",
+              "correction",
+              "exercise",
+              "recommendation",
+              "degraded"
+            ]
+          }
+        },
+        "required": [
+          "responseType"
+        ]
+      },
+      "then": {
+        "properties": {
+          "score": {
+            "type": "null"
+          }
+        }
+      }
+    }
+  ],
+  "properties": {
+    "citations": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "locator": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "materialType": {
+            "enum": [
+              "word",
+              "course",
+              "grammar"
+            ],
+            "type": "string"
+          },
+          "sourceId": {
+            "maxLength": 128,
+            "minLength": 1,
+            "type": "string"
+          },
+          "supports": {
+            "maxLength": 1000,
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": {
+            "maxLength": 300,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "sourceId",
+          "materialType",
+          "title",
+          "locator",
+          "supports"
+        ],
+        "type": "object"
+      },
+      "maxItems": 20,
+      "type": "array"
+    },
+    "correction": {
+      "maxLength": 4000,
+      "type": "string"
+    },
+    "errorTypes": {
+      "items": {
+        "enum": [
+          "VOCABULARY",
+          "SPELLING",
+          "GRAMMAR",
+          "TENSE",
+          "ARTICLE",
+          "PREPOSITION",
+          "COLLOCATION",
+          "WORD_ORDER",
+          "EXPRESSION",
+          "COMPREHENSION",
+          "OTHER"
+        ],
+        "type": "string"
+      },
+      "maxItems": 11,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "examples": {
+      "items": {
+        "maxLength": 2000,
+        "minLength": 1,
+        "type": "string"
+      },
+      "maxItems": 8,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "exercise": {
+      "additionalProperties": false,
+      "properties": {
+        "cefrDifficulty": {
+          "enum": [
+            "A1",
+            "A2",
+            "B1",
+            "B2",
+            "C1",
+            "C2",
+            "UNKNOWN"
+          ],
+          "type": "string"
+        },
+        "expiresAt": {
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+          "type": "string"
+        },
+        "id": {
+          "maxLength": 64,
+          "minLength": 10,
+          "type": "string"
+        },
+        "instructions": {
+          "maxLength": 2000,
+          "minLength": 1,
+          "type": "string"
+        },
+        "items": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "choices": {
+                "anyOf": [
+                  {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "id": {
+                          "maxLength": 32,
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "text": {
+                          "maxLength": 1000,
+                          "minLength": 1,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "text"
+                      ],
+                      "type": "object"
+                    },
+                    "maxItems": 8,
+                    "minItems": 2,
+                    "type": "array"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "citations": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "locator": {
+                      "anyOf": [
+                        {
+                          "maxLength": 500,
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "materialType": {
+                      "enum": [
+                        "word",
+                        "course",
+                        "grammar"
+                      ],
+                      "type": "string"
+                    },
+                    "sourceId": {
+                      "maxLength": 128,
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "supports": {
+                      "maxLength": 1000,
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "title": {
+                      "maxLength": 300,
+                      "minLength": 1,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "sourceId",
+                    "materialType",
+                    "title",
+                    "locator",
+                    "supports"
+                  ],
+                  "type": "object"
+                },
+                "maxItems": 10,
+                "type": "array"
+              },
+              "id": {
+                "maxLength": 64,
+                "minLength": 10,
+                "type": "string"
+              },
+              "maxScore": {
+                "maximum": 100,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "position": {
+                "maximum": 9007199254740991,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "prompt": {
+                "maxLength": 4000,
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "position",
+              "prompt",
+              "choices",
+              "maxScore",
+              "citations"
+            ],
+            "type": "object"
+          },
+          "maxItems": 20,
+          "minItems": 1,
+          "type": "array"
+        },
+        "personalizationReason": {
+          "maxLength": 2000,
+          "minLength": 1,
+          "type": "string"
+        },
+        "type": {
+          "enum": [
+            "MULTIPLE_CHOICE",
+            "FILL_BLANK",
+            "TRANSLATION",
+            "SITUATIONAL_DIALOGUE"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "cefrDifficulty",
+        "instructions",
+        "personalizationReason",
+        "items",
+        "expiresAt"
+      ],
+      "type": "object"
+    },
+    "explanation": {
+      "maxLength": 12000,
+      "minLength": 1,
+      "type": "string"
+    },
+    "gradingItems": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "correction": {
+            "maxLength": 4000,
+            "type": "string"
+          },
+          "errorTypes": {
+            "items": {
+              "enum": [
+                "VOCABULARY",
+                "SPELLING",
+                "GRAMMAR",
+                "TENSE",
+                "ARTICLE",
+                "PREPOSITION",
+                "COLLOCATION",
+                "WORD_ORDER",
+                "EXPRESSION",
+                "COMPREHENSION",
+                "OTHER"
+              ],
+              "type": "string"
+            },
+            "maxItems": 11,
+            "type": "array"
+          },
+          "explanation": {
+            "maxLength": 4000,
+            "minLength": 1,
+            "type": "string"
+          },
+          "isCorrect": {
+            "type": "boolean"
+          },
+          "itemId": {
+            "maxLength": 64,
+            "minLength": 1,
+            "type": "string"
+          },
+          "score": {
+            "maximum": 100,
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "itemId",
+          "isCorrect",
+          "score",
+          "correction",
+          "explanation",
+          "errorTypes"
+        ],
+        "type": "object"
+      },
+      "maxItems": 50,
+      "minItems": 1,
+      "type": "array"
+    },
+    "learningUpdate": {
+      "additionalProperties": false,
+      "properties": {
+        "attemptId": {
+          "anyOf": [
+            {
+              "maxLength": 64,
+              "minLength": 10,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "changes": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "label": {
+                "maxLength": 300,
+                "minLength": 1,
+                "type": "string"
+              },
+              "nextReviewAt": {
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                "type": "string"
+              },
+              "nextState": {
+                "enum": [
+                  "LEARNING",
+                  "REVIEW",
+                  "MASTERED"
+                ],
+                "type": "string"
+              },
+              "previousState": {
+                "enum": [
+                  "NEW",
+                  "LEARNING",
+                  "REVIEW",
+                  "MASTERED"
+                ],
+                "type": "string"
+              },
+              "quality": {
+                "maximum": 5,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "reason": {
+                "maxLength": 1000,
+                "minLength": 1,
+                "type": "string"
+              },
+              "targetKey": {
+                "maxLength": 128,
+                "minLength": 1,
+                "type": "string"
+              },
+              "targetType": {
+                "enum": [
+                  "WORD",
+                  "ERROR_TYPE"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "targetType",
+              "targetKey",
+              "label",
+              "previousState",
+              "nextState",
+              "quality",
+              "nextReviewAt",
+              "reason"
+            ],
+            "type": "object"
+          },
+          "maxItems": 100,
+          "type": "array"
+        },
+        "savedAt": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "status": {
+          "enum": [
+            "saved",
+            "replayed",
+            "not_saved"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "status",
+        "attemptId",
+        "changes",
+        "savedAt"
+      ],
+      "type": "object"
+    },
+    "nextAction": {
+      "enum": [
+        "review",
+        "practice",
+        "continue"
+      ],
+      "type": "string"
+    },
+    "nextActionReason": {
+      "maxLength": 2000,
+      "minLength": 1,
+      "type": "string"
+    },
+    "responseType": {
+      "enum": [
+        "answer",
+        "correction",
+        "exercise",
+        "grading",
+        "recommendation",
+        "degraded"
+      ],
+      "type": "string"
+    },
+    "schemaVersion": {
+      "const": "coach.result.v1",
+      "type": "string"
+    },
+    "score": {
+      "anyOf": [
+        {
+          "maximum": 100,
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "traceId": {
+      "maxLength": 64,
+      "minLength": 10,
+      "pattern": "^[A-Za-z0-9_-]+$",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "responseType",
+    "correction",
+    "explanation",
+    "examples",
+    "errorTypes",
+    "score",
+    "nextAction",
+    "citations",
+    "nextActionReason",
+    "traceId"
+  ],
+  "title": "CoachResultV1",
+  "type": "object"
+}

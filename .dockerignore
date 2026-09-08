@@ -1,0 +1,13 @@
+.git
+.gitignore
+.env
+.env.*
+!.env.example
+coverage
+test-results
+playwright-report
+*.log
+.DS_Store
+.idea
+.vscode
+specs

@@ -6,7 +6,17 @@ import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
   {
-    ignores: ['eslint.config.mjs'],
+    ignores: [
+      'eslint.config.mjs',
+      'node_modules/**',
+      'dist/**',
+      'build/**',
+      'coverage/**',
+      'test-results/**',
+      'apps/**/src/generated/**',
+      'libs/**/src/generated/**',
+      '**/*.min.js',
+    ],
   },
   eslint.configs.recommended,
   ...tseslint.configs.recommendedTypeChecked,
@@ -26,14 +36,25 @@ export default tseslint.config(
   },
   {
     rules: {
-      "@typescript-eslint/no-unsafe-return": "off",
+      '@typescript-eslint/no-unsafe-return': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-floating-promises': 'warn',
       '@typescript-eslint/no-unsafe-argument': 'warn',
-      "@typescript-eslint/no-unsafe-assignment": "off",
-      "@typescript-eslint/no-unsafe-member-access": "off",
-      "@typescript-eslint/no-unused-vars": "off",
-      "prettier/prettier": ["error", { endOfLine: "auto" }],
+      '@typescript-eslint/no-unsafe-assignment': 'off',
+      '@typescript-eslint/no-unsafe-member-access': 'off',
+      '@typescript-eslint/no-unused-vars': 'off',
+      'prettier/prettier': ['error', { endOfLine: 'auto' }],
+    },
+  },
+  {
+    files: ['**/*.spec.ts', '**/*.e2e-spec.ts', '**/test/**/*.ts'],
+    rules: {
+      '@typescript-eslint/require-await': 'off',
+      '@typescript-eslint/unbound-method': 'off',
+      '@typescript-eslint/no-unnecessary-type-assertion': 'off',
+      '@typescript-eslint/no-require-imports': 'off',
+      '@typescript-eslint/no-unsafe-call': 'off',
+      'no-useless-escape': 'off',
     },
   },
 );

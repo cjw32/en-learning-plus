@@ -1,0 +1,1923 @@
+{
+  "$id": "https://en-learning-plus.local/schemas/coach-tools.v1.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "create_exercise": {
+      "additionalProperties": false,
+      "properties": {
+        "input": {
+          "additionalProperties": false,
+          "properties": {
+            "count": {
+              "maximum": 20,
+              "minimum": 1,
+              "type": "integer"
+            },
+            "difficulty": {
+              "enum": [
+                "A1",
+                "A2",
+                "B1",
+                "B2",
+                "C1",
+                "C2",
+                "UNKNOWN"
+              ],
+              "type": "string"
+            },
+            "idempotencyKey": {
+              "maxLength": 128,
+              "minLength": 16,
+              "type": "string"
+            },
+            "materialSourceIds": {
+              "items": {
+                "maxLength": 128,
+                "minLength": 1,
+                "type": "string"
+              },
+              "maxItems": 50,
+              "minItems": 1,
+              "type": "array",
+              "uniqueItems": true
+            },
+            "scenario": {
+              "maxLength": 1000,
+              "type": "string"
+            },
+            "schemaVersion": {
+              "const": "coach.tool.v1",
+              "type": "string"
+            },
+            "targetRefs": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "targetKey": {
+                    "maxLength": 128,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "targetType": {
+                    "enum": [
+                      "WORD",
+                      "ERROR_TYPE"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "targetType",
+                  "targetKey"
+                ],
+                "type": "object"
+              },
+              "maxItems": 50,
+              "minItems": 1,
+              "type": "array"
+            },
+            "types": {
+              "items": {
+                "enum": [
+                  "MULTIPLE_CHOICE",
+                  "FILL_BLANK",
+                  "TRANSLATION",
+                  "SITUATIONAL_DIALOGUE"
+                ],
+                "type": "string"
+              },
+              "maxItems": 4,
+              "minItems": 1,
+              "type": "array",
+              "uniqueItems": true
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "types",
+            "count",
+            "difficulty",
+            "targetRefs",
+            "materialSourceIds",
+            "idempotencyKey"
+          ],
+          "type": "object"
+        },
+        "output": {
+          "anyOf": [
+            {
+              "additionalProperties": false,
+              "properties": {
+                "citations": {
+                  "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "accessScope": {
+                        "enum": [
+                          "PUBLIC",
+                          "OWNED_COURSE"
+                        ],
+                        "type": "string"
+                      },
+                      "locator": {
+                        "anyOf": [
+                          {
+                            "maxLength": 500,
+                            "type": "string"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "materialType": {
+                        "enum": [
+                          "word",
+                          "course",
+                          "grammar"
+                        ],
+                        "type": "string"
+                      },
+                      "sourceId": {
+                        "maxLength": 128,
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "supports": {
+                        "maxLength": 1000,
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "title": {
+                        "maxLength": 300,
+                        "minLength": 1,
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "sourceId",
+                      "materialType",
+                      "title",
+                      "locator",
+                      "supports",
+                      "accessScope"
+                    ],
+                    "type": "object"
+                  },
+                  "maxItems": 20,
+                  "type": "array"
+                },
+                "difficulty": {
+                  "enum": [
+                    "A1",
+                    "A2",
+                    "B1",
+                    "B2",
+                    "C1",
+                    "C2",
+                    "UNKNOWN"
+                  ],
+                  "type": "string"
+                },
+                "exerciseId": {
+                  "type": "string"
+                },
+                "expiresAt": {
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                  "type": "string"
+                },
+                "instructions": {
+                  "maxLength": 2000,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "items": {
+                  "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "choices": {
+                        "anyOf": [
+                          {
+                            "items": {
+                              "additionalProperties": false,
+                              "properties": {
+                                "id": {
+                                  "maxLength": 32,
+                                  "type": "string"
+                                },
+                                "text": {
+                                  "maxLength": 1000,
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "text"
+                              ],
+                              "type": "object"
+                            },
+                            "maxItems": 8,
+                            "type": "array"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "citations": {
+                        "items": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "accessScope": {
+                              "enum": [
+                                "PUBLIC",
+                                "OWNED_COURSE"
+                              ],
+                              "type": "string"
+                            },
+                            "locator": {
+                              "anyOf": [
+                                {
+                                  "maxLength": 500,
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "materialType": {
+                              "enum": [
+                                "word",
+                                "course",
+                                "grammar"
+                              ],
+                              "type": "string"
+                            },
+                            "sourceId": {
+                              "maxLength": 128,
+                              "minLength": 1,
+                              "type": "string"
+                            },
+                            "supports": {
+                              "maxLength": 1000,
+                              "minLength": 1,
+                              "type": "string"
+                            },
+                            "title": {
+                              "maxLength": 300,
+                              "minLength": 1,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "sourceId",
+                            "materialType",
+                            "title",
+                            "locator",
+                            "supports",
+                            "accessScope"
+                          ],
+                          "type": "object"
+                        },
+                        "maxItems": 10,
+                        "type": "array"
+                      },
+                      "itemId": {
+                        "type": "string"
+                      },
+                      "maxScore": {
+                        "maximum": 100,
+                        "minimum": 1,
+                        "type": "integer"
+                      },
+                      "position": {
+                        "maximum": 9007199254740991,
+                        "minimum": 1,
+                        "type": "integer"
+                      },
+                      "prompt": {
+                        "maxLength": 4000,
+                        "minLength": 1,
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "itemId",
+                      "position",
+                      "prompt",
+                      "choices",
+                      "maxScore",
+                      "citations"
+                    ],
+                    "type": "object"
+                  },
+                  "maxItems": 20,
+                  "minItems": 1,
+                  "type": "array"
+                },
+                "ok": {
+                  "const": true,
+                  "type": "boolean"
+                },
+                "personalizationReason": {
+                  "maxLength": 2000,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "schemaVersion": {
+                  "const": "coach.tool.v1",
+                  "type": "string"
+                },
+                "type": {
+                  "enum": [
+                    "MULTIPLE_CHOICE",
+                    "FILL_BLANK",
+                    "TRANSLATION",
+                    "SITUATIONAL_DIALOGUE"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "schemaVersion",
+                "ok",
+                "exerciseId",
+                "type",
+                "difficulty",
+                "instructions",
+                "personalizationReason",
+                "items",
+                "citations",
+                "expiresAt"
+              ],
+              "type": "object"
+            },
+            {
+              "additionalProperties": false,
+              "properties": {
+                "code": {
+                  "enum": [
+                    "FORBIDDEN",
+                    "RESOURCE_NOT_FOUND",
+                    "VALIDATION_FAILED",
+                    "DATA_NOT_AVAILABLE",
+                    "SCHEMA_INVALID",
+                    "TOOL_TIMEOUT",
+                    "BUDGET_EXCEEDED",
+                    "IDEMPOTENCY_CONFLICT",
+                    "STATE_CONFLICT",
+                    "CANCELLED",
+                    "INTERNAL_ERROR"
+                  ],
+                  "type": "string"
+                },
+                "message": {
+                  "maxLength": 500,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "ok": {
+                  "const": false,
+                  "type": "boolean"
+                },
+                "retryable": {
+                  "type": "boolean"
+                },
+                "schemaVersion": {
+                  "const": "coach.tool.v1",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "schemaVersion",
+                "ok",
+                "code",
+                "message",
+                "retryable"
+              ],
+              "type": "object"
+            }
+          ]
+        }
+      },
+      "required": [
+        "input",
+        "output"
+      ],
+      "type": "object"
+    },
+    "get_due_words": {
+      "additionalProperties": false,
+      "properties": {
+        "input": {
+          "additionalProperties": false,
+          "properties": {
+            "courseId": {
+              "maxLength": 64,
+              "type": "string"
+            },
+            "learningDate": {
+              "format": "date",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
+              "type": "string"
+            },
+            "limit": {
+              "maximum": 100,
+              "minimum": 1,
+              "type": "integer"
+            },
+            "schemaVersion": {
+              "const": "coach.tool.v1",
+              "type": "string"
+            },
+            "timezone": {
+              "maxLength": 64,
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "learningDate",
+            "timezone",
+            "limit"
+          ],
+          "type": "object"
+        },
+        "output": {
+          "anyOf": [
+            {
+              "additionalProperties": false,
+              "properties": {
+                "asOf": {
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                  "type": "string"
+                },
+                "ok": {
+                  "const": true,
+                  "type": "boolean"
+                },
+                "schemaVersion": {
+                  "const": "coach.tool.v1",
+                  "type": "string"
+                },
+                "totalDue": {
+                  "maximum": 9007199254740991,
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "truncated": {
+                  "type": "boolean"
+                },
+                "words": {
+                  "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "citation": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "accessScope": {
+                            "enum": [
+                              "PUBLIC",
+                              "OWNED_COURSE"
+                            ],
+                            "type": "string"
+                          },
+                          "locator": {
+                            "anyOf": [
+                              {
+                                "maxLength": 500,
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "materialType": {
+                            "enum": [
+                              "word",
+                              "course",
+                              "grammar"
+                            ],
+                            "type": "string"
+                          },
+                          "sourceId": {
+                            "maxLength": 128,
+                            "minLength": 1,
+                            "type": "string"
+                          },
+                          "supports": {
+                            "maxLength": 1000,
+                            "minLength": 1,
+                            "type": "string"
+                          },
+                          "title": {
+                            "maxLength": 300,
+                            "minLength": 1,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "sourceId",
+                          "materialType",
+                          "title",
+                          "locator",
+                          "supports",
+                          "accessScope"
+                        ],
+                        "type": "object"
+                      },
+                      "definition": {
+                        "anyOf": [
+                          {
+                            "maxLength": 4000,
+                            "type": "string"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "dueAt": {
+                        "format": "date-time",
+                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                        "type": "string"
+                      },
+                      "priority": {
+                        "maximum": 9007199254740991,
+                        "minimum": 1,
+                        "type": "integer"
+                      },
+                      "reason": {
+                        "maxLength": 1000,
+                        "type": "string"
+                      },
+                      "reviewState": {
+                        "enum": [
+                          "LEARNING",
+                          "REVIEW",
+                          "MASTERED"
+                        ],
+                        "type": "string"
+                      },
+                      "translation": {
+                        "anyOf": [
+                          {
+                            "maxLength": 4000,
+                            "type": "string"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "word": {
+                        "type": "string"
+                      },
+                      "wordId": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "wordId",
+                      "word",
+                      "definition",
+                      "translation",
+                      "reviewState",
+                      "dueAt",
+                      "priority",
+                      "reason",
+                      "citation"
+                    ],
+                    "type": "object"
+                  },
+                  "maxItems": 100,
+                  "type": "array"
+                }
+              },
+              "required": [
+                "schemaVersion",
+                "ok",
+                "asOf",
+                "words",
+                "totalDue",
+                "truncated"
+              ],
+              "type": "object"
+            },
+            {
+              "additionalProperties": false,
+              "properties": {
+                "code": {
+                  "enum": [
+                    "FORBIDDEN",
+                    "RESOURCE_NOT_FOUND",
+                    "VALIDATION_FAILED",
+                    "DATA_NOT_AVAILABLE",
+                    "SCHEMA_INVALID",
+                    "TOOL_TIMEOUT",
+                    "BUDGET_EXCEEDED",
+                    "IDEMPOTENCY_CONFLICT",
+                    "STATE_CONFLICT",
+                    "CANCELLED",
+                    "INTERNAL_ERROR"
+                  ],
+                  "type": "string"
+                },
+                "message": {
+                  "maxLength": 500,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "ok": {
+                  "const": false,
+                  "type": "boolean"
+                },
+                "retryable": {
+                  "type": "boolean"
+                },
+                "schemaVersion": {
+                  "const": "coach.tool.v1",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "schemaVersion",
+                "ok",
+                "code",
+                "message",
+                "retryable"
+              ],
+              "type": "object"
+            }
+          ]
+        }
+      },
+      "required": [
+        "input",
+        "output"
+      ],
+      "type": "object"
+    },
+    "get_learner_profile": {
+      "additionalProperties": false,
+      "properties": {
+        "input": {
+          "additionalProperties": false,
+          "properties": {
+            "dimensions": {
+              "items": {
+                "enum": [
+                  "LEVEL",
+                  "GOAL",
+                  "LEARNED_WORDS",
+                  "WEAK_ITEMS",
+                  "ERROR_TYPES",
+                  "RECENT_PERFORMANCE",
+                  "ACTIVE_COURSE"
+                ],
+                "type": "string"
+              },
+              "maxItems": 7,
+              "minItems": 1,
+              "type": "array",
+              "uniqueItems": true
+            },
+            "perDimensionLimit": {
+              "maximum": 50,
+              "minimum": 1,
+              "type": "integer"
+            },
+            "schemaVersion": {
+              "const": "coach.tool.v1",
+              "type": "string"
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "dimensions",
+            "perDimensionLimit"
+          ],
+          "type": "object"
+        },
+        "output": {
+          "anyOf": [
+            {
+              "additionalProperties": false,
+              "properties": {
+                "activeCourse": {
+                  "anyOf": [
+                    {
+                      "additionalProperties": false,
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "maxLength": 300,
+                          "type": "string"
+                        },
+                        "value": {
+                          "maxLength": 50,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "value"
+                      ],
+                      "type": "object"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "errorTypes": {
+                  "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "count": {
+                        "maximum": 9007199254740991,
+                        "minimum": 1,
+                        "type": "integer"
+                      },
+                      "lastSeenAt": {
+                        "format": "date-time",
+                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                        "type": "string"
+                      },
+                      "type": {
+                        "enum": [
+                          "VOCABULARY",
+                          "SPELLING",
+                          "GRAMMAR",
+                          "TENSE",
+                          "ARTICLE",
+                          "PREPOSITION",
+                          "COLLOCATION",
+                          "WORD_ORDER",
+                          "EXPRESSION",
+                          "COMPREHENSION",
+                          "OTHER"
+                        ],
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "type",
+                      "count",
+                      "lastSeenAt"
+                    ],
+                    "type": "object"
+                  },
+                  "maxItems": 11,
+                  "type": "array"
+                },
+                "goal": {
+                  "anyOf": [
+                    {
+                      "additionalProperties": false,
+                      "properties": {
+                        "text": {
+                          "anyOf": [
+                            {
+                              "maxLength": 500,
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "type": {
+                          "enum": [
+                            "GENERAL",
+                            "EXAM",
+                            "BUSINESS",
+                            "TRAVEL",
+                            "CUSTOM"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "text"
+                      ],
+                      "type": "object"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "learnedWordSummary": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "coachEngagedCount": {
+                      "maximum": 9007199254740991,
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "legacyCompletedCount": {
+                      "maximum": 9007199254740991,
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "recentWords": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "state": {
+                            "enum": [
+                              "LEGACY_COMPLETED",
+                              "LEARNING",
+                              "REVIEW",
+                              "MASTERED"
+                            ],
+                            "type": "string"
+                          },
+                          "word": {
+                            "type": "string"
+                          },
+                          "wordId": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "wordId",
+                          "word",
+                          "state"
+                        ],
+                        "type": "object"
+                      },
+                      "maxItems": 50,
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "legacyCompletedCount",
+                    "coachEngagedCount",
+                    "recentWords"
+                  ],
+                  "type": "object"
+                },
+                "level": {
+                  "anyOf": [
+                    {
+                      "additionalProperties": false,
+                      "properties": {
+                        "cefr": {
+                          "enum": [
+                            "A1",
+                            "A2",
+                            "B1",
+                            "B2",
+                            "C1",
+                            "C2"
+                          ],
+                          "type": "string"
+                        },
+                        "source": {
+                          "const": "USER_DECLARED",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "cefr",
+                        "source"
+                      ],
+                      "type": "object"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "ok": {
+                  "const": true,
+                  "type": "boolean"
+                },
+                "recentPerformance": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "attemptCount": {
+                      "maximum": 9007199254740991,
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "averageScore": {
+                      "anyOf": [
+                        {
+                          "maximum": 100,
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "windowStart": {
+                      "format": "date-time",
+                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "attemptCount",
+                    "averageScore",
+                    "windowStart"
+                  ],
+                  "type": "object"
+                },
+                "schemaVersion": {
+                  "const": "coach.tool.v1",
+                  "type": "string"
+                },
+                "signals": {
+                  "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "dimension": {
+                        "enum": [
+                          "LEVEL",
+                          "GOAL",
+                          "LEARNED_WORDS",
+                          "WEAK_ITEMS",
+                          "ERROR_TYPES",
+                          "RECENT_PERFORMANCE",
+                          "ACTIVE_COURSE"
+                        ],
+                        "type": "string"
+                      },
+                      "status": {
+                        "enum": [
+                          "AVAILABLE",
+                          "MISSING",
+                          "STALE",
+                          "NOT_APPLICABLE"
+                        ],
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "dimension",
+                      "status"
+                    ],
+                    "type": "object"
+                  },
+                  "maxItems": 7,
+                  "minItems": 1,
+                  "type": "array"
+                },
+                "snapshotAt": {
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                  "type": "string"
+                },
+                "timezone": {
+                  "maxLength": 64,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "weakItems": {
+                  "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "dueAt": {
+                        "anyOf": [
+                          {
+                            "format": "date-time",
+                            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                            "type": "string"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "label": {
+                        "maxLength": 300,
+                        "type": "string"
+                      },
+                      "lastQuality": {
+                        "anyOf": [
+                          {
+                            "maximum": 5,
+                            "minimum": 0,
+                            "type": "integer"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "reviewState": {
+                        "enum": [
+                          "LEARNING",
+                          "REVIEW",
+                          "MASTERED"
+                        ],
+                        "type": "string"
+                      },
+                      "targetKey": {
+                        "type": "string"
+                      },
+                      "targetType": {
+                        "enum": [
+                          "WORD",
+                          "ERROR_TYPE"
+                        ],
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "targetType",
+                      "targetKey",
+                      "label",
+                      "reviewState",
+                      "lastQuality",
+                      "dueAt"
+                    ],
+                    "type": "object"
+                  },
+                  "maxItems": 50,
+                  "type": "array"
+                }
+              },
+              "required": [
+                "schemaVersion",
+                "ok",
+                "snapshotAt",
+                "timezone",
+                "level",
+                "goal",
+                "activeCourse",
+                "learnedWordSummary",
+                "weakItems",
+                "errorTypes",
+                "recentPerformance",
+                "signals"
+              ],
+              "type": "object"
+            },
+            {
+              "additionalProperties": false,
+              "properties": {
+                "code": {
+                  "enum": [
+                    "FORBIDDEN",
+                    "RESOURCE_NOT_FOUND",
+                    "VALIDATION_FAILED",
+                    "DATA_NOT_AVAILABLE",
+                    "SCHEMA_INVALID",
+                    "TOOL_TIMEOUT",
+                    "BUDGET_EXCEEDED",
+                    "IDEMPOTENCY_CONFLICT",
+                    "STATE_CONFLICT",
+                    "CANCELLED",
+                    "INTERNAL_ERROR"
+                  ],
+                  "type": "string"
+                },
+                "message": {
+                  "maxLength": 500,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "ok": {
+                  "const": false,
+                  "type": "boolean"
+                },
+                "retryable": {
+                  "type": "boolean"
+                },
+                "schemaVersion": {
+                  "const": "coach.tool.v1",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "schemaVersion",
+                "ok",
+                "code",
+                "message",
+                "retryable"
+              ],
+              "type": "object"
+            }
+          ]
+        }
+      },
+      "required": [
+        "input",
+        "output"
+      ],
+      "type": "object"
+    },
+    "grade_answer": {
+      "additionalProperties": false,
+      "properties": {
+        "input": {
+          "additionalProperties": false,
+          "properties": {
+            "answers": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "answer": {
+                    "anyOf": [
+                      {
+                        "maxLength": 4000,
+                        "type": "string"
+                      },
+                      {
+                        "items": {
+                          "maxLength": 1000,
+                          "type": "string"
+                        },
+                        "maxItems": 20,
+                        "type": "array"
+                      }
+                    ]
+                  },
+                  "itemId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "itemId",
+                  "answer"
+                ],
+                "type": "object"
+              },
+              "maxItems": 50,
+              "minItems": 1,
+              "type": "array"
+            },
+            "exerciseId": {
+              "maxLength": 64,
+              "minLength": 10,
+              "type": "string"
+            },
+            "idempotencyKey": {
+              "maxLength": 128,
+              "minLength": 16,
+              "type": "string"
+            },
+            "schemaVersion": {
+              "const": "coach.tool.v1",
+              "type": "string"
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "exerciseId",
+            "answers",
+            "idempotencyKey"
+          ],
+          "type": "object"
+        },
+        "output": {
+          "anyOf": [
+            {
+              "additionalProperties": false,
+              "properties": {
+                "answerVersion": {
+                  "type": "string"
+                },
+                "citations": {
+                  "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "accessScope": {
+                        "enum": [
+                          "PUBLIC",
+                          "OWNED_COURSE"
+                        ],
+                        "type": "string"
+                      },
+                      "locator": {
+                        "anyOf": [
+                          {
+                            "maxLength": 500,
+                            "type": "string"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "materialType": {
+                        "enum": [
+                          "word",
+                          "course",
+                          "grammar"
+                        ],
+                        "type": "string"
+                      },
+                      "sourceId": {
+                        "maxLength": 128,
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "supports": {
+                        "maxLength": 1000,
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "title": {
+                        "maxLength": 300,
+                        "minLength": 1,
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "sourceId",
+                      "materialType",
+                      "title",
+                      "locator",
+                      "supports",
+                      "accessScope"
+                    ],
+                    "type": "object"
+                  },
+                  "maxItems": 20,
+                  "type": "array"
+                },
+                "correction": {
+                  "maxLength": 4000,
+                  "type": "string"
+                },
+                "errorTypes": {
+                  "items": {
+                    "enum": [
+                      "VOCABULARY",
+                      "SPELLING",
+                      "GRAMMAR",
+                      "TENSE",
+                      "ARTICLE",
+                      "PREPOSITION",
+                      "COLLOCATION",
+                      "WORD_ORDER",
+                      "EXPRESSION",
+                      "COMPREHENSION",
+                      "OTHER"
+                    ],
+                    "type": "string"
+                  },
+                  "maxItems": 11,
+                  "type": "array"
+                },
+                "examples": {
+                  "items": {
+                    "maxLength": 2000,
+                    "type": "string"
+                  },
+                  "maxItems": 8,
+                  "type": "array"
+                },
+                "explanation": {
+                  "maxLength": 12000,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "gradingHash": {
+                  "type": "string"
+                },
+                "items": {
+                  "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "correction": {
+                        "maxLength": 4000,
+                        "type": "string"
+                      },
+                      "errorTypes": {
+                        "items": {
+                          "enum": [
+                            "VOCABULARY",
+                            "SPELLING",
+                            "GRAMMAR",
+                            "TENSE",
+                            "ARTICLE",
+                            "PREPOSITION",
+                            "COLLOCATION",
+                            "WORD_ORDER",
+                            "EXPRESSION",
+                            "COMPREHENSION",
+                            "OTHER"
+                          ],
+                          "type": "string"
+                        },
+                        "maxItems": 11,
+                        "type": "array"
+                      },
+                      "explanation": {
+                        "maxLength": 4000,
+                        "type": "string"
+                      },
+                      "isCorrect": {
+                        "type": "boolean"
+                      },
+                      "itemId": {
+                        "type": "string"
+                      },
+                      "score": {
+                        "maximum": 100,
+                        "minimum": 0,
+                        "type": "integer"
+                      },
+                      "targetQualities": {
+                        "items": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "quality": {
+                              "maximum": 5,
+                              "minimum": 0,
+                              "type": "integer"
+                            },
+                            "targetKey": {
+                              "type": "string"
+                            },
+                            "targetType": {
+                              "enum": [
+                                "WORD",
+                                "ERROR_TYPE"
+                              ],
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "targetType",
+                            "targetKey",
+                            "quality"
+                          ],
+                          "type": "object"
+                        },
+                        "maxItems": 50,
+                        "minItems": 1,
+                        "type": "array"
+                      }
+                    },
+                    "required": [
+                      "itemId",
+                      "isCorrect",
+                      "score",
+                      "correction",
+                      "explanation",
+                      "errorTypes",
+                      "targetQualities"
+                    ],
+                    "type": "object"
+                  },
+                  "maxItems": 50,
+                  "minItems": 1,
+                  "type": "array"
+                },
+                "ok": {
+                  "const": true,
+                  "type": "boolean"
+                },
+                "schemaVersion": {
+                  "const": "coach.tool.v1",
+                  "type": "string"
+                },
+                "score": {
+                  "maximum": 100,
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "submissionId": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "schemaVersion",
+                "ok",
+                "submissionId",
+                "answerVersion",
+                "gradingHash",
+                "score",
+                "correction",
+                "explanation",
+                "examples",
+                "errorTypes",
+                "items",
+                "citations"
+              ],
+              "type": "object"
+            },
+            {
+              "additionalProperties": false,
+              "properties": {
+                "code": {
+                  "enum": [
+                    "FORBIDDEN",
+                    "RESOURCE_NOT_FOUND",
+                    "VALIDATION_FAILED",
+                    "DATA_NOT_AVAILABLE",
+                    "SCHEMA_INVALID",
+                    "TOOL_TIMEOUT",
+                    "BUDGET_EXCEEDED",
+                    "IDEMPOTENCY_CONFLICT",
+                    "STATE_CONFLICT",
+                    "CANCELLED",
+                    "INTERNAL_ERROR"
+                  ],
+                  "type": "string"
+                },
+                "message": {
+                  "maxLength": 500,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "ok": {
+                  "const": false,
+                  "type": "boolean"
+                },
+                "retryable": {
+                  "type": "boolean"
+                },
+                "schemaVersion": {
+                  "const": "coach.tool.v1",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "schemaVersion",
+                "ok",
+                "code",
+                "message",
+                "retryable"
+              ],
+              "type": "object"
+            }
+          ]
+        }
+      },
+      "required": [
+        "input",
+        "output"
+      ],
+      "type": "object"
+    },
+    "save_attempt": {
+      "additionalProperties": false,
+      "properties": {
+        "input": {
+          "additionalProperties": false,
+          "properties": {
+            "gradingHash": {
+              "maxLength": 128,
+              "minLength": 32,
+              "type": "string"
+            },
+            "idempotencyKey": {
+              "maxLength": 128,
+              "minLength": 16,
+              "type": "string"
+            },
+            "schemaVersion": {
+              "const": "coach.tool.v1",
+              "type": "string"
+            },
+            "submissionId": {
+              "maxLength": 64,
+              "minLength": 10,
+              "type": "string"
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "submissionId",
+            "gradingHash",
+            "idempotencyKey"
+          ],
+          "type": "object"
+        },
+        "output": {
+          "anyOf": [
+            {
+              "additionalProperties": false,
+              "properties": {
+                "attemptId": {
+                  "type": "string"
+                },
+                "changes": {
+                  "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "label": {
+                        "maxLength": 300,
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "nextReviewAt": {
+                        "format": "date-time",
+                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                        "type": "string"
+                      },
+                      "nextState": {
+                        "enum": [
+                          "LEARNING",
+                          "REVIEW",
+                          "MASTERED"
+                        ],
+                        "type": "string"
+                      },
+                      "previousState": {
+                        "enum": [
+                          "NEW",
+                          "LEARNING",
+                          "REVIEW",
+                          "MASTERED"
+                        ],
+                        "type": "string"
+                      },
+                      "quality": {
+                        "maximum": 5,
+                        "minimum": 0,
+                        "type": "integer"
+                      },
+                      "reason": {
+                        "maxLength": 1000,
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "targetKey": {
+                        "maxLength": 128,
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "targetType": {
+                        "enum": [
+                          "WORD",
+                          "ERROR_TYPE"
+                        ],
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "targetType",
+                      "targetKey",
+                      "label",
+                      "previousState",
+                      "nextState",
+                      "quality",
+                      "nextReviewAt",
+                      "reason"
+                    ],
+                    "type": "object"
+                  },
+                  "maxItems": 100,
+                  "type": "array"
+                },
+                "ok": {
+                  "const": true,
+                  "type": "boolean"
+                },
+                "savedAt": {
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                  "type": "string"
+                },
+                "schemaVersion": {
+                  "const": "coach.tool.v1",
+                  "type": "string"
+                },
+                "score": {
+                  "maximum": 100,
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "status": {
+                  "enum": [
+                    "saved",
+                    "replayed"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "schemaVersion",
+                "ok",
+                "status",
+                "attemptId",
+                "score",
+                "changes",
+                "savedAt"
+              ],
+              "type": "object"
+            },
+            {
+              "additionalProperties": false,
+              "properties": {
+                "code": {
+                  "enum": [
+                    "FORBIDDEN",
+                    "RESOURCE_NOT_FOUND",
+                    "VALIDATION_FAILED",
+                    "DATA_NOT_AVAILABLE",
+                    "SCHEMA_INVALID",
+                    "TOOL_TIMEOUT",
+                    "BUDGET_EXCEEDED",
+                    "IDEMPOTENCY_CONFLICT",
+                    "STATE_CONFLICT",
+                    "CANCELLED",
+                    "INTERNAL_ERROR"
+                  ],
+                  "type": "string"
+                },
+                "message": {
+                  "maxLength": 500,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "ok": {
+                  "const": false,
+                  "type": "boolean"
+                },
+                "retryable": {
+                  "type": "boolean"
+                },
+                "schemaVersion": {
+                  "const": "coach.tool.v1",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "schemaVersion",
+                "ok",
+                "code",
+                "message",
+                "retryable"
+              ],
+              "type": "object"
+            }
+          ]
+        }
+      },
+      "required": [
+        "input",
+        "output"
+      ],
+      "type": "object"
+    },
+    "search_learning_materials": {
+      "additionalProperties": false,
+      "properties": {
+        "input": {
+          "additionalProperties": false,
+          "properties": {
+            "cefrLevel": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "A1",
+                    "A2",
+                    "B1",
+                    "B2",
+                    "C1",
+                    "C2"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "courseId": {
+              "maxLength": 64,
+              "type": "string"
+            },
+            "limit": {
+              "maximum": 50,
+              "minimum": 1,
+              "type": "integer"
+            },
+            "materialTypes": {
+              "items": {
+                "enum": [
+                  "word",
+                  "course",
+                  "grammar"
+                ],
+                "type": "string"
+              },
+              "maxItems": 3,
+              "minItems": 1,
+              "type": "array",
+              "uniqueItems": true
+            },
+            "query": {
+              "maxLength": 1000,
+              "minLength": 1,
+              "type": "string"
+            },
+            "schemaVersion": {
+              "const": "coach.tool.v1",
+              "type": "string"
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "query",
+            "materialTypes",
+            "limit"
+          ],
+          "type": "object"
+        },
+        "output": {
+          "anyOf": [
+            {
+              "additionalProperties": false,
+              "properties": {
+                "materials": {
+                  "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "citation": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "accessScope": {
+                            "enum": [
+                              "PUBLIC",
+                              "OWNED_COURSE"
+                            ],
+                            "type": "string"
+                          },
+                          "locator": {
+                            "anyOf": [
+                              {
+                                "maxLength": 500,
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "materialType": {
+                            "enum": [
+                              "word",
+                              "course",
+                              "grammar"
+                            ],
+                            "type": "string"
+                          },
+                          "sourceId": {
+                            "maxLength": 128,
+                            "minLength": 1,
+                            "type": "string"
+                          },
+                          "supports": {
+                            "maxLength": 1000,
+                            "minLength": 1,
+                            "type": "string"
+                          },
+                          "title": {
+                            "maxLength": 300,
+                            "minLength": 1,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "sourceId",
+                          "materialType",
+                          "title",
+                          "locator",
+                          "supports",
+                          "accessScope"
+                        ],
+                        "type": "object"
+                      },
+                      "freshness": {
+                        "format": "date-time",
+                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                        "type": "string"
+                      },
+                      "summary": {
+                        "maxLength": 4000,
+                        "minLength": 1,
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "summary",
+                      "freshness"
+                    ],
+                    "type": "object"
+                  },
+                  "maxItems": 50,
+                  "type": "array"
+                },
+                "ok": {
+                  "const": true,
+                  "type": "boolean"
+                },
+                "query": {
+                  "type": "string"
+                },
+                "schemaVersion": {
+                  "const": "coach.tool.v1",
+                  "type": "string"
+                },
+                "unavailableTypes": {
+                  "items": {
+                    "enum": [
+                      "word",
+                      "course",
+                      "grammar"
+                    ],
+                    "type": "string"
+                  },
+                  "maxItems": 3,
+                  "type": "array"
+                }
+              },
+              "required": [
+                "schemaVersion",
+                "ok",
+                "query",
+                "materials",
+                "unavailableTypes"
+              ],
+              "type": "object"
+            },
+            {
+              "additionalProperties": false,
+              "properties": {
+                "code": {
+                  "enum": [
+                    "FORBIDDEN",
+                    "RESOURCE_NOT_FOUND",
+                    "VALIDATION_FAILED",
+                    "DATA_NOT_AVAILABLE",
+                    "SCHEMA_INVALID",
+                    "TOOL_TIMEOUT",
+                    "BUDGET_EXCEEDED",
+                    "IDEMPOTENCY_CONFLICT",
+                    "STATE_CONFLICT",
+                    "CANCELLED",
+                    "INTERNAL_ERROR"
+                  ],
+                  "type": "string"
+                },
+                "message": {
+                  "maxLength": 500,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "ok": {
+                  "const": false,
+                  "type": "boolean"
+                },
+                "retryable": {
+                  "type": "boolean"
+                },
+                "schemaVersion": {
+                  "const": "coach.tool.v1",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "schemaVersion",
+                "ok",
+                "code",
+                "message",
+                "retryable"
+              ],
+              "type": "object"
+            }
+          ]
+        }
+      },
+      "required": [
+        "input",
+        "output"
+      ],
+      "type": "object"
+    }
+  },
+  "required": [
+    "get_learner_profile",
+    "get_due_words",
+    "search_learning_materials",
+    "create_exercise",
+    "grade_answer",
+    "save_attempt"
+  ],
+  "title": "CoachToolContractsV1",
+  "type": "object"
+}

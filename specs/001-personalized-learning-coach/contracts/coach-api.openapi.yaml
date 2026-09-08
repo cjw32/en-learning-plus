@@ -1,0 +1,909 @@
+openapi: 3.1.0
+info:
+  title: en-learning-plus Personalized Coach API
+  version: coach.v1
+  description: Authenticated lifecycle API for the controlled personalized English-learning Coach.
+servers:
+  - url: /ai/v1
+security:
+  - bearerAuth: []
+tags:
+  - name: Coach Profile
+  - name: Coach Conversations
+  - name: Coach Requests
+  - name: Coach Privacy
+
+paths:
+  /coach/profile:
+    get:
+      tags: [Coach Profile]
+      summary: Read the current authenticated learner's Coach profile
+      operationId: getCoachProfile
+      responses:
+        "200":
+          description: Current profile. Missing CEFR is represented as null.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiCoachProfile"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+    patch:
+      tags: [Coach Profile]
+      summary: Update user-declared CEFR, goal, active course, or timezone
+      operationId: updateCoachProfile
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CoachProfileUpdate"
+      responses:
+        "200":
+          description: Updated profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiCoachProfile"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+  /coach/conversations:
+    post:
+      tags: [Coach Conversations]
+      summary: Create an authenticated Coach conversation
+      operationId: createCoachConversation
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                title:
+                  type: string
+                  minLength: 1
+                  maxLength: 120
+      responses:
+        "201":
+          description: Conversation created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiConversation"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "409":
+          $ref: "#/components/responses/Conflict"
+    get:
+      tags: [Coach Conversations]
+      summary: List the current authenticated user's active conversations
+      operationId: listCoachConversations
+      parameters:
+        - name: cursor
+          in: query
+          schema:
+            type: string
+            maxLength: 200
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 20
+      responses:
+        "200":
+          description: Cursor-paginated conversation list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiConversationList"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /coach/conversations/{conversationId}:
+    parameters:
+      - $ref: "#/components/parameters/ConversationId"
+    get:
+      tags: [Coach Conversations]
+      summary: Read an owned conversation and validated user-visible messages
+      operationId: getCoachConversation
+      parameters:
+        - name: cursor
+          in: query
+          schema:
+            type: string
+            maxLength: 200
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 50
+      responses:
+        "200":
+          description: Owned conversation and messages
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiConversationDetail"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      tags: [Coach Conversations]
+      summary: Delete an owned conversation and its checkpoint
+      operationId: deleteCoachConversation
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      responses:
+        "202":
+          description: Deletion accepted; data is immediately hidden and purged within 24 hours
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiDeletionStatus"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /coach/conversations/{conversationId}/requests:
+    post:
+      tags: [Coach Requests]
+      summary: Create a controlled Coach request or submit exercise answers
+      operationId: createCoachRequest
+      parameters:
+        - $ref: "#/components/parameters/ConversationId"
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: "#/components/schemas/CoachMessageRequest"
+                - $ref: "#/components/schemas/CoachExerciseSubmissionRequest"
+                - $ref: "#/components/schemas/CoachRecommendationRequest"
+              discriminator:
+                propertyName: type
+      responses:
+        "202":
+          description: Request accepted and queued
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiRequestAccepted"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /coach/requests/{requestId}:
+    parameters:
+      - $ref: "#/components/parameters/RequestId"
+    get:
+      tags: [Coach Requests]
+      summary: Read current status or the final validated result for an owned request
+      operationId: getCoachRequest
+      responses:
+        "200":
+          description: Request status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiCoachRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /coach/requests/{requestId}/events:
+    parameters:
+      - $ref: "#/components/parameters/RequestId"
+      - name: Last-Event-ID
+        in: header
+        required: false
+        description: Last fully processed event ID for replay.
+        schema:
+          type: string
+          maxLength: 100
+    get:
+      tags: [Coach Requests]
+      summary: Stream ordered Coach events for an owned request
+      operationId: streamCoachRequest
+      responses:
+        "200":
+          description: |
+            SSE stream. Event envelopes and ordering are defined in coach-sse.md.
+            The only authoritative final object is the result event.
+          content:
+            text/event-stream:
+              schema:
+                type: string
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "410":
+          description: Replay buffer expired; query the request resource for terminal result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+
+  /coach/requests/{requestId}/cancel:
+    parameters:
+      - $ref: "#/components/parameters/RequestId"
+    post:
+      tags: [Coach Requests]
+      summary: Request cancellation for an owned non-terminal request
+      operationId: cancelCoachRequest
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      responses:
+        "202":
+          description: Cancellation accepted or replayed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiCancelStatus"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+  /coach/requests/{requestId}/retry:
+    parameters:
+      - $ref: "#/components/parameters/RequestId"
+    post:
+      tags: [Coach Requests]
+      summary: Safely retry an owned failed, timed-out, cancelled, or disconnected request
+      operationId: retryCoachRequest
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      responses:
+        "200":
+          description: Original request already completed; original result returned
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiCoachRequest"
+        "202":
+          description: New retry request queued with lineage to the original
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiRequestAccepted"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /coach/requests/{requestId}/feedback:
+    parameters:
+      - $ref: "#/components/parameters/RequestId"
+    put:
+      tags: [Coach Requests]
+      summary: Create or replace feedback for an owned terminal request
+      operationId: upsertCoachFeedback
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CoachFeedbackInput"
+      responses:
+        "200":
+          description: Feedback saved or replayed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiFeedback"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+  /coach/data:
+    delete:
+      tags: [Coach Privacy]
+      summary: Delete the current user's Coach conversations, profile, attempts, review state, and feedback
+      operationId: deleteCoachData
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [confirmation]
+              properties:
+                confirmation:
+                  const: DELETE_COACH_DATA
+      responses:
+        "202":
+          description: Data is immediately hidden and primary-store purge completes within 24 hours
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiDeletionStatus"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      schema:
+        type: string
+        minLength: 16
+        maxLength: 128
+        pattern: "^[A-Za-z0-9._:-]+$"
+    ConversationId:
+      name: conversationId
+      in: path
+      required: true
+      schema:
+        type: string
+        minLength: 10
+        maxLength: 64
+    RequestId:
+      name: requestId
+      in: path
+      required: true
+      schema:
+        type: string
+        minLength: 10
+        maxLength: 64
+
+  responses:
+    Unauthorized:
+      description: Missing, expired, revoked, or invalid access JWT
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
+    Forbidden:
+      description: Authenticated but not permitted
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
+    NotFound:
+      description: Resource not found or not owned by the authenticated user
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
+    ValidationError:
+      description: Request does not satisfy the declared schema
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
+    Conflict:
+      description: Idempotency or state conflict
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
+    RateLimited:
+      description: User or source rate/concurrency budget exceeded
+      headers:
+        Retry-After:
+          schema:
+            type: integer
+            minimum: 1
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
+
+  schemas:
+    ApiEnvelope:
+      type: object
+      additionalProperties: false
+      required: [timestamp, path, success, code, message, data]
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        path:
+          type: string
+        success:
+          type: boolean
+        code:
+          type: integer
+        message:
+          type: string
+        data: {}
+
+    ApiError:
+      type: object
+      additionalProperties: false
+      required: [timestamp, path, success, code, message, retryable]
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        path:
+          type: string
+        success:
+          const: false
+        code:
+          $ref: "#/components/schemas/ErrorCode"
+        message:
+          type: string
+          minLength: 1
+          maxLength: 500
+        retryable:
+          type: boolean
+        requestId:
+          type: [string, "null"]
+        traceId:
+          type: [string, "null"]
+
+    ErrorCode:
+      type: string
+      enum:
+        - AUTH_REQUIRED
+        - TOKEN_INVALID
+        - FORBIDDEN
+        - RESOURCE_NOT_FOUND
+        - VALIDATION_FAILED
+        - SCHEMA_INVALID
+        - MATERIAL_NOT_AVAILABLE
+        - MODEL_UNAVAILABLE
+        - TOOL_TIMEOUT
+        - REQUEST_TIMEOUT
+        - BUDGET_EXCEEDED
+        - RATE_LIMITED
+        - IDEMPOTENCY_CONFLICT
+        - STATE_CONFLICT
+        - CANCELLED
+        - INTERNAL_ERROR
+
+    CoachProfile:
+      type: object
+      additionalProperties: false
+      required: [cefrLevel, levelSource, goalType, goalText, activeCourseId, timezone, updatedAt]
+      properties:
+        cefrLevel:
+          oneOf:
+            - $ref: "#/components/schemas/CefrLevel"
+            - type: "null"
+        levelSource:
+          type: [string, "null"]
+          enum: [USER_DECLARED, null]
+        goalType:
+          type: [string, "null"]
+          enum: [GENERAL, EXAM, BUSINESS, TRAVEL, CUSTOM, null]
+        goalText:
+          type: [string, "null"]
+          maxLength: 500
+        activeCourseId:
+          type: [string, "null"]
+        timezone:
+          type: string
+          minLength: 1
+          maxLength: 64
+        updatedAt:
+          type: string
+          format: date-time
+
+    CoachProfileUpdate:
+      type: object
+      additionalProperties: false
+      minProperties: 1
+      properties:
+        cefrLevel:
+          oneOf:
+            - $ref: "#/components/schemas/CefrLevel"
+            - type: "null"
+        goalType:
+          type: [string, "null"]
+          enum: [GENERAL, EXAM, BUSINESS, TRAVEL, CUSTOM, null]
+        goalText:
+          type: [string, "null"]
+          maxLength: 500
+        activeCourseId:
+          type: [string, "null"]
+        timezone:
+          type: string
+          minLength: 1
+          maxLength: 64
+
+    CefrLevel:
+      type: string
+      enum: [A1, A2, B1, B2, C1, C2]
+
+    ApiCoachProfile:
+      allOf:
+        - $ref: "#/components/schemas/ApiEnvelope"
+        - type: object
+          properties:
+            data:
+              $ref: "#/components/schemas/CoachProfile"
+
+    Conversation:
+      type: object
+      additionalProperties: false
+      required: [id, title, status, lastActivityAt, expiresAt, createdAt]
+      properties:
+        id:
+          type: string
+        title:
+          type: [string, "null"]
+          maxLength: 120
+        status:
+          type: string
+          enum: [ACTIVE, DELETING, DELETED, EXPIRED]
+        lastActivityAt:
+          type: string
+          format: date-time
+        expiresAt:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+
+    CoachMessage:
+      type: object
+      additionalProperties: false
+      required: [id, role, content, structuredResult, createdAt]
+      properties:
+        id:
+          type: string
+        role:
+          type: string
+          enum: [USER, COACH]
+        content:
+          type: [string, "null"]
+        structuredResult:
+          oneOf:
+            - $ref: "./coach-result.schema.json"
+            - type: "null"
+        createdAt:
+          type: string
+          format: date-time
+
+    ApiConversation:
+      allOf:
+        - $ref: "#/components/schemas/ApiEnvelope"
+        - type: object
+          properties:
+            data:
+              $ref: "#/components/schemas/Conversation"
+
+    ApiConversationList:
+      allOf:
+        - $ref: "#/components/schemas/ApiEnvelope"
+        - type: object
+          properties:
+            data:
+              type: object
+              additionalProperties: false
+              required: [items, nextCursor]
+              properties:
+                items:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/Conversation"
+                nextCursor:
+                  type: [string, "null"]
+
+    ApiConversationDetail:
+      allOf:
+        - $ref: "#/components/schemas/ApiEnvelope"
+        - type: object
+          properties:
+            data:
+              type: object
+              additionalProperties: false
+              required: [conversation, messages, nextCursor]
+              properties:
+                conversation:
+                  $ref: "#/components/schemas/Conversation"
+                messages:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/CoachMessage"
+                nextCursor:
+                  type: [string, "null"]
+
+    CoachMessageRequest:
+      type: object
+      additionalProperties: false
+      required: [type, message]
+      properties:
+        type:
+          const: MESSAGE
+        message:
+          type: string
+          minLength: 1
+          maxLength: 8000
+        intentHint:
+          type: string
+          enum: [ANSWER, CORRECTION, CREATE_EXERCISE]
+        exercisePreferences:
+          $ref: "#/components/schemas/ExercisePreferences"
+
+    CoachExerciseSubmissionRequest:
+      type: object
+      additionalProperties: false
+      required: [type, exerciseId, answers]
+      properties:
+        type:
+          const: EXERCISE_SUBMISSION
+        exerciseId:
+          type: string
+          minLength: 10
+          maxLength: 64
+        answers:
+          type: array
+          minItems: 1
+          maxItems: 50
+          items:
+            type: object
+            additionalProperties: false
+            required: [itemId, answer]
+            properties:
+              itemId:
+                type: string
+              answer:
+                oneOf:
+                  - type: string
+                    maxLength: 4000
+                  - type: array
+                    maxItems: 20
+                    items:
+                      type: string
+                      maxLength: 1000
+
+    CoachRecommendationRequest:
+      type: object
+      additionalProperties: false
+      required: [type]
+      properties:
+        type:
+          const: RECOMMENDATION
+
+    ExercisePreferences:
+      type: object
+      additionalProperties: false
+      properties:
+        types:
+          type: array
+          minItems: 1
+          maxItems: 4
+          uniqueItems: true
+          items:
+            $ref: "#/components/schemas/ExerciseType"
+        count:
+          type: integer
+          minimum: 1
+          maximum: 20
+        topic:
+          type: string
+          maxLength: 500
+
+    ExerciseType:
+      type: string
+      enum: [MULTIPLE_CHOICE, FILL_BLANK, TRANSLATION, SITUATIONAL_DIALOGUE]
+
+    RequestStatus:
+      type: string
+      enum: [CREATED, QUEUED, RUNNING, COMPLETED, CANCELLED, TIMED_OUT, BUDGET_EXCEEDED, FAILED]
+
+    RequestAccepted:
+      type: object
+      additionalProperties: false
+      required: [requestId, conversationId, status, streamUrl, traceId]
+      properties:
+        requestId:
+          type: string
+        conversationId:
+          type: string
+        status:
+          const: QUEUED
+        streamUrl:
+          type: string
+        traceId:
+          type: string
+
+    ApiRequestAccepted:
+      allOf:
+        - $ref: "#/components/schemas/ApiEnvelope"
+        - type: object
+          properties:
+            data:
+              $ref: "#/components/schemas/RequestAccepted"
+
+    CoachRequest:
+      type: object
+      additionalProperties: false
+      required: [requestId, conversationId, status, retryOfRequestId, finalResult, error, traceId, createdAt, updatedAt]
+      properties:
+        requestId:
+          type: string
+        conversationId:
+          type: string
+        status:
+          $ref: "#/components/schemas/RequestStatus"
+        retryOfRequestId:
+          type: [string, "null"]
+        finalResult:
+          oneOf:
+            - $ref: "./coach-result.schema.json"
+            - type: "null"
+        error:
+          oneOf:
+            - $ref: "#/components/schemas/PublicRequestError"
+            - type: "null"
+        traceId:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    PublicRequestError:
+      type: object
+      additionalProperties: false
+      required: [code, message, retryable]
+      properties:
+        code:
+          $ref: "#/components/schemas/ErrorCode"
+        message:
+          type: string
+          maxLength: 500
+        retryable:
+          type: boolean
+
+    ApiCoachRequest:
+      allOf:
+        - $ref: "#/components/schemas/ApiEnvelope"
+        - type: object
+          properties:
+            data:
+              $ref: "#/components/schemas/CoachRequest"
+
+    CancelStatus:
+      type: object
+      additionalProperties: false
+      required: [requestId, status, saveStatus]
+      properties:
+        requestId:
+          type: string
+        status:
+          type: string
+          enum: [CANCEL_REQUESTED, CANCELLED, ALREADY_TERMINAL]
+        saveStatus:
+          type: string
+          enum: [NOT_STARTED, NOT_SAVED, SAVED_ONCE, NOT_APPLICABLE]
+
+    ApiCancelStatus:
+      allOf:
+        - $ref: "#/components/schemas/ApiEnvelope"
+        - type: object
+          properties:
+            data:
+              $ref: "#/components/schemas/CancelStatus"
+
+    CoachFeedbackInput:
+      type: object
+      additionalProperties: false
+      required: [rating]
+      properties:
+        rating:
+          type: string
+          enum: [UP, DOWN]
+        category:
+          type: string
+          enum: [INCORRECT, TOO_HARD, TOO_EASY, IRRELEVANT, UNSAFE, OTHER]
+        comment:
+          type: string
+          maxLength: 1000
+
+    Feedback:
+      type: object
+      additionalProperties: false
+      required: [requestId, rating, category, comment, updatedAt]
+      properties:
+        requestId:
+          type: string
+        rating:
+          type: string
+          enum: [UP, DOWN]
+        category:
+          type: [string, "null"]
+          enum: [INCORRECT, TOO_HARD, TOO_EASY, IRRELEVANT, UNSAFE, OTHER, null]
+        comment:
+          type: [string, "null"]
+          maxLength: 1000
+        updatedAt:
+          type: string
+          format: date-time
+
+    ApiFeedback:
+      allOf:
+        - $ref: "#/components/schemas/ApiEnvelope"
+        - type: object
+          properties:
+            data:
+              $ref: "#/components/schemas/Feedback"
+
+    DeletionStatus:
+      type: object
+      additionalProperties: false
+      required: [deletionId, status, hiddenAt, purgeDeadline]
+      properties:
+        deletionId:
+          type: string
+        status:
+          type: string
+          enum: [ACCEPTED, PURGING, COMPLETED]
+        hiddenAt:
+          type: string
+          format: date-time
+        purgeDeadline:
+          type: string
+          format: date-time
+
+    ApiDeletionStatus:
+      allOf:
+        - $ref: "#/components/schemas/ApiEnvelope"
+        - type: object
+          properties:
+            data:
+              $ref: "#/components/schemas/DeletionStatus"

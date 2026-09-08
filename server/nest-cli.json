@@ -38,6 +38,15 @@
       "compilerOptions": {
         "tsConfigPath": "libs/shared/tsconfig.lib.json"
       }
+    },
+    "learning": {
+      "type": "library",
+      "root": "libs/learning",
+      "entryFile": "index",
+      "sourceRoot": "libs/learning/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/learning/tsconfig.lib.json"
+      }
     }
   }
 }

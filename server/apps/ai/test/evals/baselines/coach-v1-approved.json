@@ -1,0 +1,6 @@
+{
+  "status": "pending_measurement",
+  "approved": false,
+  "datasetVersion": "coach-eval-dataset.v1",
+  "reason": "Existing AI and candidate live measurements have not been run and approved. No numeric quality, latency, or cost threshold is asserted."
+}

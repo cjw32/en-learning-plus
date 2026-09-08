@@ -1,0 +1,17 @@
+{
+  "moduleFileExtensions": ["js", "json", "ts"],
+  "rootDir": "../../..",
+  "roots": ["<rootDir>/apps/server/test"],
+  "testRegex": ".*\\.e2e-spec\\.ts$",
+  "transform": {
+    "^.+\\.(t|j)s$": "ts-jest"
+  },
+  "testEnvironment": "node",
+  "moduleNameMapper": {
+    "^(\\.{1,2}/.*)\\.js$": "$1",
+    "^@libs/shared$": "<rootDir>/libs/shared/src",
+    "^@libs/shared/(.*)$": "<rootDir>/libs/shared/src/$1",
+    "^@libs/learning$": "<rootDir>/libs/learning/src",
+    "^@libs/learning/(.*)$": "<rootDir>/libs/learning/src/$1"
+  }
+}

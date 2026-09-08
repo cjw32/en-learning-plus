@@ -1,0 +1,9 @@
+{
+  "rubricVersion": "cefr-fit.v1",
+  "scorer": "human_or_independent_model",
+  "criteria": [
+    { "id": "level_fit", "scale": [0, 1, 2], "anchor": "2 means vocabulary, syntax and explanation density fit the supplied CEFR level." }
+  ],
+  "passState": { "minimumTotal": 2, "pairedCasesMustDiffer": true },
+  "disputeReview": { "trigger": "level-fit disagreement", "resolver": "qualified language reviewer" }
+}

@@ -1,0 +1,9 @@
+{
+  "rubricVersion": "citation-support.v1",
+  "scorer": "human_or_independent_model",
+  "criteria": [
+    { "id": "source_support", "scale": [0, 1, 2], "anchor": "2 means every cited source is authorized and directly supports the associated claim." }
+  ],
+  "passState": { "minimumTotal": 2, "unsupportedCitationCount": 0 },
+  "disputeReview": { "trigger": "support relationship disputed", "resolver": "independent source reviewer" }
+}

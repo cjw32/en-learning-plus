@@ -2,12 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { CreateLearnDto } from './dto/create-learn.dto';
 import { UpdateLearnDto } from './dto/update-learn.dto';
 import { PrismaService, ResponseService } from '@libs/shared';
+import { LegacyReviewInitializerService } from '@libs/learning';
 
 @Injectable()
 export class LearnService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly response: ResponseService,
+    private readonly legacyReview: LegacyReviewInitializerService,
   ) {}
   //读取单词列表
   async getWordList(id: string, userId: string) {
@@ -46,25 +48,7 @@ export class LearnService {
   }
   //保存单词到wordBookRecord
   async saveWordMaster(wordIds: string[], userId: string) {
-    const wordBookRecords = wordIds.map((wordId) => ({
-      wordId,
-      userId,
-      isMaster: true,
-    }));
-    await this.prisma.wordBookRecord.createMany({
-      data: wordBookRecords,
-    });
-    //更新用户学习单词的数量
-    const user = await this.prisma.user.update({
-      where: {
-        id: userId,
-      },
-      data: {
-        wordNumber: {
-          increment: wordIds.length,
-        },
-      },
-    });
+    const user = await this.legacyReview.saveWordMaster(userId, wordIds);
     return this.response.success({
       wordNumber: user.wordNumber,
     });

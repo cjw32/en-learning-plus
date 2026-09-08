@@ -8,3 +8,5 @@ export * from './pay/pay.service';
 export * from './pay/pay.module';
 export * from './email/email.service';
 export * from './email/email.module';
+export * from './auth/auth.guard';
+export * from './auth/coach-execution-context';

@@ -1,0 +1,7 @@
+node_modules
+dist
+coverage
+test-results
+apps/**/src/generated
+libs/**/src/generated
+*.min.js

@@ -8,7 +8,9 @@
     "build": "run-p type-check \"build-only {@}\" --",
     "preview": "vite preview",
     "build-only": "vite build",
-    "type-check": "vue-tsc --build"
+    "type-check": "vue-tsc --build",
+    "test:unit": "vitest run",
+    "test:unit:watch": "vitest"
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.2",
@@ -35,7 +37,9 @@
     "@tsconfig/node24": "^24.0.4",
     "@types/node": "^24.12.0",
     "@vitejs/plugin-vue": "^6.0.5",
+    "@vue/test-utils": "^2.5.0",
     "@vue/tsconfig": "^0.9.1",
+    "jsdom": "^30.0.1",
     "npm-run-all2": "^8.0.4",
     "rollup-plugin-visualizer": "^7.0.1",
     "typescript": "~6.0.0",
@@ -44,6 +48,7 @@
     "vite": "^8.0.3",
     "vite-plugin-compression": "^0.5.1",
     "vite-plugin-vue-devtools": "^8.1.1",
+    "vitest": "^4.1.11",
     "vue-tsc": "^3.2.6"
   },
   "engines": {

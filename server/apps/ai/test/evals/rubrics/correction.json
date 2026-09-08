@@ -1,0 +1,10 @@
+{
+  "rubricVersion": "correction.v1",
+  "scorer": "human_or_independent_model",
+  "criteria": [
+    { "id": "correctness", "scale": [0, 1, 2], "anchor": "2 means the correction is grammatical and preserves intended meaning." },
+    { "id": "explanation", "scale": [0, 1, 2], "anchor": "2 means the error and correction are clearly explained." }
+  ],
+  "passState": { "minimumTotal": 3, "requiredCriterionMinimum": 1 },
+  "disputeReview": { "trigger": "scorers differ by 2 or more", "resolver": "independent human adjudicator" }
+}
