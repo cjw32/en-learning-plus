@@ -1,16 +1,18 @@
-import type { CoachResult } from '@en/common/coach';
-import { coachResultSchema } from '@en/common/coach';
+import type { AnyPublicCoachResult, CoachResult } from '@en/common/coach';
+import { anyPublicCoachResultSchema } from '@en/common/coach';
 import { z } from '@en/common/coach/zod';
 import type { CoachExecutionContext } from '@libs/shared';
 import { END, START, StateGraph } from '@langchain/langgraph';
 import {
   generateValidatedAnswer,
+  generateValidatedGroundedAnswer,
   ownedSourceIds,
   type CoachAnswerWorkflowInput,
   type CoachMaterialResult,
 } from './answer.nodes';
 import {
   buildCoachAnswerResult,
+  buildCoachGroundedAnswerResult,
   buildSafeDegradedResult,
   citationsAreSupported,
   type CoachRecommendation,
@@ -29,6 +31,10 @@ import {
   type ProfileSignalState,
 } from './next-action.policy';
 import { assembleLearningUpdate } from './coach-result.assembler';
+import {
+  buildRagDegradationFallback,
+  RagRetrievalDegradationError,
+} from './fallback.builder';
 
 const runtimeGraphStateSchema = z
   .object({
@@ -43,7 +49,7 @@ const runtimeGraphStateSchema = z
         'UNKNOWN',
       ])
       .nullable(),
-    result: coachResultSchema.nullable(),
+    result: anyPublicCoachResultSchema.nullable(),
   })
   .strict();
 
@@ -52,15 +58,15 @@ export async function runControlledCoachRuntimeGraph(input: {
   branches: {
     message(): Promise<{
       intent: 'ANSWER' | 'CORRECTION' | 'CREATE_EXERCISE' | 'UNKNOWN';
-      result: CoachResult;
+      result: AnyPublicCoachResult;
     }>;
     submission(): Promise<{
       intent: 'GRADE_ANSWER';
-      result: CoachResult;
+      result: AnyPublicCoachResult;
     }>;
     recommendation(): Promise<{
       intent: 'REVIEW_RECOMMENDATION';
-      result: CoachResult;
+      result: AnyPublicCoachResult;
     }>;
   };
 }) {
@@ -70,7 +76,7 @@ export async function runControlledCoachRuntimeGraph(input: {
     .addNode('submission', async () => input.branches.submission())
     .addNode('recommendation', async () => input.branches.recommendation())
     .addNode('validate_result', (state) => ({
-      result: coachResultSchema.parse(state.result),
+      result: anyPublicCoachResultSchema.parse(state.result),
     }))
     .addEdge(START, 'route')
     .addConditionalEdges(
@@ -251,7 +257,7 @@ export interface CoachAnswerWorkflowDependencies {
   }): Promise<CoachRecommendation>;
   gradeAnswer(...args: unknown[]): Promise<unknown>;
   saveAttempt(...args: unknown[]): Promise<unknown>;
-  onValidate?(result: CoachResult): void;
+  onValidate?(result: AnyPublicCoachResult): void;
 }
 
 export class CoachAnswerWorkflow {
@@ -260,8 +266,8 @@ export class CoachAnswerWorkflow {
   async run(
     input: CoachAnswerWorkflowInput,
     context: CoachExecutionContext,
-  ): Promise<CoachResult> {
-    let result: CoachResult;
+  ): Promise<AnyPublicCoachResult> {
+    let result: AnyPublicCoachResult;
     try {
       const classified = await this.dependencies.classifyIntent(input, context);
       if (classified !== 'ANSWER' && classified !== 'CORRECTION') {
@@ -274,36 +280,72 @@ export class CoachAnswerWorkflow {
         profile,
         context,
       );
-      const answer = await generateValidatedAnswer({
-        generate: () =>
-          this.dependencies.generateAnswer({
+      const generate = () =>
+        this.dependencies.generateAnswer({
+          intent,
+          message: input.message,
+          profile,
+          materials,
+          context,
+        });
+      if (materials.ragEvidence) {
+        const answer = await generateValidatedGroundedAnswer({
+          generate,
+          evidence: materials.ragEvidence,
+        });
+        if (!answer) {
+          result = buildRagDegradationFallback(input.traceId, {
+            status: 'insufficient',
+            diagnosticCode: 'SCHEMA_INVALID',
+          });
+        } else {
+          const recommendation = await this.dependencies.recommend({
             intent,
-            message: input.message,
             profile,
-            materials,
             context,
-          }),
-      });
-      if (
-        !answer ||
-        !citationsAreSupported(answer, ownedSourceIds(materials))
-      ) {
-        return this.validatedFallback(input.traceId);
+          });
+          result =
+            buildCoachGroundedAnswerResult({
+              responseType: intent === 'CORRECTION' ? 'correction' : 'answer',
+              answer,
+              evidence: materials.ragEvidence,
+              recommendation,
+              traceId: input.traceId,
+            }) ??
+            buildRagDegradationFallback(input.traceId, {
+              status: 'insufficient',
+              diagnosticCode: 'SCHEMA_INVALID',
+            });
+        }
+      } else {
+        const answer = await generateValidatedAnswer({ generate });
+        if (
+          !answer ||
+          !citationsAreSupported(answer, ownedSourceIds(materials))
+        ) {
+          return this.validatedFallback(input.traceId);
+        }
+        const recommendation = await this.dependencies.recommend({
+          intent,
+          profile,
+          context,
+        });
+        result =
+          buildCoachAnswerResult({
+            responseType: intent === 'CORRECTION' ? 'correction' : 'answer',
+            answer,
+            recommendation,
+            traceId: input.traceId,
+          }) ?? buildSafeDegradedResult(input.traceId);
       }
-      const recommendation = await this.dependencies.recommend({
-        intent,
-        profile,
-        context,
-      });
+    } catch (error) {
       result =
-        buildCoachAnswerResult({
-          responseType: intent === 'CORRECTION' ? 'correction' : 'answer',
-          answer,
-          recommendation,
-          traceId: input.traceId,
-        }) ?? buildSafeDegradedResult(input.traceId);
-    } catch {
-      result = buildSafeDegradedResult(input.traceId);
+        error instanceof RagRetrievalDegradationError
+          ? buildRagDegradationFallback(input.traceId, {
+              status: error.outcome,
+              diagnosticCode: error.diagnosticCode,
+            })
+          : buildSafeDegradedResult(input.traceId);
     }
     this.dependencies.onValidate?.(result);
     return result;
@@ -420,8 +462,13 @@ export class CoachExerciseWorkflow {
           traceId: input.traceId,
         }) ?? buildSafeDegradedResult(input.traceId)
       );
-    } catch {
-      return buildSafeDegradedResult(input.traceId);
+    } catch (error) {
+      return error instanceof RagRetrievalDegradationError
+        ? buildRagDegradationFallback(input.traceId, {
+            status: error.outcome,
+            diagnosticCode: error.diagnosticCode,
+          })
+        : buildSafeDegradedResult(input.traceId);
     }
   }
 }

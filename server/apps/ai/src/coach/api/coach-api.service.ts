@@ -13,11 +13,14 @@ import {
   coachProfileSchema,
   coachRequestSchema,
   coachResultSchema,
+  publicCoachResultV2Schema,
+  storedCoachResultV2Schema,
   type CoachProfileUpdate,
   type CoachFeedbackInput,
   type CreateCoachRequest,
 } from '@en/common/coach';
 import {
+  CitationProjectionService,
   LearnerProfileService,
   LearningDomainError,
   type LearnerProfileRecord,
@@ -126,7 +129,26 @@ export class CoachApiService {
     private readonly feedback: CoachFeedbackService,
     private readonly retention: CoachRetentionService,
     @Optional() private readonly admission?: CoachAdmissionService,
+    @Optional() private readonly citationProjection?: CitationProjectionService,
   ) {}
+
+  private async projectStoredResult(subjectId: string, value: unknown) {
+    const v1 = coachResultSchema.safeParse(value);
+    if (v1.success) return v1.data;
+    if (!this.citationProjection) return null;
+    const storedV2 = storedCoachResultV2Schema.safeParse(value);
+    if (storedV2.success) {
+      return this.citationProjection.projectResult(subjectId, storedV2.data);
+    }
+    const legacyPublicV2 = publicCoachResultV2Schema.safeParse(value);
+    if (legacyPublicV2.success) {
+      return this.citationProjection.projectResult(
+        subjectId,
+        legacyPublicV2.data,
+      );
+    }
+    return null;
+  }
 
   async getProfile(context: CoachExecutionContext) {
     await this.retention.assertSubjectActive(context.subjectId);
@@ -226,16 +248,18 @@ export class CoachApiService {
     const page = detail.messages.slice(0, input.limit);
     return this.response.success({
       conversation: mapConversation(detail.conversation),
-      messages: page.map((message) => {
-        const parsed = coachResultSchema.safeParse(message.structuredResult);
-        return {
+      messages: await Promise.all(
+        page.map(async (message) => ({
           id: message.id,
           role: message.role,
           content: message.content,
-          structuredResult: parsed.success ? parsed.data : null,
+          structuredResult: await this.projectStoredResult(
+            context.subjectId,
+            message.structuredResult,
+          ),
           createdAt: message.createdAt.toISOString(),
-        };
-      }),
+        })),
+      ),
       nextCursor: hasMore ? page.at(-1)!.id : null,
     });
   }
@@ -302,7 +326,10 @@ export class CoachApiService {
       requestId,
     );
     if (!request) throw new NotFoundException('学习资源不存在或不可访问');
-    const finalResult = coachResultSchema.safeParse(request.finalResult);
+    const finalResult = await this.projectStoredResult(
+      context.subjectId,
+      request.finalResult,
+    );
     return this.response.success(
       coachRequestSchema.parse({
         id: request.id,
@@ -311,7 +338,7 @@ export class CoachApiService {
         retryOfRequestId: request.retryOfRequestId,
         intent: request.intent,
         status: request.status,
-        finalResult: finalResult.success ? finalResult.data : null,
+        finalResult,
         error: request.errorCode
           ? {
               code: request.errorCode,
@@ -328,6 +355,19 @@ export class CoachApiService {
         traceId: `trace_${request.id}`,
         startedAt: request.startedAt?.toISOString() ?? null,
         finishedAt: request.finishedAt?.toISOString() ?? null,
+      }),
+    );
+  }
+
+  async getCitation(context: CoachExecutionContext, citationId: string) {
+    await this.retention.assertSubjectActive(context.subjectId);
+    if (!this.citationProjection) {
+      throw new ServiceUnavailableException('引用解析服务暂时不可用');
+    }
+    return this.response.success(
+      await this.citationProjection.resolve({
+        subjectId: context.subjectId,
+        citationId,
       }),
     );
   }

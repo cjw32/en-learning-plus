@@ -3,6 +3,10 @@ import {
   CoachRequestStore,
   StoredCoachRequest,
 } from '../../src/coach/api/coach-request.service';
+import {
+  CoachRequestRepository,
+  toStoredCoachResult,
+} from '../../src/coach/api/coach-request.repository';
 
 class MemoryRequestStore implements CoachRequestStore {
   readonly requests: StoredCoachRequest[] = [];
@@ -120,5 +124,97 @@ describe('Coach request state and idempotency', () => {
     });
     expect(created.request.inputPayload).toEqual(body);
     expect(created.request.inputPayload).not.toHaveProperty('userId');
+  });
+
+  it('stores v2 results as citation IDs and claims without dynamic evidence', async () => {
+    const publicResult = {
+      schemaVersion: 'coach.result.v2',
+      responseType: 'answer',
+      correction: '',
+      explanation: 'A harbor is a sheltered place for boats.',
+      examples: [],
+      errorTypes: [],
+      score: null,
+      nextAction: 'continue',
+      nextActionReason: 'Continue learning.',
+      traceId: 'trace_storage_v2_000001',
+      knowledgeStatus: 'grounded',
+      groundedClaims: [
+        {
+          claimId: 'claim_storage_000001',
+          resultPath: '/explanation',
+          text: 'A harbor is a sheltered place for boats.',
+          citationIds: ['cit_storage_v2_000001'],
+        },
+      ],
+      citations: [
+        {
+          citationId: 'cit_storage_v2_000001',
+          status: 'active',
+          source: 'synthetic-word-source',
+          title: 'harbor',
+          category: 'WORD_MEANING',
+          excerpt: 'PRIVATE_DYNAMIC_EXCERPT_CANARY',
+          accessScope: 'PRIVATE_OWNER',
+          locator: null,
+        },
+      ],
+    } as const;
+    const stored = toStoredCoachResult(publicResult);
+    expect(stored).toMatchObject({
+      schemaVersion: 'coach.result.v2',
+      citationIds: ['cit_storage_v2_000001'],
+      groundedClaims: publicResult.groundedClaims,
+    });
+    expect(JSON.stringify(stored)).not.toMatch(
+      /PRIVATE_DYNAMIC_EXCERPT_CANARY|excerpt|locator|private-learning-summary/i,
+    );
+
+    const requestWrite = jest.fn().mockResolvedValue({ count: 1 });
+    const messageWrite = jest.fn().mockResolvedValue({});
+    const transaction = {
+      coachRequest: { updateMany: requestWrite },
+      coachMessage: { create: messageWrite },
+      coachConversation: { update: jest.fn().mockResolvedValue({}) },
+    };
+    const repository = new CoachRequestRepository({
+      $transaction: async (work: (tx: typeof transaction) => unknown) =>
+        work(transaction),
+    } as never);
+    await repository.completeExecution({
+      request: {
+        id: 'request-storage-v2',
+        subjectId: 'user-a',
+        conversationId: 'conversation-a',
+        clientRequestKey: 'storage-v2',
+        requestBodyHash: 'hash',
+        inputPayload: { type: 'MESSAGE', message: 'Explain harbor.' },
+        retryOfRequestId: null,
+        errorCode: null,
+        inputType: 'MESSAGE',
+        status: 'RUNNING',
+        deadlineAt: new Date('2026-09-09T00:01:00.000Z'),
+        createdAt: new Date('2026-09-09T00:00:00.000Z'),
+        updatedAt: new Date('2026-09-09T00:00:00.000Z'),
+        queuedAt: new Date('2026-09-09T00:00:00.000Z'),
+        startedAt: new Date('2026-09-09T00:00:01.000Z'),
+        finishedAt: null,
+        cancelRequestedAt: null,
+      },
+      intent: 'ANSWER',
+      result: publicResult,
+      promptVersion: 'prompt.test.v1',
+      modelVersion: 'model.test.v1',
+      budgetVersion: 'budget.test.v1',
+      finishedAt: new Date('2026-09-09T00:00:02.000Z'),
+    });
+    const persistedJson = JSON.stringify([
+      requestWrite.mock.calls[0]?.[0]?.data?.finalResult,
+      messageWrite.mock.calls.at(-1)?.[0]?.data?.structuredResult,
+    ]);
+    expect(persistedJson).toContain('cit_storage_v2_000001');
+    expect(persistedJson).not.toMatch(
+      /PRIVATE_DYNAMIC_EXCERPT_CANARY|excerpt|locator|private-learning-summary/i,
+    );
   });
 });

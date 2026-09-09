@@ -24,6 +24,17 @@ export type CoachEvalReport = Readonly<{
     schemaVersion: string;
     priceVersion: string;
     generatedAt: string;
+    sourceRightsSnapshotVersion?: string;
+    embeddingVersion?: string;
+    chunkingVersion?: string;
+    indexVersion?: string;
+    retrievalConfigVersion?: string;
+    rubricVersion?: string;
+  }>;
+  completeness: Readonly<{
+    status: 'complete' | 'incomplete';
+    missingVersions: readonly string[];
+    hasRagMetrics: boolean;
   }>;
   totals: Readonly<{
     cases: number;
@@ -36,6 +47,7 @@ export type CoachEvalReport = Readonly<{
     Readonly<{ p50: number; p95: number; max: number }>
   >;
   cases: readonly EvalCaseResult[];
+  ragMetrics: import('./rag-metrics').RagMetricsReport | null;
 }>;
 
 const metricNames: readonly EvalMetricName[] = [
@@ -56,6 +68,7 @@ export function buildEvalReport(input: {
   mode: 'mock' | 'live';
   versions: CoachEvalReport['versions'];
   cases: readonly EvalCaseResult[];
+  ragMetrics?: import('./rag-metrics').RagMetricsReport | null;
 }): CoachEvalReport {
   const scored = input.cases.filter((item) => item.qualityState !== 'unscored');
   const measurements = Object.fromEntries(
@@ -71,10 +84,36 @@ export function buildEvalReport(input: {
       ];
     }),
   ) as CoachEvalReport['measurements'];
+  const requiredVersions = [
+    'datasetVersion',
+    'sourceRightsSnapshotVersion',
+    'promptVersion',
+    'modelVersion',
+    'embeddingVersion',
+    'chunkingVersion',
+    'indexVersion',
+    'retrievalConfigVersion',
+    'schemaVersion',
+    'rubricVersion',
+    'priceVersion',
+  ] as const;
+  const missingVersions = requiredVersions.filter((name) => {
+    const value = input.versions[name];
+    return typeof value !== 'string' || value.trim().length === 0;
+  });
+  const ragMetrics = input.ragMetrics ?? null;
   return Object.freeze({
     reportVersion: 'coach-eval-report.v1' as const,
     mode: input.mode,
     versions: Object.freeze({ ...input.versions }),
+    completeness: Object.freeze({
+      status:
+        missingVersions.length === 0 && ragMetrics !== null
+          ? ('complete' as const)
+          : ('incomplete' as const),
+      missingVersions: Object.freeze([...missingVersions]),
+      hasRagMetrics: ragMetrics !== null,
+    }),
     totals: Object.freeze({
       cases: input.cases.length,
       deterministicFailures: input.cases.reduce(
@@ -93,5 +132,6 @@ export function buildEvalReport(input: {
     }),
     measurements,
     cases: Object.freeze(input.cases.map((item) => Object.freeze(item))),
+    ragMetrics,
   });
 }

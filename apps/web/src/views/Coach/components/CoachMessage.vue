@@ -28,13 +28,26 @@
       </span>
     </section>
 
-    <section v-if="result.citations.length">
+    <section v-if="result.schemaVersion === 'coach.result.v1' && result.citations.length">
       <h3 class="text-xs font-semibold uppercase tracking-wide text-slate-500">学习依据</h3>
       <ul class="mt-2 space-y-2 text-sm text-slate-600">
         <li v-for="citation in result.citations" :key="citation.sourceId">
           <span class="font-medium text-slate-800">{{ citation.title }}</span>
           <span>：{{ citation.supports }}</span>
         </li>
+      </ul>
+    </section>
+
+    <section v-if="result.schemaVersion === 'coach.result.v2' && v2Citations.length">
+      <h3 class="text-xs font-semibold uppercase tracking-wide text-slate-500">学习依据</h3>
+      <ul class="mt-2 space-y-2">
+        <CitationCard
+          v-for="citation in v2Citations"
+          :key="citation.citationId"
+          :citation="citation"
+          :claims="claimsFor(citation.citationId)"
+          @open="openCitation"
+        />
       </ul>
     </section>
 
@@ -49,13 +62,40 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { CoachResult } from '@en/common/coach'
+import router from '@/router'
+import { controlledCitationRoute } from '@/apis/coach'
+import type {
+  AnyPublicCoachResult,
+  CitationLocator,
+  GroundedClaim,
+  PublicCoachCitationV2,
+} from '@en/common/coach'
 import GradingResult from './GradingResult.vue'
+import CitationCard from './CitationCard.vue'
 
-const props = defineProps<{ result: CoachResult }>()
+const props = defineProps<{ result: AnyPublicCoachResult }>()
 const actionLabel = computed(() => ({
   review: '复习',
   practice: '练习',
   continue: '继续学习',
 })[props.result.nextAction])
+
+const v2Citations = computed<PublicCoachCitationV2[]>(() => {
+  if (props.result.schemaVersion !== 'coach.result.v2') return []
+  return [...new Map(
+    props.result.citations.map((citation) => [citation.citationId, citation]),
+  ).values()]
+})
+
+function claimsFor(citationId: string): GroundedClaim[] {
+  if (props.result.schemaVersion !== 'coach.result.v2') return []
+  return props.result.groundedClaims.filter((claim) =>
+    claim.citationIds.includes(citationId),
+  )
+}
+
+async function openCitation(locator: CitationLocator) {
+  const route = controlledCitationRoute(locator)
+  if (route) await router.push(route)
+}
 </script>

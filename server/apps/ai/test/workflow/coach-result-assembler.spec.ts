@@ -1,6 +1,9 @@
 import { coachResultSchema } from '@en/common/coach';
 import { assembleLearningUpdate } from '../../src/coach/workflow/coach-result.assembler';
-import { validateFinalResult } from '../../src/coach/workflow/final-result.validator';
+import {
+  upgradeCoachResultToV2,
+  validateFinalResult,
+} from '../../src/coach/workflow/final-result.validator';
 
 const saveResult = {
   schemaVersion: 'coach.tool.v1' as const,
@@ -114,5 +117,18 @@ describe('Coach final-result transaction reconciliation', () => {
         },
       }).success,
     ).toBe(false);
+  });
+
+  it('upgrades non-knowledge branches to citation-free v2 when RAG is enabled', () => {
+    expect(
+      upgradeCoachResultToV2(coachResultSchema.parse(candidate)),
+    ).toMatchObject({
+      schemaVersion: 'coach.result.v2',
+      responseType: 'grading',
+      knowledgeStatus: 'not_applicable',
+      groundedClaims: [],
+      citations: [],
+      learningUpdate: candidate.learningUpdate,
+    });
   });
 });

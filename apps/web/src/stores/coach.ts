@@ -1,14 +1,16 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 import {
-  coachResultSchema,
+  anyPublicCoachResultSchema,
   coachSseEventSchema,
+  type AnyPublicCoachResult,
   type CoachProfile,
-  type CoachResult,
+  type PublicCoachCitationV2,
   type CoachSseEvent,
   type CreateCoachRequest,
   type CoachRequest,
 } from '@en/common/coach'
+import { getCoachCitation } from '@/apis/coach'
 import type {
   CoachConversation,
   CoachMessage,
@@ -40,7 +42,7 @@ export const useCoachStore = defineStore('coach', () => {
   const conversations = ref<CoachConversation[]>([])
   const activeConversationId = ref<string | null>(null)
   const messages = ref<CoachMessage[]>([])
-  const finalResult = ref<CoachResult | null>(null)
+  const finalResult = ref<AnyPublicCoachResult | null>(null)
   const provisionalText = ref('')
   const lastEventSequence = ref(-1)
   const error = ref<CoachStoreError | null>(null)
@@ -64,6 +66,18 @@ export const useCoachStore = defineStore('coach', () => {
       ) ?? null,
   )
   const activeExercise = computed(() => finalResult.value?.exercise ?? null)
+  const claimsByCitationId = computed(() => {
+    const result = finalResult.value
+    const claims =
+      result?.schemaVersion === 'coach.result.v2' ? result.groundedClaims : []
+    const grouped = new Map<string, typeof claims>()
+    for (const claim of claims) {
+      for (const citationId of claim.citationIds) {
+        grouped.set(citationId, [...(grouped.get(citationId) ?? []), claim])
+      }
+    }
+    return grouped
+  })
 
   function setProfile(value: CoachProfile) {
     profile.value = value
@@ -105,7 +119,36 @@ export const useCoachStore = defineStore('coach', () => {
   }
 
   function acceptResult(untrusted: unknown): boolean {
-    const parsed = coachResultSchema.safeParse(untrusted)
+    const normalized = (() => {
+      if (
+        !untrusted ||
+        typeof untrusted !== 'object' ||
+        !('schemaVersion' in untrusted) ||
+        untrusted.schemaVersion !== 'coach.result.v2' ||
+        !('citations' in untrusted) ||
+        !Array.isArray(untrusted.citations)
+      ) {
+        return untrusted
+      }
+      const seen = new Set<string>()
+      return {
+        ...untrusted,
+        citations: untrusted.citations.filter((citation) => {
+          if (
+            !citation ||
+            typeof citation !== 'object' ||
+            !('citationId' in citation) ||
+            typeof citation.citationId !== 'string' ||
+            seen.has(citation.citationId)
+          ) {
+            return false
+          }
+          seen.add(citation.citationId)
+          return true
+        }),
+      }
+    })()
+    const parsed = anyPublicCoachResultSchema.safeParse(normalized)
     if (!parsed.success) return rejectUntrustedResult()
     const result = parsed.data
     finalResult.value = result
@@ -123,6 +166,56 @@ export const useCoachStore = defineStore('coach', () => {
       createdAt: new Date().toISOString(),
     })
     return true
+  }
+
+  function replaceCitation(citation: PublicCoachCitationV2) {
+    const replace = (
+      result: AnyPublicCoachResult | null,
+    ): AnyPublicCoachResult | null => {
+      if (!result || result.schemaVersion !== 'coach.result.v2') return result
+      return {
+        ...result,
+        citations: result.citations.map((current) =>
+          current.citationId === citation.citationId ? citation : current,
+        ),
+      }
+    }
+    finalResult.value = replace(finalResult.value)
+    messages.value = messages.value.map((message) => ({
+      ...message,
+      structuredResult: replace(message.structuredResult),
+    }))
+  }
+
+  async function resolveCitation(
+    citationId: string,
+    resolver: typeof getCoachCitation = getCoachCitation,
+  ) {
+    try {
+      const response = await resolver(citationId)
+      replaceCitation(response.data)
+      return response.data
+    } catch {
+      const unavailable = {
+        citationId,
+        status: 'unavailable',
+        reason: 'SOURCE_UNAVAILABLE',
+      } as const
+      replaceCitation(unavailable)
+      return unavailable
+    }
+  }
+
+  async function refreshCitations(
+    resolver: typeof getCoachCitation = getCoachCitation,
+  ) {
+    const result = finalResult.value
+    if (!result || result.schemaVersion !== 'coach.result.v2') return []
+    return Promise.all(
+      result.citations.map((citation) =>
+        resolveCitation(citation.citationId, resolver),
+      ),
+    )
   }
 
   function applyValidatedEvent(event: CoachSseEvent): boolean {
@@ -327,6 +420,7 @@ export const useCoachStore = defineStore('coach', () => {
     activeConversationId,
     activeConversation,
     activeExercise,
+    claimsByCitationId,
     messages,
     finalResult,
     provisionalText,
@@ -344,6 +438,8 @@ export const useCoachStore = defineStore('coach', () => {
     openConversation,
     appendProvisional,
     acceptResult,
+    resolveCitation,
+    refreshCitations,
     acceptEvent,
     resetRequestState,
     beginStream,

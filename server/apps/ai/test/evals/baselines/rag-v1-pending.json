@@ -1,0 +1,30 @@
+{
+  "baselineVersion": "rag-baseline.v1",
+  "status": "pending_measurement",
+  "approved": false,
+  "datasetVersion": "rag-eval.synthetic.v1",
+  "versions": {
+    "sourceRightsSnapshotVersion": "rights.synthetic.v1",
+    "promptVersion": "coach.rag.v1",
+    "modelVersion": "pending_measurement",
+    "embeddingVersion": "embedding.fake.8d.v1",
+    "chunkingVersion": "chunking.v1",
+    "indexVersion": "exact-cosine.v1",
+    "retrievalConfigVersion": "retrieval.exact.v1",
+    "schemaVersion": "coach.result.v2",
+    "rubricVersion": "rag-quality.v1",
+    "priceVersion": "rag-price.pending.v1"
+  },
+  "measurements": {
+    "quality": "pending_measurement",
+    "safety": "pending_measurement",
+    "latency": "pending_measurement",
+    "tokens": "pending_measurement",
+    "cost": "pending_measurement"
+  },
+  "approval": null,
+  "releaseGate": {
+    "allowed": false,
+    "reason": "baseline_not_approved"
+  }
+}

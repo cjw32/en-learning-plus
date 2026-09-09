@@ -48,7 +48,7 @@ function budgetFactory() {
   });
 }
 
-function fixture(abort = new AbortController()) {
+function fixture(abort = new AbortController(), rag = false) {
   const order: string[] = [];
   const stream = {
     async publishStatus(_id: string, status: string) {
@@ -99,6 +99,34 @@ function fixture(abort = new AbortController()) {
         ],
       };
     },
+    generateGroundedAnswer: jest.fn(
+      async (
+        _input: unknown,
+        signal: AbortSignal,
+        telemetry: {
+          onFirstOutput(): void;
+          onUsage(value: { inputTokens: number; outputTokens: number }): void;
+        },
+      ) => {
+        expect(signal.aborted).toBe(false);
+        telemetry.onFirstOutput();
+        telemetry.onUsage({ inputTokens: 20, outputTokens: 10 });
+        return {
+          correction: '',
+          explanation: 'Went is the past tense of go.',
+          examples: ['I went home yesterday.'],
+          errorTypes: [],
+          groundedClaims: [
+            {
+              claimId: 'claim_runtime_grounded_001',
+              resultPath: '/explanation',
+              text: 'Went is the past tense of go.',
+              citationIds: ['cit_runtime_grounded_000001'],
+            },
+          ],
+        };
+      },
+    ),
   };
   const profile = {
     execute: jest.fn(async () => ({
@@ -125,26 +153,102 @@ function fixture(abort = new AbortController()) {
     })),
   };
   const materials = {
-    execute: jest.fn(async () => ({
-      schemaVersion: 'coach.tool.v1',
-      ok: true,
-      query: 'Explain went.',
-      materials: [
-        {
-          citation: {
-            sourceId: 'word:went',
-            materialType: 'word',
-            title: 'went',
-            locator: 'dictionary/went',
-            supports: 'past tense of go',
-            accessScope: 'PUBLIC',
+    execute: jest.fn(async () =>
+      rag
+        ? {
+            schemaVersion: 'coach.tool.v2',
+            ok: true,
+            query: 'Explain went.',
+            appliedFilters: {
+              levels: ['A2'],
+              levelFilterApplied: true,
+              categories: [
+                'WORD_MEANING',
+                'WORD_TRANSLATION',
+                'WORD_PRONUNCIATION',
+                'WORD_FORM',
+                'WORD_USAGE',
+                'COLLOCATION',
+                'EXAMPLE_SENTENCE',
+                'GRAMMAR_RULE',
+                'GRAMMAR_EXCEPTION',
+                'COURSE_LESSON',
+              ],
+              sources: [],
+              courseIds: [],
+              wordIds: [],
+              accessScopes: ['PUBLIC', 'OWNED_COURSE'],
+              privateOwnerEnforced: true,
+              topK: 8,
+              minimumRelevance: 0.65,
+              sourceRightsSnapshotVersion: 'rights.test.v1',
+              contentVersionPolicy: 'content.sha256.v1',
+              chunkingVersion: 'chunking.v1',
+              embeddingVersion: 'embedding.test.8d.v1',
+              retrievalConfigVersion: 'retrieval.exact.v1',
+              indexVersion: 'exact-cosine.v1',
+            },
+            results: [
+              {
+                resultId: 'result_runtime_grounded_001',
+                chunkId: 'chunk_runtime_grounded_001',
+                documentId: 'document_runtime_grounded_001',
+                citationId: 'cit_runtime_grounded_000001',
+                source: 'synthetic-word-source',
+                sourceId: 'word:went',
+                title: 'went',
+                category: 'WORD_MEANING',
+                excerpt: 'Went is the past tense of go.',
+                level: 'A2',
+                courseId: null,
+                wordId: 'word_went',
+                accessScope: 'PUBLIC',
+                rank: 1,
+                relevanceScore: 0.95,
+                contentVersion: 'content.test.v1',
+                embeddingVersion: 'embedding.test.8d.v1',
+                status: 'valid',
+              },
+            ],
+            citations: [
+              {
+                citationId: 'cit_runtime_grounded_000001',
+                source: 'synthetic-word-source',
+                sourceId: 'word:went',
+                title: 'went',
+                excerpt: 'Went is the past tense of go.',
+                category: 'WORD_MEANING',
+                wordId: 'word_went',
+                courseId: null,
+                accessScope: 'PUBLIC',
+                status: 'active',
+                usage: 'answer_evidence',
+              },
+            ],
+            conflicts: [],
+            retrievalStatus: 'success',
+          }
+        : {
+            schemaVersion: 'coach.tool.v1',
+            ok: true,
+            query: 'Explain went.',
+            materials: [
+              {
+                citation: {
+                  sourceId: 'word:went',
+                  materialType: 'word',
+                  title: 'went',
+                  locator: 'dictionary/went',
+                  supports: 'past tense of go',
+                  accessScope: 'PUBLIC',
+                },
+                summary: 'went is the past tense of go',
+                freshness: now.toISOString(),
+              },
+            ],
+            unavailableTypes: ['course', 'grammar'],
           },
-          summary: 'went is the past tense of go',
-          freshness: now.toISOString(),
-        },
-      ],
-      unavailableTypes: ['course', 'grammar'],
-    })),
+    ),
   };
   const runtime = new CoachRuntimeWorkflowService(
     stream as never,
@@ -163,7 +267,7 @@ function fixture(abort = new AbortController()) {
     { execute: jest.fn() } as never,
     () => now,
   );
-  return { runtime, order, profile, materials };
+  return { runtime, order, profile, materials, model };
 }
 
 describe('Coach controlled runtime graph', () => {
@@ -247,5 +351,82 @@ describe('Coach controlled runtime graph', () => {
     ).rejects.toMatchObject({ code: 'CANCELLED' });
     expect(test.profile.execute).not.toHaveBeenCalled();
     expect(test.materials.execute).not.toHaveBeenCalled();
+  });
+
+  it('keeps issued citation IDs through the live RAG path and emits coach.result.v2', async () => {
+    const environment = {
+      COACH_ENABLED: 'true',
+      RAG_ENABLED: 'true',
+      RAG_SHADOW_ENABLED: 'false',
+      RAG_INGESTION_ENABLED: 'false',
+      RAG_PRIVATE_CONTENT_ENABLED: 'false',
+      RAG_EMBEDDING_PROVIDER_APPROVED: 'true',
+      RAG_EMBEDDING_ENDPOINT: 'https://embedding.invalid/v1/embeddings',
+      RAG_EMBEDDING_MODEL: 'approved-test-model',
+      RAG_EMBEDDING_DIMENSIONS: '8',
+      RAG_EMBEDDING_VERSION: 'embedding.test.8d.v1',
+      RAG_SOURCE_RIGHTS_SNAPSHOT_VERSION: 'rights.test.v1',
+      RAG_CHUNKING_VERSION: 'chunking.v1',
+      RAG_RETRIEVAL_CONFIG_VERSION: 'retrieval.exact.v1',
+      RAG_INDEX_VERSION: 'exact-cosine.v1',
+      RAG_RESULT_SCHEMA_VERSION: 'coach.result.v2',
+      RAG_PRICE_VERSION: 'price.test.v1',
+      RAG_TEST_BUDGET_MICROS: '1000',
+      COACH_TRACE_PEPPER: 'synthetic-test-pepper',
+    } as const;
+    const previous = Object.fromEntries(
+      Object.keys(environment).map((key) => [key, process.env[key]]),
+    );
+    Object.assign(process.env, environment);
+    try {
+      const test = fixture(new AbortController(), true);
+      const trace = new CoachTraceService(
+        'trace_request_runtime_001',
+        'ts_user_a',
+      );
+      trace.configureRun({
+        requestId: 'request_runtime_001',
+        promptVersion: 'coach.workflow.v1',
+        promptHash: 'a'.repeat(64),
+        modelProvider: 'deepseek',
+        modelName: 'deepseek-chat',
+        modelVersion: 'candidate-1',
+        resultSchemaVersion: 'coach.result.v1',
+        budgetVersion: 'budget-v1',
+        startedAtMs: now.getTime(),
+      });
+
+      const output = await test.runtime.run({
+        request: request(),
+        context: new CoachExecutionContext('user-a', 1_788_307_260),
+        signal: new AbortController().signal,
+        trace,
+      });
+
+      expect(test.model.generateGroundedAnswer).toHaveBeenCalledTimes(1);
+      expect(output.result).toMatchObject({
+        schemaVersion: 'coach.result.v2',
+        knowledgeStatus: 'grounded',
+        citations: [{ citationId: 'cit_runtime_grounded_000001' }],
+        groundedClaims: [{ citationIds: ['cit_runtime_grounded_000001'] }],
+      });
+      expect(trace.snapshot()).toMatchObject({
+        rag: {
+          usedCitationIds: ['cit_runtime_grounded_000001'],
+          unusedCitationIds: [],
+          claimCitations: [
+            {
+              claimPath: '/explanation',
+              citationIds: ['cit_runtime_grounded_000001'],
+            },
+          ],
+        },
+      });
+    } finally {
+      for (const [key, value] of Object.entries(previous)) {
+        if (value === undefined) delete process.env[key];
+        else process.env[key] = value;
+      }
+    }
   });
 });

@@ -69,9 +69,9 @@
 
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue'
-import type { CoachResult } from '@en/common/coach'
+import type { AnyPublicCoachResult } from '@en/common/coach'
 
-type Exercise = NonNullable<CoachResult['exercise']>
+type Exercise = NonNullable<AnyPublicCoachResult['exercise']>
 const props = withDefaults(
   defineProps<{
     exercise: Exercise | null

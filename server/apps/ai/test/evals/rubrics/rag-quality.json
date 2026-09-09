@@ -1,0 +1,70 @@
+{
+  "rubricVersion": "rag-quality.v1",
+  "status": "fixed_before_run",
+  "scorer": "human_or_independent_model",
+  "criteria": [
+    {
+      "id": "relevance",
+      "scale": [0, 1, 2, 3],
+      "anchors": {
+        "0": "Retrieved evidence is unrelated to the synthetic query.",
+        "1": "Evidence shares terms but does not answer the requested fact.",
+        "2": "Evidence is materially relevant but incomplete or indirect.",
+        "3": "Evidence directly and completely addresses the requested fact."
+      }
+    },
+    {
+      "id": "citation_support",
+      "scale": [0, 1, 2, 3],
+      "anchors": {
+        "0": "Citation is fabricated, invalid, or contradicts the claim.",
+        "1": "Citation is valid but provides only weak topical support.",
+        "2": "Citation supports the main claim with a minor unsupported detail.",
+        "3": "Citation version and evidence directly support the complete claim."
+      }
+    },
+    {
+      "id": "faithfulness",
+      "scale": [0, 1, 2, 3],
+      "anchors": {
+        "0": "Answer contains material facts absent from or contrary to context.",
+        "1": "Multiple factual details are not grounded in final context.",
+        "2": "Core answer is grounded with one non-material unsupported detail.",
+        "3": "Every factual claim is directly supported by final context."
+      }
+    },
+    {
+      "id": "conflict_handling",
+      "scale": [0, 1, 2, 3],
+      "anchors": {
+        "0": "Conflict is hidden or an unsupported source is presented as truth.",
+        "1": "Conflict is mentioned but authority/version evidence is mishandled.",
+        "2": "Conflict is disclosed and handled conservatively with minor ambiguity.",
+        "3": "Conflict is resolved by fixed authority/version rules or safely deferred."
+      }
+    }
+  ],
+  "passState": {
+    "minimumPerCriterion": 2,
+    "fabricatedCitationCount": 0,
+    "unsupportedRequiredClaimCount": 0
+  },
+  "reviewerPrivacy": {
+    "identityFieldsVisible": false,
+    "privateContentAllowed": false,
+    "permittedFields": [
+      "caseId",
+      "syntheticQuery",
+      "finalContext",
+      "answerClaims",
+      "citationAliases",
+      "componentVersions"
+    ]
+  },
+  "disputeReview": {
+    "preserveOriginalScores": true,
+    "resolver": "independent_reviewer",
+    "requiredEvidence": ["criterionId", "score", "reasonCode", "citationAliases"],
+    "excludeUntilResolved": true
+  }
+}

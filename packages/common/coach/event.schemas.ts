@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { coachResultSchema } from './result.schemas';
+import { anyPublicCoachResultSchema } from './result.schemas';
 
 export const COACH_SSE_SCHEMA_VERSION = 'coach.sse.v1' as const;
 
@@ -106,7 +106,7 @@ export const coachContentDeltaEventSchema = event(
 );
 export const coachResultEventSchema = event(
   'result',
-  z.object({ result: coachResultSchema }).strict(),
+  z.object({ result: anyPublicCoachResultSchema }).strict(),
 );
 export const coachCompletedEventSchema = event(
   'completed',

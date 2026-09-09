@@ -1,12 +1,17 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Optional } from '@nestjs/common';
 import {
   COACH_SSE_SCHEMA_VERSION,
-  coachResultSchema,
+  anyPublicCoachResultSchema,
   coachSseEventSchema,
   type CoachRequestStatus,
-  type CoachResult,
+  type AnyPublicCoachResult,
   type CoachSseEvent,
 } from '@en/common/coach';
+import {
+  CitationProjectionService,
+  PrismaCitationRepository,
+  type CitationReplayLookup,
+} from '@libs/learning';
 import { CoachRedisConnection } from './coach-redis.module';
 
 export type CoachEventAppend = Readonly<{
@@ -24,6 +29,7 @@ export interface CoachEventStore {
     requestId: string,
     lastEventId?: string,
   ): Promise<CoachSseEvent[] | null>;
+  purgeRequest?(requestId: string): Promise<void>;
 }
 
 export const COACH_EVENT_STORE = Symbol('COACH_EVENT_STORE');
@@ -95,6 +101,17 @@ export class RedisCoachEventStore implements CoachEventStore {
     return index < 0 ? null : events.slice(index + 1);
   }
 
+  async purgeRequest(requestId: string): Promise<void> {
+    await this.ensureConnected();
+    const base = streamKey(requestId);
+    await this.redis.client.del(
+      base,
+      `${base}:sequence`,
+      `${base}:last`,
+      `${base}:sealed`,
+    );
+  }
+
   private async ensureConnected() {
     if (this.redis.client.status === 'wait') await this.redis.client.connect();
   }
@@ -141,20 +158,60 @@ type LearningSaveStatus = Extract<
 
 @Injectable()
 export class CoachEventStreamService {
+  private readonly citationProjection?: CitationProjectionService;
+  private readonly citationReplayLookup?: CitationReplayLookup;
+  private readonly now: () => Date;
+
   constructor(
     @Inject(COACH_EVENT_STORE) private readonly store: CoachEventStore,
-    private readonly now: () => Date = () => new Date(),
-  ) {}
-  async readAfter(requestId: string, lastEventId?: string) {
+    @Optional()
+    @Inject(CitationProjectionService)
+    citationProjectionOrNow?: CitationProjectionService | (() => Date),
+    @Optional()
+    @Inject(PrismaCitationRepository)
+    citationReplayLookup?: CitationReplayLookup,
+    @Optional() now: () => Date = () => new Date(),
+  ) {
+    this.citationProjection =
+      typeof citationProjectionOrNow === 'function'
+        ? undefined
+        : citationProjectionOrNow;
+    this.now =
+      typeof citationProjectionOrNow === 'function'
+        ? citationProjectionOrNow
+        : now;
+    this.citationReplayLookup = citationReplayLookup;
+  }
+  async readAfter(requestId: string, lastEventId?: string, subjectId?: string) {
     const events = await this.store.readAfter(requestId, lastEventId);
     if (!events) return null;
     const seen = new Set<string>();
-    return events.filter((event) => {
+    const unique = events.filter((event) => {
       const parsed = coachSseEventSchema.parse(event);
       if (seen.has(parsed.eventId)) return false;
       seen.add(parsed.eventId);
       return true;
     });
+    if (!subjectId || !this.citationProjection) return unique;
+    return Promise.all(
+      unique.map(async (event) => {
+        if (
+          event.type !== 'result' ||
+          event.payload.result.schemaVersion !== 'coach.result.v2'
+        ) {
+          return event;
+        }
+        return coachSseEventSchema.parse({
+          ...event,
+          payload: {
+            result: await this.citationProjection!.projectResult(
+              subjectId,
+              event.payload.result,
+            ),
+          },
+        });
+      }),
+    );
   }
   publishConnected(
     requestId: string,
@@ -192,9 +249,20 @@ export class CoachEventStreamService {
   ) {
     return this.append(requestId, 'content_delta', { channel, delta });
   }
-  publishResult(requestId: string, result: CoachResult) {
+  publishResult(requestId: string, result: AnyPublicCoachResult) {
+    const replaySafeResult =
+      result.schemaVersion === 'coach.result.v2'
+        ? {
+            ...result,
+            citations: result.citations.map((citation) => ({
+              citationId: citation.citationId,
+              status: 'unavailable' as const,
+              reason: 'SOURCE_UNAVAILABLE' as const,
+            })),
+          }
+        : result;
     return this.append(requestId, 'result', {
-      result: coachResultSchema.parse(result),
+      result: anyPublicCoachResultSchema.parse(replaySafeResult),
     });
   }
   publishCompleted(
@@ -223,6 +291,23 @@ export class CoachEventStreamService {
   }
   publishHeartbeat(requestId: string) {
     return this.append(requestId, 'heartbeat', {});
+  }
+  async purgeRequests(requestIds: readonly string[]): Promise<void> {
+    await this.purgeAffected({ requestIds, citationIds: [] });
+  }
+  async purgeAffected(input: {
+    requestIds: readonly string[];
+    citationIds: readonly string[];
+  }): Promise<void> {
+    const fromCitations = this.citationReplayLookup
+      ? await this.citationReplayLookup.findRequestIdsByCitationIds(
+          input.citationIds,
+        )
+      : [];
+    const requestIds = [...new Set([...input.requestIds, ...fromCitations])];
+    for (const requestId of requestIds) {
+      await this.store.purgeRequest?.(requestId);
+    }
   }
   private async append(
     requestId: string,
