@@ -48,14 +48,8 @@ describe('Coach privacy redaction', () => {
   );
 
   it('creates a stable non-reversible Trace subject and never embeds the user id', () => {
-    const first = createTraceSubjectId(
-      'user-production-001',
-      'trace-pepper-v1',
-    );
-    const second = createTraceSubjectId(
-      'user-production-001',
-      'trace-pepper-v1',
-    );
+    const first = createTraceSubjectId('user-production-001', 'trace-pepper-v1');
+    const second = createTraceSubjectId('user-production-001', 'trace-pepper-v1');
     expect(first).toBe(second);
     expect(first).toMatch(/^ts_[a-f0-9]{64}$/);
     expect(first).not.toContain('user-production-001');

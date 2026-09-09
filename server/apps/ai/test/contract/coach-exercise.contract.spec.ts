@@ -38,12 +38,7 @@ function definition(type: ExerciseDefinition['type']): ExerciseDefinition {
         maxScore: 100,
         citations: [citation],
         targets: [
-          {
-            targetType: 'WORD',
-            targetKey: 'word-1',
-            wordId: 'word-1',
-            weight: 1,
-          },
+          { targetType: 'WORD', targetKey: 'word-1', wordId: 'word-1', weight: 1 },
         ],
       },
     ],
@@ -87,9 +82,7 @@ describe('Coach exercise contract', () => {
     });
 
     expect(createExerciseOutputSchema.safeParse(output).success).toBe(true);
-    expect(JSON.stringify(output)).not.toMatch(
-      /answerKey|gradingRubric|accepted|exact/,
-    );
+    expect(JSON.stringify(output)).not.toMatch(/answerKey|gradingRubric|accepted|exact/);
     expect(repository.stored?.items[0]).toMatchObject({
       answerKey: { accepted: ['went'] },
       gradingRubric: { exact: true },

@@ -1,19 +1,13 @@
-import {
-  INestApplication,
-  NotFoundException,
-  VersioningType,
-} from '@nestjs/common';
+import { INestApplication, NotFoundException, VersioningType } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Test } from '@nestjs/testing';
 import request from 'supertest';
 import { AuthGuard } from '@libs/shared';
 import { CoachApiService } from '../../src/coach/api/coach-api.service';
 import { CoachController } from '../../src/coach/api/coach.controller';
-import { CoachEnabledGuard } from '../../src/coach/governance/coach-enabled.guard';
 
 describe('Coach authentication and ownership (e2e)', () => {
   let app: INestApplication;
-  const originalCoachEnabled = process.env.COACH_ENABLED;
   const modelFake = jest.fn();
   const api = {
     getProfile: jest.fn(async (context) => ({
@@ -58,12 +52,10 @@ describe('Coach authentication and ownership (e2e)', () => {
   };
 
   beforeAll(async () => {
-    process.env.COACH_ENABLED = 'true';
     const module = await Test.createTestingModule({
       controllers: [CoachController],
       providers: [
         AuthGuard,
-        CoachEnabledGuard,
         { provide: CoachApiService, useValue: api },
         {
           provide: JwtService,
@@ -98,11 +90,7 @@ describe('Coach authentication and ownership (e2e)', () => {
     await app.init();
   });
 
-  afterAll(async () => {
-    await app.close();
-    if (originalCoachEnabled === undefined) delete process.env.COACH_ENABLED;
-    else process.env.COACH_ENABLED = originalCoachEnabled;
-  });
+  afterAll(async () => app.close());
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -112,16 +100,13 @@ describe('Coach authentication and ownership (e2e)', () => {
     ['missing', undefined],
     ['invalid', 'Bearer invalid'],
     ['refresh', 'Bearer refresh-a'],
-  ])(
-    'rejects %s authentication before profile data or model access',
-    async (_label, header) => {
-      const call = request(app.getHttpServer()).get('/ai/v1/coach/profile');
-      if (header) call.set('Authorization', header);
-      await call.expect(401);
-      expect(api.getProfile).not.toHaveBeenCalled();
-      expect(modelFake).not.toHaveBeenCalled();
-    },
-  );
+  ])('rejects %s authentication before profile data or model access', async (_label, header) => {
+    const call = request(app.getHttpServer()).get('/ai/v1/coach/profile');
+    if (header) call.set('Authorization', header);
+    await call.expect(401);
+    expect(api.getProfile).not.toHaveBeenCalled();
+    expect(modelFake).not.toHaveBeenCalled();
+  });
 
   it('allows an access token and always derives profile identity from context', async () => {
     await request(app.getHttpServer())

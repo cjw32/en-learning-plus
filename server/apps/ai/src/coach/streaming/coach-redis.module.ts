@@ -18,7 +18,7 @@ export class CoachRedisConnection implements OnModuleDestroy {
     });
   }
 
-  onModuleDestroy() {
+  async onModuleDestroy() {
     if (this.client.status !== 'end') {
       this.client.disconnect(false);
     }

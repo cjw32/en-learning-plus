@@ -60,7 +60,10 @@ export interface LearnerProfileRepository {
     subjectId: string,
     update: Partial<LearnerProfileRecord>,
   ): Promise<LearnerProfileRecord>;
-  readSignals(subjectId: string, limit: number): Promise<LearnerSignalSnapshot>;
+  readSignals(
+    subjectId: string,
+    limit: number,
+  ): Promise<LearnerSignalSnapshot>;
 }
 
 export type LearnerProfileSnapshot = {

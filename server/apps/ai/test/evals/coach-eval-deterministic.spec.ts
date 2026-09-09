@@ -19,11 +19,7 @@ describe('Coach deterministic evaluation dataset', () => {
   it('contains 50-100 versioned non-production cases with required coverage', () => {
     expect(cases.length).toBeGreaterThanOrEqual(50);
     expect(cases.length).toBeLessThanOrEqual(100);
-    const summary = validateDeterministicEvalSuite({
-      cases,
-      toolPaths,
-      securityGates,
-    });
+    const summary = validateDeterministicEvalSuite({ cases, toolPaths, securityGates });
     expect(summary.failures).toEqual([]);
     expect(summary.intents).toEqual(
       expect.arrayContaining([
@@ -106,8 +102,6 @@ describe('Coach deterministic evaluation dataset', () => {
       criteria: expect.any(Array),
     });
     expect(rubric.criteria.length).toBeGreaterThan(0);
-    expect(JSON.stringify(rubric)).not.toMatch(
-      /userId|email|phone|production conversation/i,
-    );
+    expect(JSON.stringify(rubric)).not.toMatch(/userId|email|phone|production conversation/i);
   });
 });

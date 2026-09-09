@@ -38,7 +38,9 @@ export interface ReviewScheduleRepository {
 }
 
 @Injectable()
-export class PrismaReviewScheduleRepository implements ReviewScheduleRepository {
+export class PrismaReviewScheduleRepository
+  implements ReviewScheduleRepository
+{
   constructor(private readonly prisma: PrismaService) {}
 
   async findPurchasedCourseTag(subjectId: string, courseId: string) {
@@ -100,12 +102,8 @@ export class PrismaReviewScheduleRepository implements ReviewScheduleRepository 
       total,
       rows: rows
         .filter(
-          (
-            row,
-          ): row is typeof row & {
-            word: NonNullable<typeof row.word>;
-            dueAt: Date;
-          } => Boolean(row.word && row.dueAt),
+          (row): row is typeof row & { word: NonNullable<typeof row.word>; dueAt: Date } =>
+            Boolean(row.word && row.dueAt),
         )
         .map((row) => ({
           wordId: row.word.id,
@@ -124,27 +122,23 @@ function assertTimeZone(timezone: string) {
   try {
     new Intl.DateTimeFormat('en-US', { timeZone: timezone }).format();
   } catch {
-    throw new LearningDomainError('VALIDATION_FAILED', '复习时区参数无效', 400);
+    throw new LearningDomainError(
+      'VALIDATION_FAILED',
+      '复习时区参数无效',
+      400,
+    );
   }
 }
 
 function nextIsoDate(date: string) {
-  const [year, month, day] = date.split('-').map(Number) as [
-    number,
-    number,
-    number,
-  ];
+  const [year, month, day] = date.split('-').map(Number) as [number, number, number];
   return new Date(Date.UTC(year, month - 1, day + 1))
     .toISOString()
     .slice(0, 10);
 }
 
 function zonedStartOfDay(date: string, timezone: string): Date {
-  const [year, month, day] = date.split('-').map(Number) as [
-    number,
-    number,
-    number,
-  ];
+  const [year, month, day] = date.split('-').map(Number) as [number, number, number];
   const target = Date.UTC(year, month - 1, day);
   const formatter = new Intl.DateTimeFormat('en-CA', {
     timeZone: timezone,

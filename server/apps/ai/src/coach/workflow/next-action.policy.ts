@@ -46,7 +46,9 @@ export function decideNextAction(facts: NextActionFacts): NextActionDecision {
     (quality) => Number.isInteger(quality) && quality >= 0 && quality <= 5,
   );
   const dueCount =
-    Number.isInteger(facts.dueCount) && facts.dueCount > 0 ? facts.dueCount : 0;
+    Number.isInteger(facts.dueCount) && facts.dueCount > 0
+      ? facts.dueCount
+      : 0;
 
   let nextAction: NextAction;
   let primaryEvidence: NextActionEvidenceCode;

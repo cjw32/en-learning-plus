@@ -9,7 +9,10 @@ import type {
   CoachRequest,
   CoachRequestAccepted,
   CreateCoachRequest,
+  PublicCoachCitationV2,
 } from './contracts'
+import { citationIdSchema } from '@en/common/coach'
+import { parseCoachCitationContract } from './contracts'
 
 const idempotencyHeaders = (key: string) => ({
   headers: { 'Idempotency-Key': key },
@@ -69,6 +72,20 @@ export const getCoachRequest = (requestId: string) =>
   aiApi.get(`/coach/requests/${requestId}`) as Promise<
     Response<CoachRequest>
   >
+
+export async function getCoachCitation(
+  citationId: string,
+): Promise<Response<PublicCoachCitationV2>> {
+  const parsedId = citationIdSchema.safeParse(citationId)
+  if (!parsedId.success) throw new Error('INVALID_CITATION_ID')
+  const response = (await aiApi.get(
+    `/coach/citations/${encodeURIComponent(parsedId.data)}`,
+  )) as Response<unknown>
+  return {
+    ...response,
+    data: parseCoachCitationContract(response.data),
+  }
+}
 
 export const cancelCoachRequest = (
   requestId: string,
@@ -143,3 +160,8 @@ export const deleteCoachData = (idempotencyKey: string) =>
   >
 
 export type * from './contracts'
+export {
+  controlledCitationRoute,
+  parseCoachCitationContract,
+  parseCoachResultContract,
+} from './contracts'

@@ -3,6 +3,8 @@ import type {
   NextAction,
   NextActionEvidenceCode,
 } from '../workflow/next-action.policy';
+import { redactRagTraceMetadata } from './coach-redaction';
+import type { RetrievalTraceMetadata } from './rag-trace.types';
 
 export type CoachTraceStepStatus =
   | 'STARTED'
@@ -69,6 +71,8 @@ export type CoachTraceSnapshot = Readonly<{
   resultType: string | null;
   steps: readonly CoachTraceStep[];
   recommendation: CoachRecommendationTrace | null;
+  rag: RetrievalTraceMetadata | null;
+  feedback: 'UP' | 'DOWN' | null;
 }>;
 
 export interface CoachTraceWriter {
@@ -98,6 +102,8 @@ export class CoachTraceService {
   private terminalStatus: CoachTraceTerminalStatus | null = null;
   private resultType: string | null = null;
   private finishedAtMs: number | null = null;
+  private rag: RetrievalTraceMetadata | null = null;
+  private groundingRecorded = false;
 
   constructor(
     private readonly traceId: string,
@@ -151,6 +157,87 @@ export class CoachTraceService {
 
   recordRetry(): void {
     this.retryCount += 1;
+  }
+
+  recordRetrieval(untrusted: RetrievalTraceMetadata): void {
+    if (this.rag) throw new Error('RAG retrieval was already recorded');
+    const activeStepIndex = this.steps.findIndex(
+      (step) =>
+        step.stepName === 'search_learning_materials' &&
+        step.status === 'STARTED',
+    );
+    if (activeStepIndex < 0) {
+      throw new Error('RAG retrieval requires an active search step');
+    }
+    const safe = redactRagTraceMetadata(untrusted);
+    this.assertRetrievalMetadata(safe);
+    this.rag = Object.freeze(safe) as RetrievalTraceMetadata;
+    const activeStep = this.steps[activeStepIndex]!;
+    this.steps[activeStepIndex] = Object.freeze({
+      ...activeStep,
+      metadata: redactCoachPayload({ ...activeStep.metadata, rag: this.rag }),
+    });
+  }
+
+  recordGrounding(
+    claims: readonly Readonly<{
+      resultPath: string;
+      citationIds: readonly string[];
+    }>[],
+  ): void {
+    if (!this.rag) {
+      if (claims.length === 0) return;
+      throw new Error('Grounded claims require a RAG retrieval');
+    }
+    if (this.groundingRecorded) {
+      throw new Error('RAG grounding was already recorded');
+    }
+    const available = new Set(
+      this.rag.rankings.map((ranking) => ranking.citationId),
+    );
+    const used = new Set(claims.flatMap((claim) => [...claim.citationIds]));
+    if ([...used].some((citationId) => !available.has(citationId))) {
+      throw new Error('Grounding references an unavailable Citation');
+    }
+    const next = redactRagTraceMetadata({
+      ...this.rag,
+      rankings: this.rag.rankings.map((ranking) => ({
+        ...ranking,
+        decision: used.has(ranking.citationId) ? 'used' : 'unused',
+      })),
+      usedCitationIds: [...used],
+      unusedCitationIds: this.rag.rankings
+        .map((ranking) => ranking.citationId)
+        .filter((citationId) => !used.has(citationId)),
+      claimCitations: claims.map((claim) => ({
+        claimPath: claim.resultPath,
+        citationIds: [...claim.citationIds],
+      })),
+    });
+    this.assertRetrievalMetadata(next);
+    this.rag = Object.freeze(next) as RetrievalTraceMetadata;
+    this.groundingRecorded = true;
+    const searchStepIndex = this.steps.findLastIndex(
+      (step) => step.stepName === 'search_learning_materials',
+    );
+    if (searchStepIndex >= 0) {
+      const step = this.steps[searchStepIndex]!;
+      this.steps[searchStepIndex] = Object.freeze({
+        ...step,
+        metadata: redactCoachPayload({ ...step.metadata, rag: this.rag }),
+      });
+    }
+  }
+
+  setResultSchemaVersion(resultSchemaVersion: string): void {
+    this.requireRun();
+    if (this.terminalStatus) {
+      throw new Error('Cannot change a terminal Trace');
+    }
+    if (!resultSchemaVersion.trim()) {
+      throw new Error('Result schema version is required');
+    }
+    this.run = Object.freeze({ ...this.run!, resultSchemaVersion });
   }
 
   finishRun(input: {
@@ -276,6 +363,8 @@ export class CoachTraceService {
       resultType: this.resultType,
       steps,
       recommendation: this.recommendation,
+      rag: this.rag,
+      feedback: null,
     });
   }
 
@@ -293,6 +382,70 @@ export class CoachTraceService {
   private assertCount(value: number, name: string): void {
     if (!Number.isSafeInteger(value) || value < 0) {
       throw new Error(`${name} must be a non-negative safe integer`);
+    }
+  }
+
+  private assertRetrievalMetadata(
+    value: Partial<RetrievalTraceMetadata>,
+  ): asserts value is RetrievalTraceMetadata {
+    const requiredScalars = [
+      value.metadataVersion,
+      value.queryHash,
+      value.status,
+      value.tokenCountMode,
+    ];
+    if (
+      requiredScalars.some((item) => typeof item !== 'string') ||
+      !value.appliedFilters ||
+      !value.versions ||
+      !value.counts ||
+      !value.rankings ||
+      !value.usedCitationIds ||
+      !value.unusedCitationIds ||
+      !value.claimCitations
+    ) {
+      throw new Error('RAG Trace metadata is incomplete');
+    }
+    for (const [name, count] of Object.entries(value.counts)) {
+      this.assertCount(count, `rag.counts.${name}`);
+    }
+    for (const name of [
+      'topK',
+      'conflictCount',
+      'deduplicatedCount',
+      'retrievalDurationMs',
+      'contextTokens',
+    ] as const) {
+      this.assertCount(value[name] as number, `rag.${name}`);
+    }
+    if (
+      typeof value.minimumRelevance !== 'number' ||
+      !Number.isFinite(value.minimumRelevance) ||
+      value.minimumRelevance < 0 ||
+      value.minimumRelevance > 1
+    ) {
+      throw new Error('RAG minimum relevance is invalid');
+    }
+    const counts = value.counts;
+    if (
+      counts.rawRecall < counts.accessEligible ||
+      counts.accessEligible < counts.relevanceEligible ||
+      counts.relevanceEligible < counts.deduplicated ||
+      counts.deduplicated < counts.contextSelected
+    ) {
+      throw new Error(
+        'RAG Trace stage counts must be monotonically decreasing',
+      );
+    }
+    const used = new Set(value.usedCitationIds);
+    if (value.unusedCitationIds.some((id) => used.has(id))) {
+      throw new Error('Used and unused RAG citations must be distinct');
+    }
+    if (
+      (value.status === 'success' && value.failureCode !== null) ||
+      (value.status !== 'success' && value.failureCode === null)
+    ) {
+      throw new Error('RAG Trace status and failure code disagree');
     }
   }
 }

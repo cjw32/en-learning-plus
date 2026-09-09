@@ -184,27 +184,6 @@ describe('Coach GRADE_ANSWER workflow', () => {
     expect(saveAttempt).not.toHaveBeenCalled();
   });
 
-  it('does not retry a validated tool failure', async () => {
-    const gradeAnswer = jest.fn(async () => ({
-      schemaVersion: 'coach.tool.v1',
-      ok: false,
-      code: 'SCHEMA_INVALID',
-      message: 'safe public failure',
-      retryable: false,
-    }));
-    const saveAttempt = jest.fn();
-    const test = fixture({ gradeAnswer, saveAttempt });
-
-    const result = await new CoachGradingWorkflow(test.dependencies).run(
-      input,
-      context,
-    );
-
-    expect(result.responseType).toBe('degraded');
-    expect(gradeAnswer).toHaveBeenCalledTimes(1);
-    expect(saveAttempt).not.toHaveBeenCalled();
-  });
-
   it('returns valid grading with not_saved when persistence fails', async () => {
     const test = fixture({
       async saveAttempt() {

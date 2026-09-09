@@ -12,7 +12,9 @@ import {
   type SelectedExerciseTarget,
 } from '@libs/learning';
 import type { CoachExecutionContext } from '@libs/shared';
-import { buildCreateExercisePrompt } from '../prompts/create-exercise.prompt';
+import {
+  buildCreateExercisePrompt,
+} from '../prompts/create-exercise.prompt';
 import type { CoachPromptMaterial } from '../prompts/answer.prompt';
 import type { CoachModelTelemetry } from '../workflow/coach-model.gateway';
 
@@ -30,14 +32,10 @@ export type CreateExerciseToolScope = Readonly<{
 }>;
 
 export interface CoachExerciseGenerator {
-  generateDefinition(
-    input: {
-      prompt: string;
-      jsonSchema: unknown;
-    },
-    signal?: AbortSignal,
-    telemetry?: CoachModelTelemetry,
-  ): Promise<unknown>;
+  generateDefinition(input: {
+    prompt: string;
+    jsonSchema: unknown;
+  }, signal?: AbortSignal, telemetry?: CoachModelTelemetry): Promise<unknown>;
 }
 
 export interface CoachExerciseBudgetGate {
@@ -63,7 +61,9 @@ export class CreateExerciseTool {
     const parsed = createExerciseInputSchema.safeParse(untrustedInput);
     if (!parsed.success) return this.failure('VALIDATION_FAILED', false);
     const allowedTargets = new Set(
-      scope.targets.map((target) => `${target.targetType}:${target.targetKey}`),
+      scope.targets.map(
+        (target) => `${target.targetType}:${target.targetKey}`,
+      ),
     );
     const allowedSources = new Set(
       scope.materials.map((material) => material.citation.sourceId),
@@ -83,7 +83,7 @@ export class CreateExerciseTool {
     if (!materialSubset) return this.failure('VALIDATION_FAILED', false);
 
     const built = buildCreateExercisePrompt({
-      type: parsed.data.types[0],
+      type: parsed.data.types[0]!,
       count: parsed.data.count,
       difficulty: parsed.data.difficulty,
       scenario: parsed.data.scenario,

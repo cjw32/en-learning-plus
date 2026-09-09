@@ -17,29 +17,15 @@ function initialState(): AttemptTransactionState {
       errorTypes: ['TENSE'],
       timezone: 'Asia/Shanghai',
       targetEvidence: [
-        {
-          targetType: 'WORD',
-          targetKey: 'word-1',
-          wordId: 'word-1',
-          quality: 4,
-        },
-        {
-          targetType: 'WORD',
-          targetKey: 'word-1',
-          wordId: 'word-1',
-          quality: 2,
-        },
-        {
-          targetType: 'ERROR_TYPE',
-          targetKey: 'TENSE',
-          wordId: null,
-          quality: 3,
-        },
+        { targetType: 'WORD', targetKey: 'word-1', wordId: 'word-1', quality: 4 },
+        { targetType: 'WORD', targetKey: 'word-1', wordId: 'word-1', quality: 2 },
+        { targetType: 'ERROR_TYPE', targetKey: 'TENSE', wordId: null, quality: 3 },
       ],
     },
     attempts: [],
     itemStates: [],
     reviewEvents: [],
+    knowledgeRebuilds: [],
   };
 }
 
@@ -56,9 +42,8 @@ class MemoryAttemptRepository implements AttemptRepository {
           ? this.state.submission
           : null,
       findAttemptBySubmission: async (submissionId) =>
-        this.state.attempts.find(
-          (attempt) => attempt.submissionId === submissionId,
-        ) ?? null,
+        this.state.attempts.find((attempt) => attempt.submissionId === submissionId) ??
+        null,
       findItemState: async (subjectId, targetType, targetKey) =>
         this.state.itemStates.find(
           (item) =>
@@ -86,6 +71,9 @@ class MemoryAttemptRepository implements AttemptRepository {
       markSaved: async () => {
         this.state.submission.status = 'SAVED';
       },
+      enqueueKnowledgeRebuild: async (command) => {
+        this.state.knowledgeRebuilds.push(command);
+      },
     };
     try {
       return await operation(tx);
@@ -111,12 +99,7 @@ describe('AttemptService atomic save and replay', () => {
     const service = new AttemptService(repository, () => 'attempt_00001');
 
     const first = await service.save(input);
-    for (const retrySource of [
-      'double-click',
-      'network',
-      'sse-reconnect',
-      'queue-redelivery',
-    ]) {
+    for (const retrySource of ['double-click', 'network', 'sse-reconnect', 'queue-redelivery']) {
       expect(retrySource).toBeTruthy();
       expect(await service.save(input)).toMatchObject({ status: 'replayed' });
     }
@@ -125,10 +108,16 @@ describe('AttemptService atomic save and replay', () => {
     expect(repository.state.attempts).toHaveLength(1);
     expect(repository.state.reviewEvents).toHaveLength(2);
     expect(repository.state.itemStates).toHaveLength(2);
+    expect(repository.state.knowledgeRebuilds).toEqual([
+      {
+        subjectId: 'user-a',
+        attemptId: 'attempt_00001',
+        gradingHash: 'a'.repeat(64),
+      },
+    ]);
     expect(
-      repository.state.reviewEvents.find(
-        (event) => event.targetKey === 'word-1',
-      )?.quality,
+      repository.state.reviewEvents.find((event) => event.targetKey === 'word-1')
+        ?.quality,
     ).toBe(2);
   });
 
@@ -138,12 +127,11 @@ describe('AttemptService atomic save and replay', () => {
     await expect(
       service.save({ ...input, gradingHash: 'b'.repeat(64) }),
     ).rejects.toMatchObject({ code: 'STATE_CONFLICT' });
-    await expect(
-      service.save({ ...input, cancelled: true }),
-    ).rejects.toMatchObject({
+    await expect(service.save({ ...input, cancelled: true })).rejects.toMatchObject({
       code: 'STATE_CONFLICT',
     });
     expect(repository.state.attempts).toHaveLength(0);
+    expect(repository.state.knowledgeRebuilds).toHaveLength(0);
   });
 
   it('rolls back attempt, events, aggregates, and statuses on an injected failure', async () => {

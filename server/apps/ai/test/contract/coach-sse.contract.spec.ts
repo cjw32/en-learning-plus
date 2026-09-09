@@ -1,4 +1,7 @@
-import { coachSseEventSchema, type CoachSseEvent } from '@en/common/coach';
+import {
+  coachSseEventSchema,
+  type CoachSseEvent,
+} from '@en/common/coach';
 import {
   CoachEventStreamService,
   type CoachEventAppend,
@@ -34,9 +37,7 @@ class MemoryEventStore implements CoachEventStore {
 
   async readAfter(_requestId: string, lastEventId?: string) {
     if (!lastEventId) return [...this.events];
-    const index = this.events.findIndex(
-      (event) => event.eventId === lastEventId,
-    );
+    const index = this.events.findIndex((event) => event.eventId === lastEventId);
     return index < 0 ? null : this.events.slice(index + 1);
   }
 }
@@ -82,14 +83,10 @@ describe('Coach SSE contract', () => {
       'not_applicable',
     );
 
-    expect(
-      store.events.every(
-        (event) => coachSseEventSchema.safeParse(event).success,
-      ),
-    ).toBe(true);
-    expect(store.events.map((event) => event.sequence)).toEqual([
-      0, 1, 2, 3, 4, 5,
-    ]);
+    expect(store.events.every((event) => coachSseEventSchema.safeParse(event).success)).toBe(
+      true,
+    );
+    expect(store.events.map((event) => event.sequence)).toEqual([0, 1, 2, 3, 4, 5]);
     expect(store.events[1]).toMatchObject({
       type: 'status',
       payload: { label: '正在批改答案' },
@@ -142,8 +139,6 @@ describe('Coach SSE contract', () => {
       retryAfterSeconds: 5,
       saveStatus: 'NOT_STARTED',
     });
-    expect(coachSseEventSchema.safeParse(errorStore.events[0]).success).toBe(
-      true,
-    );
+    expect(coachSseEventSchema.safeParse(errorStore.events[0]).success).toBe(true);
   });
 });

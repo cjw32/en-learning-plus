@@ -1,7 +1,7 @@
 # Phase 0 Research: 个性化英语学习 Coach
 
-**Feature**: `001-personalized-learning-coach`
-**Date**: 2026-09-02
+**Feature**: `001-personalized-learning-coach`  
+**Date**: 2026-09-02  
 **Purpose**: Resolve the specification's open product decisions and the technical unknowns that affect architecture, contracts, privacy, evaluation, and compatibility.
 
 ## R-001 — Use one controlled LangGraph workflow, not a free ReAct loop

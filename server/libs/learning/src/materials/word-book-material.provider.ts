@@ -21,7 +21,9 @@ export interface WordBookMaterialRepository {
 }
 
 @Injectable()
-export class PrismaWordBookMaterialRepository implements WordBookMaterialRepository {
+export class PrismaWordBookMaterialRepository
+  implements WordBookMaterialRepository
+{
   constructor(private readonly prisma: PrismaService) {}
 
   searchWords(query: string, limit: number) {
@@ -53,10 +55,7 @@ export class WordBookMaterialProvider implements LearningMaterialProvider {
   constructor(private readonly repository: WordBookMaterialRepository) {}
 
   async search(context: LearningMaterialSearchContext) {
-    const words = await this.repository.searchWords(
-      context.query,
-      context.limit,
-    );
+    const words = await this.repository.searchWords(context.query, context.limit);
     return {
       available: true,
       materials: words.map((word) => {

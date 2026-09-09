@@ -81,9 +81,9 @@ describe('CoachIdempotencyService', () => {
       { logicalResource: 'submission-2' },
       { answerVersion: 'answer-v2' },
     ]) {
-      await expect(
-        service.execute({ ...base, ...change }),
-      ).rejects.toMatchObject({ code: 'IDEMPOTENCY_CONFLICT' });
+      await expect(service.execute({ ...base, ...change })).rejects.toMatchObject(
+        { code: 'IDEMPOTENCY_CONFLICT' },
+      );
     }
     expect(store.bindings.size).toBe(1);
   });

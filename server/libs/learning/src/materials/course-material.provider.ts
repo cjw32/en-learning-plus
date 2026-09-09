@@ -23,7 +23,9 @@ export interface CourseMaterialRepository {
 }
 
 @Injectable()
-export class PrismaCourseMaterialRepository implements CourseMaterialRepository {
+export class PrismaCourseMaterialRepository
+  implements CourseMaterialRepository
+{
   constructor(private readonly prisma: PrismaService) {}
 
   searchOwnedCourses(

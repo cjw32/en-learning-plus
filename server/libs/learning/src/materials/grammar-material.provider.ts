@@ -8,7 +8,7 @@ import {
 export class GrammarMaterialProvider implements LearningMaterialProvider {
   readonly materialType = 'grammar' as const;
 
-  search(_context: LearningMaterialSearchContext) {
-    return Promise.resolve({ available: false, materials: [] });
+  async search(_context: LearningMaterialSearchContext) {
+    return { available: false, materials: [] };
   }
 }

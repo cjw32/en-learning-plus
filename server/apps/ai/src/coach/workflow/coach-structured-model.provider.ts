@@ -58,9 +58,7 @@ export class ConfiguredCoachStructuredModel implements CoachStructuredModel {
 function positiveMaxOutputTokens() {
   const value = process.env.COACH_MAX_MODEL_OUTPUT_TOKENS_PER_CALL;
   if (!value || !/^\d+$/.test(value) || Number(value) < 1) {
-    throw new CoachModelUnavailableError(
-      'Approved model output budget is missing',
-    );
+    throw new CoachModelUnavailableError('Approved model output budget is missing');
   }
   return Number(value);
 }

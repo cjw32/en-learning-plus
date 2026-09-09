@@ -44,7 +44,7 @@ export class ExerciseTargetingService {
     const levelIndex = baseLevel ? levels.indexOf(baseLevel) : -1;
     const difficulty: Difficulty =
       shouldChallenge && levelIndex >= 0 && levelIndex < levels.length - 1
-        ? levels[levelIndex + 1]
+        ? levels[levelIndex + 1]!
         : (baseLevel ?? 'UNKNOWN');
     const challengeNotice =
       difficulty !== 'UNKNOWN' && difficulty !== baseLevel
@@ -86,8 +86,8 @@ export class ExerciseTargetingService {
     const targets = [...unique.values()];
     const personalizationReason = !baseLevel
       ? '尚未设置英语水平；本次仅按到期词和薄弱项生成受限难度练习。'
-      : (challengeNotice ??
-        `按 ${baseLevel} 水平练习 ${targets.map((target) => target.label).join('、') || '当前学习目标'}。`);
+      : challengeNotice ??
+        `按 ${baseLevel} 水平练习 ${targets.map((target) => target.label).join('、') || '当前学习目标'}。`;
     return { difficulty, targets, challengeNotice, personalizationReason };
   }
 }

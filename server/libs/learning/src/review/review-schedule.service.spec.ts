@@ -38,9 +38,8 @@ describe('ReviewScheduleService', () => {
         };
       },
     };
-    const service = new ReviewScheduleService(
-      repository,
-      () => new Date('2026-09-02T02:00:00.000Z'),
+    const service = new ReviewScheduleService(repository, () =>
+      new Date('2026-09-02T02:00:00.000Z'),
     );
 
     const first = await service.getDueWords('user-a', {
@@ -97,3 +96,4 @@ describe('ReviewScheduleService', () => {
     ).rejects.toMatchObject({ code: 'RESOURCE_NOT_FOUND' });
   });
 });
+

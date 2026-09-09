@@ -37,13 +37,14 @@ export function assertCoachNodeCanStart(
   if (node === 'save_attempt' && !state.gradingValidated) {
     throw new CoachWorkflowGuardError('A valid grade is required before save');
   }
-  if (node === 'create_exercise' && state.intent !== 'CREATE_EXERCISE') {
+  if (
+    node === 'create_exercise' &&
+    state.intent !== 'CREATE_EXERCISE'
+  ) {
     throw new CoachWorkflowGuardError('Exercise intent is required');
   }
   if (node === 'finalize' && state.currentNode !== 'validate_result') {
-    throw new CoachWorkflowGuardError(
-      'Result validation must precede finalize',
-    );
+    throw new CoachWorkflowGuardError('Result validation must precede finalize');
   }
   return state;
 }

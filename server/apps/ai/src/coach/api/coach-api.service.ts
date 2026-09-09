@@ -13,12 +13,15 @@ import {
   coachProfileSchema,
   coachRequestSchema,
   coachResultSchema,
+  publicCoachResultV2Schema,
+  storedCoachResultV2Schema,
   type CoachProfileUpdate,
   type CoachFeedbackInput,
   type CreateCoachRequest,
 } from '@en/common/coach';
 import {
   LearnerProfileService,
+  CitationProjectionService,
   LearningDomainError,
   type LearnerProfileRecord,
 } from '@libs/learning';
@@ -125,8 +128,26 @@ export class CoachApiService {
     private readonly retry: CoachRetryService,
     private readonly feedback: CoachFeedbackService,
     private readonly retention: CoachRetentionService,
+    private readonly citationProjection: CitationProjectionService,
     @Optional() private readonly admission?: CoachAdmissionService,
   ) {}
+
+  private async projectStoredResult(subjectId: string, value: unknown) {
+    const v1 = coachResultSchema.safeParse(value);
+    if (v1.success) return v1.data;
+    const storedV2 = storedCoachResultV2Schema.safeParse(value);
+    if (storedV2.success) {
+      return this.citationProjection.projectResult(subjectId, storedV2.data);
+    }
+    const legacyPublicV2 = publicCoachResultV2Schema.safeParse(value);
+    if (legacyPublicV2.success) {
+      return this.citationProjection.projectResult(
+        subjectId,
+        legacyPublicV2.data,
+      );
+    }
+    return null;
+  }
 
   async getProfile(context: CoachExecutionContext) {
     await this.retention.assertSubjectActive(context.subjectId);
@@ -226,16 +247,18 @@ export class CoachApiService {
     const page = detail.messages.slice(0, input.limit);
     return this.response.success({
       conversation: mapConversation(detail.conversation),
-      messages: page.map((message) => {
-        const parsed = coachResultSchema.safeParse(message.structuredResult);
-        return {
+      messages: await Promise.all(
+        page.map(async (message) => ({
           id: message.id,
           role: message.role,
           content: message.content,
-          structuredResult: parsed.success ? parsed.data : null,
+          structuredResult: await this.projectStoredResult(
+            context.subjectId,
+            message.structuredResult,
+          ),
           createdAt: message.createdAt.toISOString(),
-        };
-      }),
+        })),
+      ),
       nextCursor: hasMore ? page.at(-1)!.id : null,
     });
   }
@@ -249,9 +272,9 @@ export class CoachApiService {
     await this.retention.assertSubjectActive(context.subjectId);
     let acquiredConcurrencyLease = false;
     let retainConcurrencyLease = false;
-    let leasedRequestId: string | null = null;
     try {
-      await this.admission?.consumeSubject(context.subjectId);
+      await this.admission?.acquireSubject(context.subjectId);
+      acquiredConcurrencyLease = Boolean(this.admission);
       const created = await this.requests.create({
         subjectId: context.subjectId,
         conversationId,
@@ -264,18 +287,13 @@ export class CoachApiService {
         ? created.request
         : await this.requests.transition(created.request.id, 'QUEUED');
       if (!created.replayed) {
+        retainConcurrencyLease = true;
         try {
           await this.stream.publishConnected(request.id, 'QUEUED', null);
         } catch {
           // The durable request remains authoritative when Redis is unavailable.
         }
-      }
-      if (request.status === 'QUEUED') {
-        await this.admission?.acquireSubject(context.subjectId, request.id);
-        acquiredConcurrencyLease = Boolean(this.admission);
-        leasedRequestId = request.id;
         await this.queue.enqueue(request.id);
-        retainConcurrencyLease = true;
       }
       return this.response.success({
         requestId: request.id,
@@ -289,7 +307,7 @@ export class CoachApiService {
     } finally {
       if (acquiredConcurrencyLease && !retainConcurrencyLease) {
         await this.admission
-          ?.releaseSubject(context.subjectId, leasedRequestId!)
+          ?.releaseSubject(context.subjectId)
           .catch(() => undefined);
       }
     }
@@ -302,7 +320,10 @@ export class CoachApiService {
       requestId,
     );
     if (!request) throw new NotFoundException('学习资源不存在或不可访问');
-    const finalResult = coachResultSchema.safeParse(request.finalResult);
+    const finalResult = await this.projectStoredResult(
+      context.subjectId,
+      request.finalResult,
+    );
     return this.response.success(
       coachRequestSchema.parse({
         id: request.id,
@@ -311,7 +332,7 @@ export class CoachApiService {
         retryOfRequestId: request.retryOfRequestId,
         intent: request.intent,
         status: request.status,
-        finalResult: finalResult.success ? finalResult.data : null,
+        finalResult,
         error: request.errorCode
           ? {
               code: request.errorCode,
@@ -328,6 +349,19 @@ export class CoachApiService {
         traceId: `trace_${request.id}`,
         startedAt: request.startedAt?.toISOString() ?? null,
         finishedAt: request.finishedAt?.toISOString() ?? null,
+      }),
+    );
+  }
+
+  async getCitation(
+    context: CoachExecutionContext,
+    citationId: string,
+  ) {
+    await this.retention.assertSubjectActive(context.subjectId);
+    return this.response.success(
+      await this.citationProjection.resolve({
+        subjectId: context.subjectId,
+        citationId,
       }),
     );
   }
@@ -353,29 +387,13 @@ export class CoachApiService {
     idempotencyKey: string,
   ) {
     await this.retention.assertSubjectActive(context.subjectId);
-    let acquiredConcurrencyLease = false;
-    let retainConcurrencyLease = false;
-    let leasedRequestId: string | null = null;
     try {
-      await this.admission?.consumeSubject(context.subjectId);
       const retried = await this.retry.retry(
         context,
         requestId,
         idempotencyKey,
       );
-      if (retried.request.status === 'COMPLETED') {
-        return this.getRequest(context, retried.request.id);
-      }
-      if (retried.request.status === 'QUEUED') {
-        await this.admission?.acquireSubject(
-          context.subjectId,
-          retried.request.id,
-        );
-        acquiredConcurrencyLease = Boolean(this.admission);
-        leasedRequestId = retried.request.id;
-        await this.queue.enqueue(retried.request.id);
-        retainConcurrencyLease = true;
-      }
+      if (retried.replayed) return this.getRequest(context, requestId);
       return this.response.success({
         requestId: retried.request.id,
         conversationId: retried.request.conversationId,
@@ -385,12 +403,6 @@ export class CoachApiService {
       });
     } catch (error) {
       throwPublic(error);
-    } finally {
-      if (acquiredConcurrencyLease && !retainConcurrencyLease) {
-        await this.admission
-          ?.releaseSubject(context.subjectId, leasedRequestId!)
-          .catch(() => undefined);
-      }
     }
   }
 

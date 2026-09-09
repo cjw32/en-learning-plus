@@ -12,7 +12,9 @@ export type CoachIdempotencyBinding<TResult> = {
 };
 
 export interface CoachIdempotencyStore {
-  reserve<TResult>(binding: CoachIdempotencyBinding<TResult>): Promise<{
+  reserve<TResult>(
+    binding: CoachIdempotencyBinding<TResult>,
+  ): Promise<{
     binding: CoachIdempotencyBinding<TResult>;
     created: boolean;
   }>;
@@ -83,7 +85,10 @@ export class CoachIdempotencyService {
       ) {
         return { result: reservation.binding.result, replayed: true };
       }
-      throw new CoachIdempotencyError('STATE_CONFLICT', '相同操作仍在处理中');
+      throw new CoachIdempotencyError(
+        'STATE_CONFLICT',
+        '相同操作仍在处理中',
+      );
     }
 
     try {

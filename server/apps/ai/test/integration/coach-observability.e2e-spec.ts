@@ -19,36 +19,11 @@ describe('Coach request observability', () => {
     schemaFailures: number;
     retries: number;
   }>([
-    {
-      terminalStatus: 'COMPLETED',
-      resultType: 'answer',
-      schemaFailures: 0,
-      retries: 0,
-    },
-    {
-      terminalStatus: 'COMPLETED',
-      resultType: 'degraded',
-      schemaFailures: 1,
-      retries: 1,
-    },
-    {
-      terminalStatus: 'CANCELLED',
-      resultType: null,
-      schemaFailures: 0,
-      retries: 0,
-    },
-    {
-      terminalStatus: 'TIMED_OUT',
-      resultType: null,
-      schemaFailures: 0,
-      retries: 0,
-    },
-    {
-      terminalStatus: 'BUDGET_EXCEEDED',
-      resultType: null,
-      schemaFailures: 0,
-      retries: 0,
-    },
+    { terminalStatus: 'COMPLETED', resultType: 'answer', schemaFailures: 0, retries: 0 },
+    { terminalStatus: 'COMPLETED', resultType: 'degraded', schemaFailures: 1, retries: 1 },
+    { terminalStatus: 'CANCELLED', resultType: null, schemaFailures: 0, retries: 0 },
+    { terminalStatus: 'TIMED_OUT', resultType: null, schemaFailures: 0, retries: 0 },
+    { terminalStatus: 'BUDGET_EXCEEDED', resultType: null, schemaFailures: 0, retries: 0 },
   ])('persists complete $terminalStatus metadata', async (scenario) => {
     let clock = 1_000;
     const trace = new CoachTraceService(
@@ -118,10 +93,7 @@ describe('Coach request observability', () => {
 
   it('stores exactly one trace per request and links idempotent feedback once', async () => {
     const repository = new InMemoryCoachTraceRepository();
-    const trace = new CoachTraceService(
-      'trace_unique_001',
-      'subject_hash_unique',
-    );
+    const trace = new CoachTraceService('trace_unique_001', 'subject_hash_unique');
     trace.configureRun({
       requestId: 'request_unique_001',
       promptVersion: 'coach-answer-v1',
@@ -133,11 +105,7 @@ describe('Coach request observability', () => {
       budgetVersion: 'budget-baseline-pending-v1',
       startedAtMs: 10,
     });
-    trace.finishRun({
-      terminalStatus: 'COMPLETED',
-      resultType: 'answer',
-      finishedAtMs: 20,
-    });
+    trace.finishRun({ terminalStatus: 'COMPLETED', resultType: 'answer', finishedAtMs: 20 });
     await trace.persist(repository);
     await expect(trace.persist(repository)).rejects.toThrow('one Trace');
   });
@@ -155,9 +123,8 @@ describe('Coach request observability', () => {
         responseType: 'answer',
       },
     ]);
-    const service = new CoachFeedbackService(
-      repository,
-      () => new Date('2026-09-02T00:00:00.000Z'),
+    const service = new CoachFeedbackService(repository, () =>
+      new Date('2026-09-02T00:00:00.000Z'),
     );
     const input = {
       rating: 'DOWN' as const,
@@ -186,12 +153,7 @@ describe('Coach request observability', () => {
       responseType: 'answer',
     });
     await expect(
-      service.upsert(
-        'other_subject_hash',
-        'request_feedback_001',
-        'feedback-key-000002',
-        input,
-      ),
+      service.upsert('other_subject_hash', 'request_feedback_001', 'feedback-key-000002', input),
     ).rejects.toThrow('不存在或不可访问');
     expect(repository.feedbackCount()).toBe(1);
   });

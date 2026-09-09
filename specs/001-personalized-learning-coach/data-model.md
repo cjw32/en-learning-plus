@@ -1,7 +1,7 @@
 # Phase 1 Data Model: 个性化英语学习 Coach
 
-**Feature**: `001-personalized-learning-coach`
-**Date**: 2026-09-02
+**Feature**: `001-personalized-learning-coach`  
+**Date**: 2026-09-02  
 **Model status**: Logical design for Plan; no migration is executed in this phase.
 
 ## Design Boundaries

@@ -59,36 +59,35 @@ export interface CoachFeedbackRepository {
   upsert(feedback: StoredCoachFeedback): Promise<StoredCoachFeedback>;
 }
 
-export class InMemoryCoachFeedbackRepository implements CoachFeedbackRepository {
+export class InMemoryCoachFeedbackRepository
+  implements CoachFeedbackRepository
+{
   private readonly requests = new Map<string, OwnedFeedbackRequest>();
   private readonly feedback = new Map<string, StoredCoachFeedback>();
 
   constructor(requests: readonly OwnedFeedbackRequest[]) {
-    for (const request of requests)
-      this.requests.set(request.requestId, request);
+    for (const request of requests) this.requests.set(request.requestId, request);
   }
 
-  findOwnedTerminalRequest(subjectId: string, requestId: string) {
+  async findOwnedTerminalRequest(subjectId: string, requestId: string) {
     const request = this.requests.get(requestId);
-    return Promise.resolve(
-      request?.traceSubjectId === subjectId && request.terminal
-        ? request
-        : null,
-    );
+    return request?.traceSubjectId === subjectId && request.terminal
+      ? request
+      : null;
   }
 
-  findByIdempotencyKey(subjectId: string, key: string) {
-    return Promise.resolve(
+  async findByIdempotencyKey(subjectId: string, key: string) {
+    return (
       [...this.feedback.values()].find(
         (item) =>
           item.subjectId === subjectId && item.clientIdempotencyKey === key,
-      ) ?? null,
+      ) ?? null
     );
   }
 
-  upsert(feedback: StoredCoachFeedback) {
+  async upsert(feedback: StoredCoachFeedback) {
     this.feedback.set(`${feedback.subjectId}:${feedback.requestId}`, feedback);
-    return Promise.resolve(feedback);
+    return feedback;
   }
 
   feedbackCount() {
@@ -111,11 +110,7 @@ export class PrismaCoachFeedbackRepository implements CoachFeedbackRepository {
       where: { id: requestId, userId: subjectId, status: 'COMPLETED' },
       include: { trace: true },
     });
-    if (
-      !request?.trace ||
-      !request.finalResultSchemaVersion ||
-      !request.finalResult
-    ) {
+    if (!request?.trace || !request.finalResultSchemaVersion || !request.finalResult) {
       return null;
     }
     const result = z
@@ -140,8 +135,7 @@ export class PrismaCoachFeedbackRepository implements CoachFeedbackRepository {
       where: { userId: subjectId, clientIdempotencyKey: key },
       include: { request: { include: { trace: true } } },
     });
-    if (!found?.request.trace || !found.request.finalResultSchemaVersion)
-      return null;
+    if (!found?.request.trace || !found.request.finalResultSchemaVersion) return null;
     const responseType = z
       .object({ responseType: z.string() })
       .passthrough()
@@ -219,10 +213,7 @@ export class CoachFeedbackService {
       .digest('hex');
     const replay = await this.repository.findByIdempotencyKey(subjectId, key);
     if (replay) {
-      if (
-        replay.requestId !== requestId ||
-        replay.requestBodyHash !== bodyHash
-      ) {
+      if (replay.requestId !== requestId || replay.requestBodyHash !== bodyHash) {
         throw new ConflictException('幂等键已绑定到其他反馈内容');
       }
       return this.publicResult(replay);

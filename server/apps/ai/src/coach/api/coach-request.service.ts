@@ -68,7 +68,13 @@ export class CoachRequestRuleError extends Error {
 const transitions: Record<CoachRequestStatus, readonly CoachRequestStatus[]> = {
   CREATED: ['QUEUED', 'CANCELLED'],
   QUEUED: ['RUNNING', 'CANCELLED'],
-  RUNNING: ['COMPLETED', 'CANCELLED', 'TIMED_OUT', 'BUDGET_EXCEEDED', 'FAILED'],
+  RUNNING: [
+    'COMPLETED',
+    'CANCELLED',
+    'TIMED_OUT',
+    'BUDGET_EXCEEDED',
+    'FAILED',
+  ],
   COMPLETED: [],
   CANCELLED: [],
   TIMED_OUT: [],
@@ -115,7 +121,10 @@ export class CoachRequestService {
       !input.conversationId ||
       input.clientRequestKey.length < 16
     ) {
-      throw new CoachRequestRuleError('VALIDATION_FAILED', '请求参数无效');
+      throw new CoachRequestRuleError(
+        'VALIDATION_FAILED',
+        '请求参数无效',
+      );
     }
     const parsedBody = createCoachRequestSchema.safeParse(input.body);
     if (!parsedBody.success) {

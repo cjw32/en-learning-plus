@@ -1,7 +1,11 @@
 node_modules
 dist
+build
 coverage
 test-results
 apps/**/src/generated
 libs/**/src/generated
 *.min.js
+package-lock.json
+yarn.lock
+pnpm-lock.yaml

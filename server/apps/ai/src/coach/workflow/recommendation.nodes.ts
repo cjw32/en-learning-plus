@@ -18,9 +18,7 @@ export type ExplainedNextAction = Readonly<{
 
 export async function explainFixedNextAction(input: {
   decision: NextActionDecision;
-  generate(
-    prompt: ReturnType<typeof buildExplainNextActionPrompt>,
-  ): Promise<unknown>;
+  generate(prompt: ReturnType<typeof buildExplainNextActionPrompt>): Promise<unknown>;
 }): Promise<ExplainedNextAction> {
   try {
     const parsed = explanationSchema.safeParse(

@@ -99,12 +99,7 @@ describe('Coach evaluation runner and release gate', () => {
       schemaVersion: 'coach.result.v1',
       feedback: 'DOWN',
     });
-    expect(link).toMatchObject({
-      caseId: 'eval_security_01',
-      traceId: 'trace_eval_001',
-    });
-    expect(JSON.stringify(link)).not.toMatch(
-      /userId|message|conversation|answer/i,
-    );
+    expect(link).toMatchObject({ caseId: 'eval_security_01', traceId: 'trace_eval_001' });
+    expect(JSON.stringify(link)).not.toMatch(/userId|message|conversation|answer/i);
   });
 });

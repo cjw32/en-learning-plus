@@ -1,13 +1,55 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@libs/shared';
-import { createCoachRequestSchema } from '@en/common/coach';
+import {
+  coachResultSchema,
+  createCoachRequestSchema,
+  publicCoachResultV2Schema,
+  storedCoachResultV2Schema,
+  type CoachResult,
+  type PublicCoachResultV2,
+  type StoredCoachResultV2,
+} from '@en/common/coach';
 import { Prisma } from '@libs/shared/generated/prisma/client';
-import { CoachRequestStore, StoredCoachRequest } from './coach-request.service';
+import {
+  CoachRequestStore,
+  StoredCoachRequest,
+} from './coach-request.service';
 import type {
   CoachExecutorRepository,
   CoachRuntimeIntent,
 } from '../workflow/coach-workflow.executor';
-import type { CoachResult, CoachSseEvent } from '@en/common/coach';
+import type { CoachSseEvent } from '@en/common/coach';
+
+export type PersistableCoachResult =
+  | CoachResult
+  | PublicCoachResultV2
+  | StoredCoachResultV2;
+
+export function toStoredCoachResult(
+  result: PersistableCoachResult,
+): CoachResult | StoredCoachResultV2 {
+  if (result.schemaVersion === 'coach.result.v1') {
+    return coachResultSchema.parse(result);
+  }
+  if ('citationIds' in result) return storedCoachResultV2Schema.parse(result);
+  const parsed = publicCoachResultV2Schema.parse(result);
+  const { citations, exercise, ...stable } = parsed;
+  return storedCoachResultV2Schema.parse({
+    ...stable,
+    citationIds: citations.map((citation) => citation.citationId),
+    ...(exercise
+      ? {
+          exercise: {
+            ...exercise,
+            items: exercise.items.map((item) => ({
+              ...item,
+              citations: [],
+            })),
+          },
+        }
+      : {}),
+  });
+}
 
 function toStored(request: {
   id: string;
@@ -66,9 +108,7 @@ export class CoachRequestRepository
 
   async findByOwnerAndKey(subjectId: string, key: string) {
     const request = await this.prisma.coachRequest.findUnique({
-      where: {
-        userId_clientRequestKey: { userId: subjectId, clientRequestKey: key },
-      },
+      where: { userId_clientRequestKey: { userId: subjectId, clientRequestKey: key } },
     });
     return request ? toStored(request) : null;
   }
@@ -145,12 +185,13 @@ export class CoachRequestRepository
   async completeExecution(input: {
     request: StoredCoachRequest;
     intent: CoachRuntimeIntent;
-    result: CoachResult;
+    result: PersistableCoachResult;
     promptVersion: string;
     modelVersion: string;
     budgetVersion: string;
     finishedAt: Date;
   }) {
+    const storedResult = toStoredCoachResult(input.result);
     return this.prisma.$transaction(async (transaction) => {
       const completed = await transaction.coachRequest.updateMany({
         where: {
@@ -165,8 +206,8 @@ export class CoachRequestRepository
           promptVersion: input.promptVersion,
           modelVersion: input.modelVersion,
           budgetVersion: input.budgetVersion,
-          finalResultSchemaVersion: input.result.schemaVersion,
-          finalResult: input.result as Prisma.InputJsonValue,
+          finalResultSchemaVersion: storedResult.schemaVersion,
+          finalResult: storedResult as Prisma.InputJsonValue,
           errorCode: null,
           finishedAt: input.finishedAt,
         },
@@ -188,9 +229,9 @@ export class CoachRequestRepository
           conversationId: input.request.conversationId,
           requestId: input.request.id,
           role: 'COACH',
-          content: input.result.explanation,
-          resultSchemaVersion: input.result.schemaVersion,
-          structuredResult: input.result as Prisma.InputJsonValue,
+          content: storedResult.explanation,
+          resultSchemaVersion: storedResult.schemaVersion,
+          structuredResult: storedResult as Prisma.InputJsonValue,
         },
       });
       await transaction.coachConversation.update({
@@ -236,9 +277,7 @@ export class CoachRequestRepository
         updated: failed.count === 1,
         status,
         errorCode,
-        saveStatus: request?.savedAttempt
-          ? ('SAVED_ONCE' as const)
-          : ('NOT_SAVED' as const),
+        saveStatus: request?.savedAttempt ? ('SAVED_ONCE' as const) : ('NOT_SAVED' as const),
       };
     });
   }

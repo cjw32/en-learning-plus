@@ -146,13 +146,8 @@ export class GradingService {
   async grade(input: {
     exercise: GradableExercise;
     answers: unknown;
-    subjective?: SubjectiveGrader;
   }): Promise<GradingResult> {
-    const parsed = z
-      .array(answerSchema)
-      .min(1)
-      .max(50)
-      .safeParse(input.answers);
+    const parsed = z.array(answerSchema).min(1).max(50).safeParse(input.answers);
     if (!parsed.success || parsed.data.length !== input.exercise.items.length) {
       return failed();
     }
@@ -186,10 +181,9 @@ export class GradingService {
           exerciseType: input.exercise.type,
         });
       } else {
-        const subjective = input.subjective ?? this.subjective;
-        if (!subjective) return failed();
+        if (!this.subjective) return failed();
         const evaluated = subjectiveEvaluationSchema.safeParse(
-          await subjective.evaluate({
+          await this.subjective.evaluate({
             exerciseType: input.exercise.type,
             prompt: item.prompt,
             answer: answer.answer,
@@ -221,9 +215,10 @@ export class GradingService {
     const earned = graded.reduce((sum, item) => sum + item.score, 0);
     const score = maxScore > 0 ? Math.round((earned / maxScore) * 100) : 0;
     const errorTypes = [...new Set(graded.flatMap((item) => item.errorTypes))];
-    const examples = [
-      ...new Set(graded.flatMap((item) => item.examples)),
-    ].slice(0, 8);
+    const examples = [...new Set(graded.flatMap((item) => item.examples))].slice(
+      0,
+      8,
+    );
     const resultWithoutHash = {
       status: 'GRADED_VALID' as const,
       answerVersion,
@@ -352,9 +347,9 @@ function storedSubmissionFromRow(row: {
   exercise: { citations: unknown };
 }): StoredValidSubmission | null {
   const result = storedValidResultSchema.safeParse(row.gradingResult);
-  const citations = z
-    .array(storedCitationSchema)
-    .safeParse(row.exercise.citations);
+  const citations = z.array(storedCitationSchema).safeParse(
+    row.exercise.citations,
+  );
   if (
     !result.success ||
     !citations.success ||
@@ -417,9 +412,9 @@ export class PrismaGradingRepository implements GradingRepository {
       },
     });
     if (!exercise) return null;
-    const citations = z
-      .array(storedCitationSchema)
-      .safeParse(exercise.citations);
+    const citations = z.array(storedCitationSchema).safeParse(
+      exercise.citations,
+    );
     if (!citations.success) return null;
     const items = exercise.items.map((item) => ({
       id: item.id,
@@ -452,7 +447,10 @@ export class PrismaGradingRepository implements GradingRepository {
     };
   }
 
-  async findOwnedSubmissionByKey(subjectId: string, idempotencyKey: string) {
+  async findOwnedSubmissionByKey(
+    subjectId: string,
+    idempotencyKey: string,
+  ) {
     const row = await this.prisma.exerciseSubmission.findFirst({
       where: { userId: subjectId, clientIdempotencyKey: idempotencyKey },
       include: { exercise: { select: { citations: true } } },
@@ -588,15 +586,16 @@ export class OwnedGradingService {
     exerciseId: string;
     answers: Array<{ itemId: string; answer: string | string[] }>;
     idempotencyKey: string;
-    subjective?: SubjectiveGrader;
   }) {
-    const parsedAnswers = z
-      .array(answerSchema)
-      .min(1)
-      .max(50)
-      .safeParse(input.answers);
+    const parsedAnswers = z.array(answerSchema).min(1).max(50).safeParse(
+      input.answers,
+    );
     if (!parsedAnswers.success) {
-      throw new LearningDomainError('VALIDATION_FAILED', '答案格式无效', 400);
+      throw new LearningDomainError(
+        'VALIDATION_FAILED',
+        '答案格式无效',
+        400,
+      );
     }
     const answerVersion = answerVersionFor(
       input.exerciseId,
@@ -630,7 +629,6 @@ export class OwnedGradingService {
     const result = await this.grading.grade({
       exercise,
       answers: parsedAnswers.data,
-      subjective: input.subjective,
     });
     if (
       result.status !== 'GRADED_VALID' ||

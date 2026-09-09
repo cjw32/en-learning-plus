@@ -21,7 +21,6 @@ export function buildGradeAnswerPrompt(input: {
   answer: string | string[];
   referenceAnswer: unknown;
   controlledRubric: Record<string, unknown>;
-  maxScore: number;
 }) {
   return [
     GRADE_ANSWER_PROMPT_INSTRUCTION,

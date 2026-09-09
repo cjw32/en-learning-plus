@@ -6,6 +6,8 @@ import { AiModule } from '../../src/ai.module';
 import { ChatController } from '../../src/chat/chat.controller';
 import { ChatModule } from '../../src/chat/chat.module';
 import { CoachModule } from '../../src/coach/coach.module';
+import { KnowledgeModule } from '../../src/knowledge/knowledge.module';
+import { RAG_LEARNING_MATERIAL_SEARCH } from '@libs/learning';
 
 describe('Coach module wiring', () => {
   it('adds Coach and learning modules without replacing ChatModule', () => {
@@ -18,6 +20,16 @@ describe('Coach module wiring', () => {
       expect.arrayContaining([ChatModule, CoachModule]),
     );
     expect(serverImports).toEqual(expect.arrayContaining([LearningModule]));
+    expect(Reflect.getMetadata(MODULE_METADATA.IMPORTS, CoachModule)).toEqual(
+      expect.arrayContaining([LearningModule, KnowledgeModule]),
+    );
+    expect(
+      Reflect.getMetadata(MODULE_METADATA.PROVIDERS, KnowledgeModule),
+    ).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ provide: RAG_LEARNING_MATERIAL_SEARCH }),
+      ]),
+    );
   });
 
   it('keeps the existing versioned Chat route and guard metadata unchanged', () => {

@@ -9,6 +9,14 @@ import { CoachRedisConnection } from '../streaming/coach-redis.module';
 const HOUR_MS = 60 * 60 * 1_000;
 const DAY_MS = 24 * HOUR_MS;
 
+export const COACH_RAG_RETENTION_POLICY = Object.freeze({
+  privateContentPurgeMs: DAY_MS,
+  diagnosticContentMs: 7 * DAY_MS,
+  traceMetadataMs: 180 * DAY_MS,
+  replayMs: HOUR_MS,
+  reconciliationMs: DAY_MS,
+});
+
 export interface CoachRetentionRepository {
   expireConversations(now: Date): Promise<string[]>;
   purgeTracesBefore(cutoff: Date): Promise<number>;
@@ -103,16 +111,20 @@ export class CoachRetentionService implements OnModuleInit, OnModuleDestroy {
   async purgeExpired(): Promise<void> {
     const now = this.now();
     await Promise.all([
-      this.ephemeral.purgeEventsBefore(new Date(now.getTime() - HOUR_MS)),
-      this.ephemeral.purgeReconciliationBefore(
-        new Date(now.getTime() - DAY_MS),
+      this.ephemeral.purgeEventsBefore(
+        new Date(now.getTime() - COACH_RAG_RETENTION_POLICY.replayMs),
       ),
-      this.repository.purgeTracesBefore(new Date(now.getTime() - 180 * DAY_MS)),
+      this.ephemeral.purgeReconciliationBefore(
+        new Date(now.getTime() - COACH_RAG_RETENTION_POLICY.reconciliationMs),
+      ),
+      this.repository.purgeTracesBefore(
+        new Date(now.getTime() - COACH_RAG_RETENTION_POLICY.traceMetadataMs),
+      ),
       this.repository.purgeFeedbackBefore(
-        new Date(now.getTime() - 180 * DAY_MS),
+        new Date(now.getTime() - COACH_RAG_RETENTION_POLICY.traceMetadataMs),
       ),
       this.repository.purgeDiagnosticsBefore(
-        new Date(now.getTime() - 7 * DAY_MS),
+        new Date(now.getTime() - COACH_RAG_RETENTION_POLICY.diagnosticContentMs),
       ),
     ]);
     const expiredThreads = await this.repository.expireConversations(now);
@@ -125,7 +137,10 @@ export class CoachRetentionService implements OnModuleInit, OnModuleDestroy {
     const requested = await this.repository.markSubjectDeleting(
       subjectId,
       requestedAt,
-      new Date(requestedAt.getTime() + DAY_MS),
+      new Date(
+        requestedAt.getTime() +
+          COACH_RAG_RETENTION_POLICY.privateContentPurgeMs,
+      ),
     );
     await this.learningDeletion.hideImmediately(subjectId, requestedAt);
     await Promise.all([
@@ -139,7 +154,10 @@ export class CoachRetentionService implements OnModuleInit, OnModuleDestroy {
     });
   }
 
-  async requestConversationDeletion(subjectId: string, conversationId: string) {
+  async requestConversationDeletion(
+    subjectId: string,
+    conversationId: string,
+  ) {
     if (!this.repository.markOwnedConversationDeleting) return null;
     const requestedAt = this.now();
     const requested = await this.repository.markOwnedConversationDeleting(
@@ -174,145 +192,80 @@ function deletionId(subjectId: string, scope: string, resourceId: string) {
 }
 
 @Injectable()
-export class PrismaCoachRetentionRepository implements CoachRetentionRepository {
+export class PrismaCoachRetentionRepository
+  implements CoachRetentionRepository
+{
   constructor(private readonly prisma: PrismaService) {}
-
-  private async redactConversation(
-    database: Prisma.TransactionClient,
-    input: {
-      conversationId: string;
-      subjectId?: string;
-      expectedStatus: 'ACTIVE' | 'DELETING';
-      terminalStatus: 'EXPIRED' | 'DELETED';
-      at: Date;
-    },
-  ) {
-    const conversation = await database.coachConversation.findFirst({
-      where: {
-        id: input.conversationId,
-        status: input.expectedStatus,
-        ...(input.subjectId ? { userId: input.subjectId } : {}),
-      },
-      select: { id: true },
-    });
-    if (!conversation) return false;
-
-    const exercises = await database.exercise.findMany({
-      where: { conversationId: input.conversationId },
-      select: { id: true },
-    });
-    const exerciseIds = exercises.map((item) => item.id);
-    const submissions = exerciseIds.length
-      ? await database.exerciseSubmission.findMany({
-          where: { exerciseId: { in: exerciseIds } },
-          select: { id: true },
-        })
-      : [];
-    const submissionIds = submissions.map((item) => item.id);
-    const requests = await database.coachRequest.findMany({
-      where: { conversationId: input.conversationId },
-      select: { id: true },
-    });
-    const requestIds = requests.map((item) => item.id);
-
-    if (submissionIds.length) {
-      await database.exerciseSubmissionItem.updateMany({
-        where: { submissionId: { in: submissionIds } },
-        data: {
-          answer: {},
-          correction: '',
-          explanation: '',
-          errorTypes: [],
-          targetQualities: [],
-        },
-      });
-      await database.exerciseSubmission.updateMany({
-        where: { id: { in: submissionIds } },
-        data: {
-          answers: [],
-          gradingResult: { redacted: true },
-          resultSchemaVersion: 'coach.redacted.v1',
-        },
-      });
-    }
-    if (exerciseIds.length) {
-      await database.exerciseItem.updateMany({
-        where: { exerciseId: { in: exerciseIds } },
-        data: {
-          prompt: '[redacted]',
-          choices: Prisma.DbNull,
-          answerKey: {},
-          gradingRubric: {},
-          citations: [],
-        },
-      });
-      await database.exercise.updateMany({
-        where: { id: { in: exerciseIds } },
-        data: {
-          status: 'EXPIRED',
-          instructions: '[redacted]',
-          personalizationReason: '[redacted]',
-          citations: [],
-        },
-      });
-    }
-    if (requestIds.length) {
-      await database.coachFeedback.deleteMany({
-        where: { requestId: { in: requestIds } },
-      });
-    }
-    await database.coachMessage.deleteMany({
-      where: { conversationId: input.conversationId },
-    });
-    await database.coachRequest.updateMany({
-      where: {
-        conversationId: input.conversationId,
-        status: { in: ['CREATED', 'QUEUED', 'RUNNING'] },
-      },
-      data: {
-        status: 'CANCELLED',
-        errorCode: 'CANCELLED',
-        cancelRequestedAt: input.at,
-        finishedAt: input.at,
-      },
-    });
-    await database.coachRequest.updateMany({
-      where: { conversationId: input.conversationId },
-      data: {
-        inputPayload: { type: 'RECOMMENDATION' },
-        finalResult: Prisma.DbNull,
-        finalResultSchemaVersion: null,
-      },
-    });
-    await database.coachConversation.update({
-      where: { id: input.conversationId },
-      data: {
-        title: null,
-        status: input.terminalStatus,
-        deletedAt: input.at,
-      },
-    });
-    return true;
-  }
 
   async expireConversations(now: Date): Promise<string[]> {
     const conversations = await this.prisma.coachConversation.findMany({
       where: { status: 'ACTIVE', expiresAt: { lte: now } },
       select: { id: true, checkpointThreadId: true },
     });
-    const expiredThreadIds: string[] = [];
     for (const conversation of conversations) {
-      const expired = await this.prisma.$transaction((database) =>
-        this.redactConversation(database, {
-          conversationId: conversation.id,
-          expectedStatus: 'ACTIVE',
-          terminalStatus: 'EXPIRED',
-          at: now,
-        }),
-      );
-      if (expired) expiredThreadIds.push(conversation.checkpointThreadId);
+      await this.prisma.$transaction(async (database) => {
+        const exercises = await database.exercise.findMany({
+          where: { conversationId: conversation.id },
+          select: { id: true },
+        });
+        const exerciseIds = exercises.map((item) => item.id);
+        const submissions = exerciseIds.length
+          ? await database.exerciseSubmission.findMany({
+              where: { exerciseId: { in: exerciseIds } },
+              select: { id: true },
+            })
+          : [];
+        const submissionIds = submissions.map((item) => item.id);
+        if (submissionIds.length) {
+          await database.exerciseSubmissionItem.updateMany({
+            where: { submissionId: { in: submissionIds } },
+            data: {
+              answer: {},
+              correction: '',
+              explanation: '',
+              errorTypes: [],
+              targetQualities: [],
+            },
+          });
+        }
+        if (exerciseIds.length) {
+          await database.exerciseItem.updateMany({
+            where: { exerciseId: { in: exerciseIds } },
+            data: {
+              prompt: '[expired]',
+              choices: Prisma.JsonNull,
+              answerKey: {},
+              gradingRubric: {},
+              citations: [],
+            },
+          });
+          await database.exercise.updateMany({
+            where: { id: { in: exerciseIds } },
+            data: {
+              instructions: '[expired]',
+              personalizationReason: '[expired]',
+              citations: [],
+            },
+          });
+        }
+        await database.coachMessage.deleteMany({
+          where: { conversationId: conversation.id },
+        });
+        await database.coachRequest.updateMany({
+          where: { conversationId: conversation.id },
+          data: {
+            inputPayload: { type: 'RECOMMENDATION' },
+            finalResult: Prisma.JsonNull,
+            finalResultSchemaVersion: null,
+          },
+        });
+        await database.coachConversation.update({
+          where: { id: conversation.id },
+          data: { status: 'EXPIRED', deletedAt: now },
+        });
+      });
     }
-    return expiredThreadIds;
+    return conversations.map((item) => item.checkpointThreadId);
   }
 
   async purgeTracesBefore(cutoff: Date) {
@@ -331,8 +284,8 @@ export class PrismaCoachRetentionRepository implements CoachRetentionRepository 
     ).count;
   }
 
-  purgeDiagnosticsBefore(_cutoff: Date) {
-    return Promise.resolve(0);
+  async purgeDiagnosticsBefore(_cutoff: Date) {
+    return 0;
   }
 
   async markSubjectDeleting(
@@ -460,26 +413,16 @@ export class PrismaCoachRetentionRepository implements CoachRetentionRepository 
   async purgeSubject(subjectId: string) {
     await this.prisma.$transaction(async (database) => {
       await database.coachFeedback.deleteMany({ where: { userId: subjectId } });
-      await database.learningAttempt.deleteMany({
-        where: { userId: subjectId },
-      });
-      await database.learningItemState.deleteMany({
-        where: { userId: subjectId },
-      });
-      await database.exerciseSubmission.deleteMany({
-        where: { userId: subjectId },
-      });
+      await database.learningAttempt.deleteMany({ where: { userId: subjectId } });
+      await database.learningItemState.deleteMany({ where: { userId: subjectId } });
+      await database.exerciseSubmission.deleteMany({ where: { userId: subjectId } });
       await database.exercise.deleteMany({ where: { userId: subjectId } });
       await database.coachMessage.deleteMany({
         where: { conversation: { userId: subjectId } },
       });
       await database.coachRequest.deleteMany({ where: { userId: subjectId } });
-      await database.coachConversation.deleteMany({
-        where: { userId: subjectId },
-      });
-      await database.learnerProfile.deleteMany({
-        where: { userId: subjectId },
-      });
+      await database.coachConversation.deleteMany({ where: { userId: subjectId } });
+      await database.learnerProfile.deleteMany({ where: { userId: subjectId } });
     });
   }
 
@@ -556,15 +499,9 @@ export class PrismaCoachRetentionRepository implements CoachRetentionRepository 
   }
 
   async purgeConversation(subjectId: string, conversationId: string) {
-    await this.prisma.$transaction((database) =>
-      this.redactConversation(database, {
-        conversationId,
-        subjectId,
-        expectedStatus: 'DELETING',
-        terminalStatus: 'DELETED',
-        at: new Date(),
-      }),
-    );
+    await this.prisma.coachConversation.deleteMany({
+      where: { id: conversationId, userId: subjectId, status: 'DELETING' },
+    });
   }
 }
 
@@ -575,12 +512,12 @@ export class RedisCoachEphemeralDataStore implements CoachEphemeralDataStore {
     private readonly prisma: PrismaService,
   ) {}
 
-  purgeEventsBefore(_cutoff: Date) {
-    return Promise.resolve(0); // Stream keys already have an enforced one-hour TTL at append time.
+  async purgeEventsBefore(_cutoff: Date) {
+    return 0; // Stream keys already have an enforced one-hour TTL at append time.
   }
 
-  purgeReconciliationBefore(_cutoff: Date) {
-    return Promise.resolve(0); // Reconciliation records are durable request state, not content cache.
+  async purgeReconciliationBefore(_cutoff: Date) {
+    return 0; // Reconciliation records are durable request state, not content cache.
   }
 
   async purgeSubject(subjectId: string) {
@@ -591,12 +528,7 @@ export class RedisCoachEphemeralDataStore implements CoachEphemeralDataStore {
     if (this.redis.client.status === 'wait') await this.redis.client.connect();
     for (const request of requests) {
       const base = `coach:events:${request.id}`;
-      await this.redis.client.set(
-        `coach:cancel:${request.id}`,
-        '1',
-        'EX',
-        3600,
-      );
+      await this.redis.client.set(`coach:cancel:${request.id}`, '1', 'EX', 3600);
       await this.redis.client.publish('coach:cancellations', request.id);
       await this.redis.client.del(
         base,

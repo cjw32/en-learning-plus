@@ -6,6 +6,7 @@ import {
   CoachRequestRuleError,
   CoachRequestService,
 } from '../api/coach-request.service';
+import { CoachQueueService } from '../queue/coach.queue';
 import { CoachEventStreamService } from '../streaming/coach-event-stream.service';
 
 const retryableErrorCodes = new Set([
@@ -20,6 +21,7 @@ export class CoachRetryService {
   constructor(
     private readonly repository: CoachRequestRepository,
     private readonly requests: CoachRequestService,
+    private readonly queue: CoachQueueService,
     private readonly stream: CoachEventStreamService,
   ) {}
 
@@ -47,7 +49,10 @@ export class CoachRetryService {
       (source.status === 'FAILED' &&
         retryableErrorCodes.has(source.errorCode ?? ''));
     if (!retryable) {
-      throw new CoachRequestRuleError('STATE_CONFLICT', '该请求当前不可重试');
+      throw new CoachRequestRuleError(
+        'STATE_CONFLICT',
+        '该请求当前不可重试',
+      );
     }
     const payload = createCoachRequestSchema.safeParse(source.inputPayload);
     if (!payload.success) {
@@ -74,6 +79,7 @@ export class CoachRetryService {
       } catch {
         // Durable request remains authoritative during stream outages.
       }
+      await this.queue.enqueue(request.id);
     }
     return { replayed: created.replayed, request };
   }

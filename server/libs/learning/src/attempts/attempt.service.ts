@@ -4,10 +4,7 @@ import type { ErrorType } from '@en/common/coach';
 import { z } from '@en/common/coach/zod';
 import { PrismaService } from '@libs/shared';
 import { Prisma } from '@libs/shared/generated/prisma/client';
-import {
-  LearningDomainError,
-  ownedResourceNotFound,
-} from '../common/learning-errors';
+import { LearningDomainError, ownedResourceNotFound } from '../common/learning-errors';
 import {
   aggregateLowestQuality,
   scheduleSm2Review,
@@ -20,7 +17,7 @@ export type AttemptSubmission = {
   id: string;
   subjectId: string;
   exerciseId: string;
-  status: string;
+  status: 'GRADED_VALID' | 'SAVED' | string;
   score: number | null;
   gradingHash: string | null;
   errorTypes: ErrorType[];
@@ -78,6 +75,12 @@ export type AttemptReviewEvent = {
   nextState: Sm2ReviewState;
 };
 
+export type AttemptKnowledgeRebuild = Readonly<{
+  subjectId: string;
+  attemptId: string;
+  gradingHash: string;
+}>;
+
 export interface AttemptTransaction {
   lockOwnedSubmission(
     subjectId: string,
@@ -95,6 +98,7 @@ export interface AttemptTransaction {
   upsertItemState(state: AttemptItemState): Promise<void>;
   createReviewEvent(event: AttemptReviewEvent): Promise<void>;
   markSaved(submissionId: string, exerciseId: string): Promise<void>;
+  enqueueKnowledgeRebuild(command: AttemptKnowledgeRebuild): Promise<void>;
 }
 
 export interface AttemptRepository {
@@ -130,9 +134,7 @@ function jsonValue(value: unknown): Prisma.InputJsonValue {
 export class PrismaAttemptRepository implements AttemptRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  transaction<T>(
-    operation: (tx: AttemptTransaction) => Promise<T>,
-  ): Promise<T> {
+  transaction<T>(operation: (tx: AttemptTransaction) => Promise<T>): Promise<T> {
     return this.prisma.$transaction(async (database) => {
       const itemStateIds = new Map<string, string>();
       const transaction: AttemptTransaction = {
@@ -184,12 +186,10 @@ export class PrismaAttemptRepository implements AttemptRepository {
               : []) as ErrorType[],
             timezone: profile?.timezone ?? 'Asia/Shanghai',
             targetEvidence: submission.items.flatMap((item) =>
-              targetEvidenceSchema
-                .parse(item.targetQualities)
-                .map((target) => ({
-                  ...target,
-                  wordId: target.wordId ?? null,
-                })),
+              targetEvidenceSchema.parse(item.targetQualities).map((target) => ({
+                ...target,
+                wordId: target.wordId ?? null,
+              })),
             ),
           };
         },
@@ -220,9 +220,7 @@ export class PrismaAttemptRepository implements AttemptRepository {
             submissionId: attempt.submissionId,
             saveRequestId: attempt.saveRequestId,
             score: attempt.score,
-            errorTypes: z
-              .array(z.string())
-              .parse(attempt.errorTypes) as ErrorType[],
+            errorTypes: z.array(z.string()).parse(attempt.errorTypes) as ErrorType[],
             gradingHash: attempt.gradingHash,
             savedAt: attempt.savedAt,
             changes,
@@ -231,11 +229,7 @@ export class PrismaAttemptRepository implements AttemptRepository {
         findItemState: async (subjectId, targetType, targetKey) => {
           const state = await database.learningItemState.findUnique({
             where: {
-              userId_targetType_targetKey: {
-                userId: subjectId,
-                targetType,
-                targetKey,
-              },
+              userId_targetType_targetKey: { userId: subjectId, targetType, targetKey },
             },
           });
           return state
@@ -312,8 +306,7 @@ export class PrismaAttemptRepository implements AttemptRepository {
           const itemStateId = itemStateIds.get(
             `${event.targetType}:${event.targetKey}`,
           );
-          if (!itemStateId)
-            throw new Error('Missing item state transaction key');
+          if (!itemStateId) throw new Error('Missing item state transaction key');
           await database.learningReviewEvent.create({
             data: {
               id: event.id,
@@ -339,6 +332,41 @@ export class PrismaAttemptRepository implements AttemptRepository {
             data: { status: 'SAVED' },
           });
         },
+        enqueueKnowledgeRebuild: async (command) => {
+          const source = await database.knowledgeSource.findUnique({
+            where: { sourceKey: 'private-learning' },
+            select: { id: true },
+          });
+          // Private RAG is default-off. Environments that enable it must first
+          // provision the audited source; legacy saves remain unaffected otherwise.
+          if (!source) return;
+          const contentVersion = `grading.sha256.${command.gradingHash}`;
+          await database.knowledgeIngestionJob.createMany({
+            skipDuplicates: true,
+            data: [
+              {
+                id: `kjob_${randomUUID().replaceAll('-', '')}`,
+                operation: 'UPSERT',
+                knowledgeSourceId: source.id,
+                sourceRecordType: 'LearningAttempt',
+                sourceRecordId: command.attemptId,
+                contentVersion,
+                pipelineVersion: 'private-wrong-answer.v1',
+                ownerUserId: command.subjectId,
+              },
+              {
+                id: `kjob_${randomUUID().replaceAll('-', '')}`,
+                operation: 'UPSERT',
+                knowledgeSourceId: source.id,
+                sourceRecordType: 'PrivateLearningSummary',
+                sourceRecordId: command.subjectId,
+                contentVersion,
+                pipelineVersion: 'private-learning-summary.v1',
+                ownerUserId: command.subjectId,
+              },
+            ],
+          });
+        },
       };
       return operation(transaction);
     });
@@ -350,6 +378,7 @@ export type AttemptTransactionState = {
   attempts: AttemptRecord[];
   itemStates: AttemptItemState[];
   reviewEvents: AttemptReviewEvent[];
+  knowledgeRebuilds: AttemptKnowledgeRebuild[];
 };
 
 function stateSnapshot(state: Sm2ReviewState): Sm2ReviewState {
@@ -458,21 +487,22 @@ export class AttemptService {
         quality: number;
       }> = [];
       for (const group of grouped.values()) {
-        const current = (await tx.findItemState(
-          input.subjectId,
-          group.targetType,
-          group.targetKey,
-        )) ?? {
-          subjectId: input.subjectId,
-          targetType: group.targetType,
-          targetKey: group.targetKey,
-          wordId: group.wordId,
-          reviewState: 'NEW' as const,
-          repetitionCount: 0,
-          easeFactor: 2.5,
-          intervalDays: 0,
-          dueAt: undefined,
-        };
+        const current =
+          (await tx.findItemState(
+            input.subjectId,
+            group.targetType,
+            group.targetKey,
+          )) ?? {
+            subjectId: input.subjectId,
+            targetType: group.targetType,
+            targetKey: group.targetKey,
+            wordId: group.wordId,
+            reviewState: 'NEW' as const,
+            repetitionCount: 0,
+            easeFactor: 2.5,
+            intervalDays: 0,
+            dueAt: undefined,
+          };
         const quality = aggregateLowestQuality(group.qualities);
         const scheduled = scheduleSm2Review({
           current,
@@ -535,6 +565,11 @@ export class AttemptService {
         });
       }
       await tx.markSaved(input.submissionId, submission.exerciseId);
+      await tx.enqueueKnowledgeRebuild({
+        subjectId: input.subjectId,
+        attemptId,
+        gradingHash: input.gradingHash,
+      });
       return {
         status: 'saved' as const,
         attemptId,

@@ -15,12 +15,7 @@ describe('Coach governance foundation', () => {
       maxCostMicros: 1_000,
       maxDurationMs: 5_000,
     });
-    budget.record({
-      inputTokens: 90,
-      outputTokens: 45,
-      toolCalls: 2,
-      costMicros: 900,
-    });
+    budget.record({ inputTokens: 90, outputTokens: 45, toolCalls: 2, costMicros: 900 });
 
     expect(() =>
       budget.assertCanStartNode({
@@ -35,36 +30,24 @@ describe('Coach governance foundation', () => {
 
   it('isolates rate-limit keys by authenticated subject and operation', async () => {
     const store = new InMemoryRateLimitStore();
-    const limiter = new CoachRateLimitService(store, {
-      limit: 1,
-      windowSeconds: 60,
-    });
+    const limiter = new CoachRateLimitService(store, { limit: 1, windowSeconds: 60 });
 
     await limiter.consume('user-a', 'create-request');
-    await expect(
-      limiter.consume('user-a', 'create-request'),
-    ).rejects.toMatchObject({
+    await expect(limiter.consume('user-a', 'create-request')).rejects.toMatchObject({
       code: 'RATE_LIMITED',
     });
-    await expect(
-      limiter.consume('user-b', 'create-request'),
-    ).resolves.toBeDefined();
+    await expect(limiter.consume('user-b', 'create-request')).resolves.toBeDefined();
     await expect(limiter.consume('user-a', 'stream')).resolves.toBeDefined();
   });
 
   it('records monotonically ordered minimized trace steps', () => {
-    const trace = new CoachTraceService(
-      'trace_000001',
-      'subject-internal-hash',
-    );
+    const trace = new CoachTraceService('trace_000001', 'subject-internal-hash');
     trace.startStep('classify_intent', 100);
     trace.finishStep('classify_intent', 'SUCCEEDED', 120);
     trace.startStep('get_learner_profile', 121);
 
     expect(trace.snapshot().steps.map((step) => step.sequence)).toEqual([0, 1]);
-    expect(JSON.stringify(trace.snapshot())).not.toContain(
-      'user-a@example.test',
-    );
+    expect(JSON.stringify(trace.snapshot())).not.toContain('user-a@example.test');
   });
 
   it('removes sensitive canaries and keeps only the explicit allowlist', () => {

@@ -20,7 +20,6 @@ import {
   CoachSseSessionError,
   CoachSseSessionService,
 } from './coach-sse-session.service';
-import { CoachEnabledGuard } from '../governance/coach-enabled.guard';
 
 type AuthenticatedRequest = Request & {
   coachContext?: CoachExecutionContext;
@@ -40,7 +39,7 @@ function terminal(event: CoachSseEvent) {
 }
 
 @Controller({ path: 'coach', version: '1' })
-@UseGuards(AuthGuard, CoachEnabledGuard)
+@UseGuards(AuthGuard)
 export class CoachSseController {
   constructor(private readonly sessions: CoachSseSessionService) {}
 

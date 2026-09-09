@@ -26,14 +26,17 @@ import {
   createCoachRequestSchema,
   idempotencyKeySchema,
   deleteCoachDataSchema,
+  citationIdSchema,
 } from '@en/common/coach';
 import { z } from '@en/common/coach/zod';
-import { AuthGuard, CoachExecutionContext } from '@libs/shared';
+import {
+  AuthGuard,
+  CoachExecutionContext,
+} from '@libs/shared';
 import type { Request } from 'express';
 import type { Response } from 'express';
 import { CoachApiService } from './coach-api.service';
 import { CoachAdmissionService } from '../governance/coach-admission.service';
-import { CoachEnabledGuard } from '../governance/coach-enabled.guard';
 
 type CoachRequest = Request & { coachContext?: CoachExecutionContext };
 
@@ -63,7 +66,7 @@ function contextFrom(request: CoachRequest): CoachExecutionContext {
 }
 
 @Controller({ path: 'coach', version: '1' })
-@UseGuards(AuthGuard, CoachEnabledGuard)
+@UseGuards(AuthGuard)
 export class CoachController {
   constructor(
     private readonly api: CoachApiService,
@@ -102,7 +105,10 @@ export class CoachController {
   }
 
   @Get('conversations')
-  listConversations(@Req() request: CoachRequest, @Query() query: unknown) {
+  listConversations(
+    @Req() request: CoachRequest,
+    @Query() query: unknown,
+  ) {
     return this.api.listConversations(
       contextFrom(request),
       parse(listQuerySchema, query),
@@ -144,7 +150,14 @@ export class CoachController {
     @Body() body: unknown,
     @Headers('idempotency-key') key: unknown,
   ) {
-    await this.consumeIp(request.ip);
+    try {
+      await this.admission?.consumeIp(request.ip);
+    } catch (error) {
+      if (error && typeof error === 'object' && 'code' in error && error.code === 'RATE_LIMITED') {
+        throw new HttpException('请求过于频繁，请稍后再试。', HttpStatus.TOO_MANY_REQUESTS);
+      }
+      throw new ServiceUnavailableException('Coach 请求治理暂时不可用');
+    }
     return this.api.createRequest(
       contextFrom(request),
       conversationId,
@@ -159,6 +172,17 @@ export class CoachController {
     @Param('requestId') requestId: string,
   ) {
     return this.api.getRequest(contextFrom(request), requestId);
+  }
+
+  @Get('citations/:citationId')
+  getCitation(
+    @Req() request: CoachRequest,
+    @Param('citationId') citationId: string,
+  ) {
+    return this.api.getCitation(
+      contextFrom(request),
+      parse(citationIdSchema, citationId),
+    );
   }
 
   @Post('requests/:requestId/cancel')
@@ -182,7 +206,6 @@ export class CoachController {
     @Param('requestId') requestId: string,
     @Headers('idempotency-key') key: unknown,
   ) {
-    await this.consumeIp(request.ip);
     const result = await this.api.retryRequest(
       contextFrom(request),
       requestId,
@@ -219,24 +242,5 @@ export class CoachController {
       contextFrom(request),
       parse(idempotencyKeySchema, key),
     );
-  }
-
-  private async consumeIp(ipAddress: string | undefined) {
-    try {
-      await this.admission?.consumeIp(ipAddress);
-    } catch (error) {
-      if (
-        error &&
-        typeof error === 'object' &&
-        'code' in error &&
-        error.code === 'RATE_LIMITED'
-      ) {
-        throw new HttpException(
-          '请求过于频繁，请稍后再试。',
-          HttpStatus.TOO_MANY_REQUESTS,
-        );
-      }
-      throw new ServiceUnavailableException('Coach 请求治理暂时不可用');
-    }
   }
 }

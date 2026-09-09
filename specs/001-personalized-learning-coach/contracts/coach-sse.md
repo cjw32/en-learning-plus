@@ -1,8 +1,8 @@
 # Coach SSE Contract v1
 
-**Endpoint**: `GET /ai/v1/coach/requests/{requestId}/events`
-**Authentication**: Bearer access JWT; request ownership is rechecked before replay or live subscription.
-**Media type**: `text/event-stream`
+**Endpoint**: `GET /ai/v1/coach/requests/{requestId}/events`  
+**Authentication**: Bearer access JWT; request ownership is rechecked before replay or live subscription.  
+**Media type**: `text/event-stream`  
 **Replay**: Client sends `Last-Event-ID`; server resumes after that event while the one-hour Redis replay buffer exists.
 
 ## Envelope

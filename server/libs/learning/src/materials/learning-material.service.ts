@@ -1,8 +1,9 @@
-import { Inject, Injectable } from '@nestjs/common';
-import {
-  LearningDomainError,
-  ownedResourceNotFound,
-} from '../common/learning-errors';
+import { Inject, Injectable, Optional } from '@nestjs/common';
+import type {
+  SearchLearningMaterialsV2Input,
+  SearchLearningMaterialsV2Output,
+} from '@en/common/coach';
+import { LearningDomainError, ownedResourceNotFound } from '../common/learning-errors';
 import type {
   LearningMaterial,
   LearningMaterialCitation,
@@ -14,13 +15,52 @@ import type {
 export const LEARNING_MATERIAL_PROVIDERS = Symbol(
   'LEARNING_MATERIAL_PROVIDERS',
 );
+export const RAG_LEARNING_MATERIAL_SEARCH = Symbol(
+  'RAG_LEARNING_MATERIAL_SEARCH',
+);
+
+export interface RagLearningMaterialSearchPort {
+  search(
+    subjectId: string,
+    input: SearchLearningMaterialsV2Input,
+    context?: Readonly<{
+      requestId: string;
+      deadline?: Date;
+      signal?: AbortSignal;
+    }>,
+  ): Promise<SearchLearningMaterialsV2Output>;
+}
 
 @Injectable()
 export class LearningMaterialService {
   constructor(
     @Inject(LEARNING_MATERIAL_PROVIDERS)
     private readonly providers: readonly LearningMaterialProvider[],
+    @Optional()
+    @Inject(RAG_LEARNING_MATERIAL_SEARCH)
+    private readonly ragSearch?: RagLearningMaterialSearchPort,
   ) {}
+
+  async searchV2(
+    subjectId: string,
+    input: SearchLearningMaterialsV2Input,
+    context?: Readonly<{
+      requestId: string;
+      deadline?: Date;
+      signal?: AbortSignal;
+    }>,
+    overrideSearch?: RagLearningMaterialSearchPort,
+  ): Promise<SearchLearningMaterialsV2Output> {
+    const search = overrideSearch ?? this.ragSearch;
+    if (!search) {
+      throw new LearningDomainError(
+        'DATA_NOT_AVAILABLE',
+        'RAG learning material search is disabled',
+        503,
+      );
+    }
+    return search.search(subjectId, input, context);
+  }
 
   async search(
     subjectId: string,

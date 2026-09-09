@@ -6,6 +6,8 @@ import type {
   CoachTraceTerminalStatus,
   CoachTraceWriter,
 } from './coach-trace.service';
+import { redactRagTraceMetadata } from './coach-redaction';
+import type { RetrievalTraceMetadata } from './rag-trace.types';
 
 export interface CoachTraceRepository extends CoachTraceWriter {
   findOwned(
@@ -17,21 +19,29 @@ export interface CoachTraceRepository extends CoachTraceWriter {
 export class InMemoryCoachTraceRepository implements CoachTraceRepository {
   private readonly traces = new Map<string, CoachTraceSnapshot>();
   private readonly requests = new Set<string>();
+  private readonly feedback = new Map<string, 'UP' | 'DOWN'>();
 
-  save(trace: CoachTraceSnapshot): Promise<void> {
+  async save(trace: CoachTraceSnapshot): Promise<void> {
     if (this.traces.has(trace.traceId) || this.requests.has(trace.requestId)) {
       throw new Error('Each request must have exactly one Trace');
     }
     this.traces.set(trace.traceId, trace);
     this.requests.add(trace.requestId);
-    return Promise.resolve();
   }
 
-  findOwned(traceSubjectId: string, traceId: string) {
+  async findOwned(traceSubjectId: string, traceId: string) {
     const trace = this.traces.get(traceId);
-    return Promise.resolve(
-      trace?.traceSubjectId === traceSubjectId ? trace : null,
-    );
+    return trace?.traceSubjectId === traceSubjectId
+      ? Object.freeze({
+          ...trace,
+          feedback: this.feedback.get(traceId) ?? null,
+        })
+      : null;
+  }
+
+  linkFeedback(traceId: string, rating: 'UP' | 'DOWN'): void {
+    if (!this.traces.has(traceId)) throw new Error('Trace does not exist');
+    this.feedback.set(traceId, rating);
   }
 }
 
@@ -72,13 +82,11 @@ export class PrismaCoachTraceRepository implements CoachTraceRepository {
   }
 
   async save(trace: CoachTraceSnapshot): Promise<void> {
-    if (!trace.terminalStatus)
-      throw new Error('Terminal Trace status is required');
+    if (!trace.terminalStatus) throw new Error('Terminal Trace status is required');
     const resultType = trace.resultType
       ? resultTypes[trace.resultType as keyof typeof resultTypes]
       : null;
-    if (trace.resultType && !resultType)
-      throw new Error('Invalid Trace result type');
+    if (trace.resultType && !resultType) throw new Error('Invalid Trace result type');
     await this.prisma.coachTrace.create({
       data: {
         id: trace.traceId,
@@ -126,7 +134,10 @@ export class PrismaCoachTraceRepository implements CoachTraceRepository {
   async findOwned(subjectId: string, traceId: string) {
     const trace = await this.prisma.coachTrace.findFirst({
       where: { id: traceId, traceSubject: { userId: subjectId } },
-      include: { steps: { orderBy: { sequence: 'asc' } }, request: true },
+      include: {
+        steps: { orderBy: { sequence: 'asc' } },
+        request: { include: { feedback: { orderBy: { updatedAt: 'desc' }, take: 1 } } },
+      },
     });
     if (!trace?.traceSubjectId) return null;
     const terminalStatuses = new Set<CoachTraceTerminalStatus>([
@@ -136,11 +147,22 @@ export class PrismaCoachTraceRepository implements CoachTraceRepository {
       'TIMED_OUT',
       'BUDGET_EXCEEDED',
     ]);
-    if (
-      !terminalStatuses.has(trace.terminalStatus as CoachTraceTerminalStatus)
-    ) {
+    if (!terminalStatuses.has(trace.terminalStatus as CoachTraceTerminalStatus)) {
       return null;
     }
+    const ragStep = trace.steps.find(
+      (step) =>
+        step.stepName === 'SEARCH_LEARNING_MATERIALS' &&
+        step.redactedMetadata &&
+        typeof step.redactedMetadata === 'object' &&
+        !Array.isArray(step.redactedMetadata) &&
+        'rag' in step.redactedMetadata,
+    );
+    const rag = ragStep
+      ? redactRagTraceMetadata(
+          (ragStep.redactedMetadata as Record<string, unknown>).rag,
+        )
+      : null;
     return {
       traceId: trace.id,
       traceSubjectId: trace.traceSubjectId,
@@ -179,6 +201,8 @@ export class PrismaCoachTraceRepository implements CoachTraceRepository {
         !Array.isArray(trace.recommendation)
           ? (trace.recommendation as unknown as CoachTraceSnapshot['recommendation'])
           : null,
+      rag: rag as RetrievalTraceMetadata | null,
+      feedback: trace.request.feedback[0]?.rating ?? null,
     };
   }
 }

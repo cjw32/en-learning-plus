@@ -26,7 +26,9 @@ export class CoachModelExerciseGenerator implements CoachExerciseGenerator {
   }
 }
 
-export class EnvironmentCoachExerciseBudgetGate implements CoachExerciseBudgetGate {
+export class EnvironmentCoachExerciseBudgetGate
+  implements CoachExerciseBudgetGate
+{
   assertCanGenerate(): void {
     const config = resolveCoachRuntimeConfig(process.env);
     if (

@@ -17,9 +17,7 @@ describe('Coach authentication context', () => {
       'Bearer one two',
       ['Bearer token'],
     ]) {
-      expect(() => parseStrictBearerToken(value)).toThrow(
-        UnauthorizedException,
-      );
+      expect(() => parseStrictBearerToken(value)).toThrow(UnauthorizedException);
     }
   });
 

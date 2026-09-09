@@ -1,4 +1,6 @@
-import { toPublicLearningError } from './learning-errors';
+import {
+  toPublicLearningError,
+} from './learning-errors';
 import { OwnedResourceService } from './owned-resource.service';
 
 describe('OwnedResourceService', () => {

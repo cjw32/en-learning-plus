@@ -2,8 +2,10 @@ import { Injectable } from '@nestjs/common';
 import {
   citationSchema,
   errorTypeSchema,
+  groundedClaimSchema,
   type Citation,
   type ErrorType,
+  type GroundedClaim,
 } from '@en/common/coach';
 import { z } from '@en/common/coach/zod';
 import {
@@ -12,11 +14,6 @@ import {
 } from '../prompts/answer.prompt';
 import { buildClassifyIntentPrompt } from '../prompts/classify-intent.prompt';
 import { buildCorrectionPrompt } from '../prompts/correction.prompt';
-import {
-  buildGradeAnswerPrompt,
-  subjectiveGradeModelSchema,
-} from '../prompts/grade-answer.prompt';
-import type { SubjectiveGrader } from '@libs/learning';
 
 const coachIntentModelOutputSchema = z
   .object({
@@ -41,6 +38,16 @@ export const coachAnswerModelOutputSchema = z
   })
   .strict();
 
+export const groundedCoachAnswerModelOutputSchema = z
+  .object({
+    correction: z.string().max(4000),
+    explanation: z.string().min(1).max(12000),
+    examples: z.array(z.string().min(1).max(2000)).max(8),
+    errorTypes: z.array(errorTypeSchema).max(11),
+    groundedClaims: z.array(groundedClaimSchema).min(1).max(40),
+  })
+  .strict();
+
 export type CoachAnswerModelOutput = Readonly<{
   correction: string;
   explanation: string;
@@ -49,10 +56,19 @@ export type CoachAnswerModelOutput = Readonly<{
   citations: Citation[];
 }>;
 
+export type GroundedCoachAnswerModelOutput = Readonly<{
+  correction: string;
+  explanation: string;
+  examples: string[];
+  errorTypes: ErrorType[];
+  groundedClaims: GroundedClaim[];
+}>;
+
 export type CoachStructuredInvocation = Readonly<{
   schemaName:
     | 'coach_intent_v1'
     | 'coach_answer_v1'
+    | 'coach_answer_v2'
     | 'coach_exercise_v1'
     | 'coach_subjective_grade_v1'
     | 'coach_next_action_reason_v1';
@@ -106,19 +122,22 @@ export class CoachModelGateway {
     return this.invokeAnswer(buildCorrectionPrompt(input), signal, telemetry);
   }
 
-  async gradeSubjective(
-    input: Parameters<SubjectiveGrader['evaluate']>[0],
+  async generateGroundedAnswer(
+    input: CoachAnswerPromptInput & Readonly<{ correction: boolean }>,
     signal?: AbortSignal,
     telemetry?: CoachModelTelemetry,
-  ) {
+  ): Promise<GroundedCoachAnswerModelOutput> {
+    const prompt = input.correction
+      ? buildCorrectionPrompt(input)
+      : buildAnswerPrompt(input);
     const raw = await this.model.invokeStructured({
-      schemaName: 'coach_subjective_grade_v1',
-      prompt: buildGradeAnswerPrompt(input),
-      jsonSchema: z.toJSONSchema(subjectiveGradeModelSchema),
+      schemaName: 'coach_answer_v2',
+      prompt,
+      jsonSchema: z.toJSONSchema(groundedCoachAnswerModelOutputSchema),
       signal,
       telemetry,
     });
-    return subjectiveGradeModelSchema.parse(raw);
+    return groundedCoachAnswerModelOutputSchema.parse(raw);
   }
 
   private async invokeAnswer(

@@ -47,7 +47,9 @@ export interface CoachRuntimeBudgetFactory {
 }
 
 @Injectable()
-export class EnvironmentCoachRuntimeBudgetFactory implements CoachRuntimeBudgetFactory {
+export class EnvironmentCoachRuntimeBudgetFactory
+  implements CoachRuntimeBudgetFactory
+{
   constructor(private readonly environment: NodeJS.ProcessEnv = process.env) {}
 
   create(deadlineRemainingMs: number) {
@@ -102,9 +104,7 @@ export class EnvironmentCoachRuntimeBudgetFactory implements CoachRuntimeBudgetF
       !config.modelName ||
       !config.modelPriceVersion
     ) {
-      throw new CoachBudgetExceededError(
-        'Approved live model policy is missing',
-      );
+      throw new CoachBudgetExceededError('Approved live model policy is missing');
     }
     const meter = new CoachCostMeter(
       new CoachModelPriceCatalog([

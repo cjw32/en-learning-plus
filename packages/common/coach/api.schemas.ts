@@ -5,7 +5,7 @@ import {
 } from './event.schemas';
 import {
   cefrLevelSchema,
-  coachResultSchema,
+  anyPublicCoachResultSchema,
   exerciseTypeSchema,
 } from './result.schemas';
 import { exerciseAnswerSchema } from './tool.schemas';
@@ -117,7 +117,7 @@ export const coachMessageSchema = z
     id: z.string(),
     role: z.enum(['USER', 'COACH']),
     content: z.string().nullable(),
-    structuredResult: coachResultSchema.nullable(),
+    structuredResult: anyPublicCoachResultSchema.nullable(),
     createdAt: isoDateTime,
   })
   .strict();
@@ -149,7 +149,7 @@ export const coachRequestSchema = z
       ])
       .nullable(),
     status: coachRequestStatusSchema,
-    finalResult: coachResultSchema.nullable(),
+    finalResult: anyPublicCoachResultSchema.nullable(),
     error: z
       .object({
         code: coachPublicErrorCodeSchema,

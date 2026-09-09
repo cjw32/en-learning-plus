@@ -64,10 +64,10 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { CoachResult } from '@en/common/coach'
+import type { AnyPublicCoachResult } from '@en/common/coach'
 import LearningUpdate from './LearningUpdate.vue'
 
-const props = defineProps<{ result: CoachResult }>()
+const props = defineProps<{ result: AnyPublicCoachResult }>()
 const actionLabel = computed(() => ({
   review: '复习',
   practice: '练习',

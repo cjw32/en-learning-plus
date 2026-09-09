@@ -27,9 +27,7 @@ export function assembleLearningUpdate(raw: unknown): AssembledLearningUpdate {
   return Object.freeze({
     status: parsed.data.status,
     attemptId: parsed.data.attemptId,
-    changes: Object.freeze(
-      parsed.data.changes.map((change) => Object.freeze(change)),
-    ),
+    changes: Object.freeze(parsed.data.changes.map((change) => Object.freeze(change))),
     savedAt: parsed.data.savedAt,
   });
 }

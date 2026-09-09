@@ -50,22 +50,14 @@ function localDateAt(instant: Date, timezone: string) {
 }
 
 function addCalendarDays(date: string, days: number) {
-  const [year, month, day] = date.split('-').map(Number) as [
-    number,
-    number,
-    number,
-  ];
+  const [year, month, day] = date.split('-').map(Number) as [number, number, number];
   return new Date(Date.UTC(year, month - 1, day + days))
     .toISOString()
     .slice(0, 10);
 }
 
 function zonedStartOfDay(date: string, timezone: string) {
-  const [year, month, day] = date.split('-').map(Number) as [
-    number,
-    number,
-    number,
-  ];
+  const [year, month, day] = date.split('-').map(Number) as [number, number, number];
   const target = Date.UTC(year, month - 1, day);
   const formatter = new Intl.DateTimeFormat('en-CA', {
     timeZone: timezone,
@@ -109,7 +101,9 @@ export function scheduleSm2Review(input: {
   if (Number.isNaN(input.reviewedAt.getTime())) {
     throw new Error('reviewedAt must be valid');
   }
-  const delta = 0.1 - (5 - input.quality) * (0.08 + (5 - input.quality) * 0.02);
+  const delta =
+    0.1 -
+    (5 - input.quality) * (0.08 + (5 - input.quality) * 0.02);
   const easeFactor = Math.max(
     1.3,
     Math.round((input.current.easeFactor + delta) * 100) / 100,

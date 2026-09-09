@@ -138,12 +138,11 @@ describe('Coach contracts', () => {
     ).toBe(false);
 
     for (const [toolName, input] of Object.entries(validToolInputs)) {
-      const schema =
-        coachToolSchemas[toolName as keyof typeof coachToolSchemas].input;
+      const schema = coachToolSchemas[toolName as keyof typeof coachToolSchemas].input;
       expect(schema.safeParse(input).success).toBe(true);
-      expect(
-        schema.safeParse({ ...input, userId: 'another-user' }).success,
-      ).toBe(false);
+      expect(schema.safeParse({ ...input, userId: 'another-user' }).success).toBe(
+        false,
+      );
     }
   });
 

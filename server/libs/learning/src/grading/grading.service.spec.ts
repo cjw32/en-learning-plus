@@ -71,18 +71,15 @@ describe('GradingService', () => {
         { itemId: 'exercise_item_00002', answer: 'went' },
       ],
     },
-  ])(
-    'returns an ungradable result for invalid answer sets',
-    async ({ answers }) => {
-      const result = await new GradingService().grade({
-        exercise: objectiveExercise,
-        answers,
-      });
-      expect(result.status).toBe('GRADING_FAILED');
-      expect(result.score).toBeNull();
-      expect(result.gradingHash).toBeNull();
-    },
-  );
+  ])('returns an ungradable result for invalid answer sets', async ({ answers }) => {
+    const result = await new GradingService().grade({
+      exercise: objectiveExercise,
+      answers,
+    });
+    expect(result.status).toBe('GRADING_FAILED');
+    expect(result.score).toBeNull();
+    expect(result.gradingHash).toBeNull();
+  });
 
   it('uses a bounded subjective evaluator but computes total and hash in business code', async () => {
     const subjective: SubjectiveGrader = {

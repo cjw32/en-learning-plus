@@ -9,9 +9,9 @@
 | FR-016–FR-024 | No public/tool `userId`, Learning Service boundary, cross-user and auth tests |
 | FR-025–FR-032 | Six Zod tools, supported citations, structured result schema, one repair retry and safe degraded results |
 | FR-033–FR-040 | One-hour Redis event stream, authenticated SSE replay, 410 reconciliation, AbortSignal, cancel/retry and eight browser scenarios |
-| FR-041–FR-048 | Approved-value fail-closed policy, enforced master flag, user/IP rate limits, request-bound idempotent distributed concurrency lease, model/tool/time/cost budgets, idempotent persistence and save reconciliation |
+| FR-041–FR-048 | Approved-value fail-closed policy, user/IP rate limits, distributed concurrency lease, model/tool/time/cost budgets, idempotent persistence and save reconciliation |
 | FR-049–FR-054 | Versioned Prompt content hash, model/schema/budget versions, TTFT, actual provider token/cost callbacks, ordered steps, recommendation evidence and feedback linkage |
-| FR-055–FR-061 | Context projection, HMAC Trace subject, allowlist redaction, TTLs, immediate hide, conversation-content redaction that preserves committed learning progress, subject-level physical purge, checkpoint deletion and in-flight completion guard |
+| FR-055–FR-061 | Context projection, HMAC Trace subject, allowlist redaction, TTLs, immediate hide, periodic physical purge, checkpoint deletion and in-flight completion guard |
 | FR-062–FR-066 | SM-2 state, atomic attempt save, legacy initializer/backfill and regression/property tests |
 | FR-067–FR-074 | 60 synthetic cases, deterministic paths/security gates, six rubrics, mock runner/report, baseline/release gate and Trace linker |
 | SC-001–SC-005 | Auth/ownership, Schema, path, personalization and learning-change tests passed |
@@ -20,12 +20,6 @@
 | SC-012 | Both Nest applications and Vue build; real AppModule and browser legacy-flow regression tests passed in an isolated environment |
 
 Detailed command results are in [build evidence](./evidence/build.md), [server tests](./evidence/server-tests.md), [web tests](./evidence/web-tests.md), [migration evidence](./evidence/migration.md), and [regression evidence](./evidence/regression.md).
-
-The 2026-09-08 review also closed four release-blocking defects: server-side
-`COACH_ENABLED` enforcement, retry/queue admission recovery with request-bound
-leases, governed subjective grading for translation/dialogue exercises, and
-conversation deletion that removes raw content without cascading into saved
-attempts or review events. Focused regression tests cover each correction.
 
 ## Remaining live-release gates
 

@@ -32,7 +32,9 @@ describe('Coach deterministic next-action policy', () => {
 
   it('chooses review when current quality is acceptable but due work exists', () => {
     expect(
-      decideNextAction(facts({ validCurrentQualities: [4, 5], dueCount: 2 })),
+      decideNextAction(
+        facts({ validCurrentQualities: [4, 5], dueCount: 2 }),
+      ),
     ).toEqual({
       nextAction: 'review',
       evidenceCodes: ['DUE_ITEMS_AVAILABLE'],
@@ -41,7 +43,9 @@ describe('Coach deterministic next-action policy', () => {
 
   it('chooses continue when there is no low current quality or due work', () => {
     expect(
-      decideNextAction(facts({ validCurrentQualities: [4, 5], dueCount: 0 })),
+      decideNextAction(
+        facts({ validCurrentQualities: [4, 5], dueCount: 0 }),
+      ),
     ).toEqual({
       nextAction: 'continue',
       evidenceCodes: ['NO_LOW_QUALITY_OR_DUE_ITEMS'],

@@ -45,11 +45,11 @@ describe('SM2_V1 review scheduler', () => {
       reviewedAt: new Date('2026-09-09T02:00:00.000Z'),
       timezone: 'Asia/Shanghai',
     });
-    expect([
-      first.intervalDays,
-      second.intervalDays,
-      third.intervalDays,
-    ]).toEqual([1, 6, Math.ceil(6 * third.easeFactor)]);
+    expect([first.intervalDays, second.intervalDays, third.intervalDays]).toEqual([
+      1,
+      6,
+      Math.ceil(6 * third.easeFactor),
+    ]);
   });
 
   it('never lowers EF below 1.3 and masters only at the explicit threshold', () => {
@@ -61,9 +61,7 @@ describe('SM2_V1 review scheduler', () => {
       current = scheduleSm2Review({
         current,
         quality: 3,
-        reviewedAt: new Date(
-          `2026-09-${String(index + 2).padStart(2, '0')}T00:00:00.000Z`,
-        ),
+        reviewedAt: new Date(`2026-09-${String(index + 2).padStart(2, '0')}T00:00:00.000Z`),
         timezone: 'UTC',
       });
     }

@@ -7,11 +7,17 @@ import {
   CoachRateLimitService,
   InMemoryRateLimitStore,
 } from '../../src/coach/governance/coach-rate-limit.service';
-import { CoachCostMeter } from '../../src/coach/governance/coach-cost-meter';
-import { CoachModelPriceCatalog } from '../../src/coach/governance/model-price.catalog';
+import {
+  CoachCostMeter,
+} from '../../src/coach/governance/coach-cost-meter';
+import {
+  CoachModelPriceCatalog,
+} from '../../src/coach/governance/model-price.catalog';
 import { mapCoachFailure } from '../../src/coach/governance/coach-failure.mapper';
 import { buildCoachFailureFallback } from '../../src/coach/workflow/fallback.builder';
-import { runCoachGovernedSteps } from '../../src/coach/queue/coach.processor';
+import {
+  runCoachGovernedSteps,
+} from '../../src/coach/queue/coach.processor';
 import {
   CoachAdmissionService,
   type CoachConcurrencyStore,
@@ -28,20 +34,15 @@ const limits: CoachBudgetLimits = {
 
 describe('Coach governance and failure handling', () => {
   it('enforces approved distributed subject, IP and concurrency admission', async () => {
-    const active = new Map<string, Set<string>>();
+    const active = new Set<string>();
     const concurrency: CoachConcurrencyStore = {
-      async acquire(key, leaseId, limit) {
-        const leases = active.get(key) ?? new Set<string>();
-        if (leases.has(leaseId)) return true;
-        if (leases.size >= limit) return false;
-        leases.add(leaseId);
-        active.set(key, leases);
+      async acquire(key) {
+        if (active.has(key)) return false;
+        active.add(key);
         return true;
       },
-      async release(key, leaseId) {
-        const leases = active.get(key);
-        leases?.delete(leaseId);
-        if (leases?.size === 0) active.delete(key);
+      async release(key) {
+        active.delete(key);
       },
     };
     const service = new CoachAdmissionService(
@@ -59,20 +60,12 @@ describe('Coach governance and failure handling', () => {
     await expect(service.consumeIp('203.0.113.10')).rejects.toMatchObject({
       code: 'RATE_LIMITED',
     });
-    await service.consumeSubject('user-a');
-    await service.acquireSubject('user-a', 'request-a');
-    await expect(
-      service.acquireSubject('user-a', 'request-b'),
-    ).rejects.toMatchObject({
+    await service.acquireSubject('user-a');
+    await expect(service.acquireSubject('user-a')).rejects.toMatchObject({
       code: 'RATE_LIMITED',
     });
-    await expect(
-      service.acquireSubject('user-a', 'request-a'),
-    ).resolves.toBeUndefined();
-    await service.releaseSubject('user-a', 'request-a');
-    await expect(
-      service.acquireSubject('user-a', 'request-b'),
-    ).resolves.toBeUndefined();
+    await service.releaseSubject('user-a');
+    await expect(service.acquireSubject('user-a')).resolves.toBeUndefined();
   });
 
   it('fails closed when admission thresholds are not approved', async () => {
@@ -87,84 +80,22 @@ describe('Coach governance and failure handling', () => {
       concurrency,
       {},
     );
-    await expect(
-      service.acquireSubject('user-a', 'request-a'),
-    ).rejects.toMatchObject({
+    await expect(service.acquireSubject('user-a')).rejects.toMatchObject({
       code: 'BUDGET_EXCEEDED',
     });
   });
 
   it.each([
-    [
-      'inputTokens',
-      {
-        inputTokens: 101,
-        outputTokens: 0,
-        modelCalls: 0,
-        toolCalls: 0,
-        costMicros: 0,
-        elapsedMs: 0,
-      },
-    ],
-    [
-      'outputTokens',
-      {
-        inputTokens: 0,
-        outputTokens: 51,
-        modelCalls: 0,
-        toolCalls: 0,
-        costMicros: 0,
-        elapsedMs: 0,
-      },
-    ],
-    [
-      'modelCalls',
-      {
-        inputTokens: 0,
-        outputTokens: 0,
-        modelCalls: 3,
-        toolCalls: 0,
-        costMicros: 0,
-        elapsedMs: 0,
-      },
-    ],
-    [
-      'toolCalls',
-      {
-        inputTokens: 0,
-        outputTokens: 0,
-        modelCalls: 0,
-        toolCalls: 4,
-        costMicros: 0,
-        elapsedMs: 0,
-      },
-    ],
-    [
-      'costMicros',
-      {
-        inputTokens: 0,
-        outputTokens: 0,
-        modelCalls: 0,
-        toolCalls: 0,
-        costMicros: 1_001,
-        elapsedMs: 0,
-      },
-    ],
-    [
-      'elapsedMs',
-      {
-        inputTokens: 0,
-        outputTokens: 0,
-        modelCalls: 0,
-        toolCalls: 0,
-        costMicros: 0,
-        elapsedMs: 500,
-      },
-    ],
+    ['inputTokens', { inputTokens: 101, outputTokens: 0, modelCalls: 0, toolCalls: 0, costMicros: 0, elapsedMs: 0 }],
+    ['outputTokens', { inputTokens: 0, outputTokens: 51, modelCalls: 0, toolCalls: 0, costMicros: 0, elapsedMs: 0 }],
+    ['modelCalls', { inputTokens: 0, outputTokens: 0, modelCalls: 3, toolCalls: 0, costMicros: 0, elapsedMs: 0 }],
+    ['toolCalls', { inputTokens: 0, outputTokens: 0, modelCalls: 0, toolCalls: 4, costMicros: 0, elapsedMs: 0 }],
+    ['costMicros', { inputTokens: 0, outputTokens: 0, modelCalls: 0, toolCalls: 0, costMicros: 1_001, elapsedMs: 0 }],
+    ['elapsedMs', { inputTokens: 0, outputTokens: 0, modelCalls: 0, toolCalls: 0, costMicros: 0, elapsedMs: 500 }],
   ] as const)('fails closed before a node exceeding %s', (_name, projected) => {
-    expect(() =>
-      new CoachBudgetService(limits).assertCanStartNode(projected),
-    ).toThrow(expect.objectContaining({ code: 'BUDGET_EXCEEDED' }));
+    expect(() => new CoachBudgetService(limits).assertCanStartNode(projected)).toThrow(
+      expect.objectContaining({ code: 'BUDGET_EXCEEDED' }),
+    );
   });
 
   it('applies independent user, IP and concurrency admission limits', async () => {
@@ -174,13 +105,9 @@ describe('Coach governance and failure handling', () => {
       () => 0,
     );
     await limiter.consume('user-a', 'request');
-    await expect(limiter.consume('user-a', 'request')).rejects.toMatchObject({
-      code: 'RATE_LIMITED',
-    });
+    await expect(limiter.consume('user-a', 'request')).rejects.toMatchObject({ code: 'RATE_LIMITED' });
     await limiter.consumeIp('203.0.113.10', 'request');
-    await expect(
-      limiter.consumeIp('203.0.113.10', 'request'),
-    ).rejects.toMatchObject({ code: 'RATE_LIMITED' });
+    await expect(limiter.consumeIp('203.0.113.10', 'request')).rejects.toMatchObject({ code: 'RATE_LIMITED' });
 
     const concurrency = new CoachConcurrencyLimitService(1);
     const lease = concurrency.acquire('user-a');
@@ -213,11 +140,7 @@ describe('Coach governance and failure handling', () => {
         outputTokens: 50,
         at: new Date('2026-09-02T00:00:00.000Z'),
       }),
-    ).toEqual({
-      estimatedCostMicros: 200,
-      currency: 'USD',
-      priceVersion: 'price-v1',
-    });
+    ).toEqual({ estimatedCostMicros: 200, currency: 'USD', priceVersion: 'price-v1' });
     expect(() =>
       meter.estimate({
         provider: 'deepseek',
@@ -244,14 +167,8 @@ describe('Coach governance and failure handling', () => {
       message: 'provider SQL failed\n    at private.ts:42:1',
       stack: 'private stack',
     });
-    expect(failure).toMatchObject({
-      code,
-      retryable,
-      saveStatus: 'NOT_STARTED',
-    });
-    expect(JSON.stringify(failure)).not.toMatch(
-      /provider|SQL|private\.ts|stack/i,
-    );
+    expect(failure).toMatchObject({ code, retryable, saveStatus: 'NOT_STARTED' });
+    expect(JSON.stringify(failure)).not.toMatch(/provider|SQL|private\.ts|stack/i);
     const fallback = buildCoachFailureFallback('trace_failure_001', failure);
     expect(fallback.result).toMatchObject({
       responseType: 'degraded',
@@ -275,36 +192,18 @@ describe('Coach governance and failure handling', () => {
             name: 'materials',
             kind: 'tool',
             timeoutMs: 5,
-            projected: {
-              inputTokens: 0,
-              outputTokens: 0,
-              modelCalls: 0,
-              toolCalls: 1,
-              costMicros: 0,
-            },
+            projected: { inputTokens: 0, outputTokens: 0, modelCalls: 0, toolCalls: 1, costMicros: 0 },
             run: async (signal) => {
               toolSignal = signal;
               await new Promise((resolve) => setTimeout(resolve, 20));
-              return {
-                inputTokens: 0,
-                outputTokens: 0,
-                modelCalls: 0,
-                toolCalls: 1,
-                costMicros: 0,
-              };
+              return { inputTokens: 0, outputTokens: 0, modelCalls: 0, toolCalls: 1, costMicros: 0 };
             },
           },
           {
             name: 'save_attempt',
             kind: 'write',
             timeoutMs: 50,
-            projected: {
-              inputTokens: 0,
-              outputTokens: 0,
-              modelCalls: 0,
-              toolCalls: 1,
-              costMicros: 0,
-            },
+            projected: { inputTokens: 0, outputTokens: 0, modelCalls: 0, toolCalls: 1, costMicros: 0 },
             run: save,
           },
         ],

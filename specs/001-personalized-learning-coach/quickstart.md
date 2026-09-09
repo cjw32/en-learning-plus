@@ -1,6 +1,6 @@
 # Phase 1 Validation Quickstart: 个性化英语学习 Coach
 
-**Feature**: `001-personalized-learning-coach`
+**Feature**: `001-personalized-learning-coach`  
 **Purpose**: Runnable validation guide for the future Implement phase. These commands describe expected verification after implementation; Plan does not install dependencies, migrate data, or run the feature.
 
 ## Prerequisites

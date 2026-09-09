@@ -26,6 +26,3 @@ The runtime rejects missing or placeholder versions, unapproved budget fields, u
 
 - Live candidate run and human/model rubric review needed to replace the pending baseline and budget files with approved measured values.
 - The deployment target still requires its normal additive migration and smoke-check procedure; this session did not deploy or mutate any target environment.
-- The 2026-09-08 review did not rerun the disposable PostgreSQL scenario because
-  no isolated database URL was configured; the 2026-09-03 evidence remains the
-  current migration/database baseline.

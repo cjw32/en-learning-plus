@@ -271,9 +271,7 @@ export class ExerciseService {
       allowedSources.size === 0 ||
       parsed.data.items.some(
         (item) =>
-          item.targets.some(
-            (target) => !allowedTargets.has(targetKey(target)),
-          ) ||
+          item.targets.some((target) => !allowedTargets.has(targetKey(target))) ||
           item.citations.some(
             (citation) => !allowedSources.has(citation.sourceId),
           ),

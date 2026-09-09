@@ -11,7 +11,9 @@ import type {
   LearnerProfileSnapshot,
 } from './learner-profile.types';
 
-export const LEARNER_PROFILE_REPOSITORY = Symbol('LEARNER_PROFILE_REPOSITORY');
+export const LEARNER_PROFILE_REPOSITORY = Symbol(
+  'LEARNER_PROFILE_REPOSITORY',
+);
 
 function isIanaTimezone(timezone: string): boolean {
   try {
@@ -23,7 +25,9 @@ function isIanaTimezone(timezone: string): boolean {
 }
 
 @Injectable()
-export class PrismaLearnerProfileRepository implements LearnerProfileRepository {
+export class PrismaLearnerProfileRepository
+  implements LearnerProfileRepository
+{
   constructor(private readonly prisma: PrismaService) {}
 
   findProfile(subjectId: string) {
@@ -45,7 +49,10 @@ export class PrismaLearnerProfileRepository implements LearnerProfileRepository 
     return record?.course ?? null;
   }
 
-  upsertProfile(subjectId: string, update: Partial<LearnerProfileRecord>) {
+  upsertProfile(
+    subjectId: string,
+    update: Partial<LearnerProfileRecord>,
+  ) {
     const data = {
       cefrLevel: update.cefrLevel,
       levelSource: update.levelSource,
@@ -187,14 +194,8 @@ export class LearnerProfileService {
       errorTypes: learning.errorTypes,
       recentPerformance: learning.recentPerformance,
       signals: [
-        {
-          dimension: 'LEVEL',
-          status: profile?.cefrLevel ? 'AVAILABLE' : 'MISSING',
-        },
-        {
-          dimension: 'GOAL',
-          status: profile?.goalType ? 'AVAILABLE' : 'MISSING',
-        },
+        { dimension: 'LEVEL', status: profile?.cefrLevel ? 'AVAILABLE' : 'MISSING' },
+        { dimension: 'GOAL', status: profile?.goalType ? 'AVAILABLE' : 'MISSING' },
         { dimension: 'LEARNED_WORDS', status: 'AVAILABLE' },
         {
           dimension: 'WEAK_ITEMS',
@@ -235,10 +236,7 @@ export class LearnerProfileService {
         400,
       );
     }
-    let activeCourse:
-      | { id: string; name: string; value: string }
-      | null
-      | undefined;
+    let activeCourse: { id: string; name: string; value: string } | null | undefined;
     if (parsed.data.activeCourseId) {
       activeCourse = await this.repository.findPurchasedCourse(
         subjectId,

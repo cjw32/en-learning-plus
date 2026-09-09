@@ -23,6 +23,9 @@ export class CoachLangChainCallbacks {
     outputTokens: number;
     estimatedCostMicros: number;
   }): void {
-    this.trace.recordModelEnd(input.outputTokens, input.estimatedCostMicros);
+    this.trace.recordModelEnd(
+      input.outputTokens,
+      input.estimatedCostMicros,
+    );
   }
 }

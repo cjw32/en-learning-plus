@@ -1,7 +1,7 @@
 # Web test evidence
 
-Date: 2026-09-08
-Vitest: 4.1.11
+Date: 2026-09-03  
+Vitest: 4.1.11  
 Playwright: 1.62.1
 
 | Command | Exit | Result |
@@ -11,7 +11,3 @@ Playwright: 1.62.1
 | Same Playwright selection with `--trace on` | 0 | 10 tests passed and 10 `test-results/playwright/**/trace.zip` artifacts generated, including screenshot snapshots |
 
 Browser scenarios cover isolated synthetic fixtures, safe tool progress, authoritative final results, 410 durable reconciliation, timeout, budget exhaustion, explicit network retry, saved grading state, cancellation, and legacy home/dictionary/course/settings/generic-AI routes. The DOM assertions reject sensitive canaries and do not render Prompt/tool arguments; legacy navigation emits no Coach API request.
-
-The unit suite, TypeScript check, production build, and 10-test Chromium
-selection were rerun during the 2026-09-08 code review. The trace-on artifact
-run in the table remains the retained 2026-09-03 evidence and was not repeated.

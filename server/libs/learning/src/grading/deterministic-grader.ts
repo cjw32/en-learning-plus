@@ -31,17 +31,13 @@ export function gradeObjectiveAnswer(input: {
   return {
     isCorrect,
     score: isCorrect ? input.maxScore : 0,
-    correction: isCorrect ? '' : input.accepted[0],
+    correction: isCorrect ? '' : input.accepted[0]!,
     explanation: isCorrect
       ? '答案正确。'
       : '答案与该题已验证的可接受形式不一致。',
     errorTypes: isCorrect
       ? []
-      : [
-          input.exerciseType === 'MULTIPLE_CHOICE'
-            ? 'COMPREHENSION'
-            : 'VOCABULARY',
-        ],
+      : [input.exerciseType === 'MULTIPLE_CHOICE' ? 'COMPREHENSION' : 'VOCABULARY'],
     examples: [],
   };
 }
@@ -55,3 +51,4 @@ export function qualityFromScore(score: number, maxScore: number): number {
   if (ratio > 0) return 1;
   return 0;
 }
+

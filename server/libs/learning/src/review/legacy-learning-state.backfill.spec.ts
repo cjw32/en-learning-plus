@@ -53,13 +53,9 @@ describe('legacy learning-state backfill', () => {
       users: await repository.listLegacyUsers(),
     };
 
-    const first = await runLegacyLearningStateBackfill(repository, {
-      rolloutAt,
-    });
+    const first = await runLegacyLearningStateBackfill(repository, { rolloutAt });
     const stateSnapshot = [...repository.states.values()];
-    const second = await runLegacyLearningStateBackfill(repository, {
-      rolloutAt,
-    });
+    const second = await runLegacyLearningStateBackfill(repository, { rolloutAt });
 
     expect(first).toEqual(second);
     expect([...repository.states.values()]).toEqual(stateSnapshot);

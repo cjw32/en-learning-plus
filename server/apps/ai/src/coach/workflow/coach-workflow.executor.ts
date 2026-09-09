@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import {
   COACH_RESULT_SCHEMA_VERSION,
-  coachResultSchema,
-  type CoachResult,
+  anyPublicCoachResultSchema,
+  type AnyPublicCoachResult,
   type CoachSseEvent,
 } from '@en/common/coach';
 import { CoachExecutionContext } from '@libs/shared';
@@ -37,7 +37,7 @@ export interface CoachExecutorRepository {
   completeExecution(input: {
     request: StoredCoachRequest;
     intent: CoachRuntimeIntent;
-    result: CoachResult;
+    result: AnyPublicCoachResult;
     promptVersion: string;
     modelVersion: string;
     budgetVersion: string;
@@ -81,7 +81,7 @@ export interface CoachRuntimeWorkflow {
     context: CoachExecutionContext;
     signal: AbortSignal;
     trace: CoachTraceService;
-  }): Promise<{ intent: CoachRuntimeIntent; result: CoachResult }>;
+  }): Promise<{ intent: CoachRuntimeIntent; result: AnyPublicCoachResult }>;
 }
 
 export interface CoachExecutorTraceWriter {
@@ -206,14 +206,15 @@ export class CoachWorkflowExecutor {
       }
       const validationStartedAt = this.now().getTime();
       trace.startStep('validate_result', validationStartedAt);
-      let result: CoachResult;
+      let result: AnyPublicCoachResult;
       try {
-        result = coachResultSchema.parse(output.result);
+        result = anyPublicCoachResultSchema.parse(output.result);
         if (result.traceId !== traceId) {
           throw Object.assign(new Error('Result Trace mismatch'), {
             code: 'SCHEMA_INVALID',
           });
         }
+        trace.setResultSchemaVersion(result.schemaVersion);
         trace.finishStep('validate_result', 'SUCCEEDED', this.now().getTime());
       } catch (error) {
         trace.recordSchemaFailure();
@@ -309,7 +310,7 @@ export class CoachWorkflowExecutor {
     } finally {
       clearTimeout(timer);
       await this.admission
-        ?.releaseSubject(request.subjectId, request.id)
+        ?.releaseSubject(request.subjectId)
         .catch(() => undefined);
     }
   }

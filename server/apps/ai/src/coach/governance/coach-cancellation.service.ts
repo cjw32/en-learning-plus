@@ -1,4 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
+import { createHash } from 'node:crypto';
 import type { CoachRequestStatus } from '@en/common/coach';
 import type { CoachExecutionContext } from '@libs/shared';
 import { CoachRequestRuleError } from '../api/coach-request.service';
@@ -27,6 +28,14 @@ export interface CoachCancellationRepository {
     idempotencyKey: string;
     requestedAt: Date;
   }): Promise<void>;
+  findKnowledgeConsumptionState?(
+    subjectId: string,
+    requestId: string,
+  ): Promise<{
+    requestStatus: CoachRequestStatus;
+    accountStatus: 'ACTIVE' | 'DELETING';
+    accessStillAllowed: boolean;
+  } | null>;
 }
 
 export interface CoachCancellationSignalStore {
@@ -35,7 +44,9 @@ export interface CoachCancellationSignalStore {
 }
 
 @Injectable()
-export class PrismaCoachCancellationRepository implements CoachCancellationRepository {
+export class PrismaCoachCancellationRepository
+  implements CoachCancellationRepository
+{
   constructor(private readonly prisma: PrismaService) {}
 
   async findOwned(subjectId: string, requestId: string) {
@@ -71,10 +82,40 @@ export class PrismaCoachCancellationRepository implements CoachCancellationRepos
       data: { cancelRequestedAt: input.requestedAt },
     });
   }
+
+  async findKnowledgeConsumptionState(subjectId: string, requestId: string) {
+    const request = await this.prisma.coachRequest.findFirst({
+      where: { id: requestId, userId: subjectId },
+      select: {
+        status: true,
+        conversation: { select: { status: true } },
+      },
+    });
+    if (!request) return null;
+    const subjectHash = createHash('sha256').update(subjectId).digest('hex');
+    const deleting = await this.prisma.coachDeletionTombstone.findFirst({
+      where: {
+        subjectHash,
+        scope: 'COACH_DATA',
+        status: { in: ['ACCEPTED', 'PURGING'] },
+      },
+      select: { id: true },
+    });
+    return {
+      requestStatus: request.status,
+      accountStatus:
+        deleting || request.conversation.status === 'DELETING'
+          ? ('DELETING' as const)
+          : ('ACTIVE' as const),
+      accessStillAllowed: request.conversation.status === 'ACTIVE',
+    };
+  }
 }
 
 @Injectable()
-export class RedisCoachCancellationSignalStore implements CoachCancellationSignalStore {
+export class RedisCoachCancellationSignalStore
+  implements CoachCancellationSignalStore
+{
   constructor(private readonly redis: CoachRedisConnection) {}
 
   async set(requestId: string) {
@@ -120,6 +161,48 @@ export class CoachCancellationService {
     return cancelled;
   }
 
+  async assertCanConsumeKnowledgeResult(
+    context: CoachExecutionContext,
+    requestId: string,
+    signal: AbortSignal,
+  ): Promise<void> {
+    const nowEpochSeconds = Math.floor(this.now().getTime() / 1_000);
+    if (context.accessTokenExpiresAtEpochSeconds <= nowEpochSeconds) {
+      throw Object.assign(new Error('Access token expired before knowledge use'), {
+        code: 'TOKEN_INVALID' as const,
+      });
+    }
+    if (signal.aborted || (await this.observe(requestId))) {
+      throw Object.assign(new Error('Knowledge result arrived after cancellation'), {
+        code: 'CANCELLED' as const,
+      });
+    }
+    const state = await this.repository.findKnowledgeConsumptionState?.(
+      context.subjectId,
+      requestId,
+    );
+    if (!state) {
+      throw Object.assign(new Error('Knowledge result is not owned'), {
+        code: 'FORBIDDEN' as const,
+      });
+    }
+    if (state.requestStatus === 'CANCELLED') {
+      throw Object.assign(new Error('Knowledge request is cancelled'), {
+        code: 'CANCELLED' as const,
+      });
+    }
+    if (state.requestStatus !== 'RUNNING' || state.accountStatus === 'DELETING') {
+      throw Object.assign(new Error('Knowledge subject is no longer active'), {
+        code: 'STATE_CONFLICT' as const,
+      });
+    }
+    if (!state.accessStillAllowed) {
+      throw Object.assign(new Error('Knowledge access was revoked'), {
+        code: 'FORBIDDEN' as const,
+      });
+    }
+  }
+
   async cancel(
     context: CoachExecutionContext,
     requestId: string,
@@ -143,15 +226,7 @@ export class CoachCancellationService {
       : request.status === 'COMPLETED'
         ? ('NOT_APPLICABLE' as const)
         : ('NOT_SAVED' as const);
-    if (
-      ![
-        'COMPLETED',
-        'CANCELLED',
-        'TIMED_OUT',
-        'BUDGET_EXCEEDED',
-        'FAILED',
-      ].includes(request.status)
-    ) {
+    if (!['COMPLETED', 'CANCELLED', 'TIMED_OUT', 'BUDGET_EXCEEDED', 'FAILED'].includes(request.status)) {
       await this.repository.markCancellationRequested({
         subjectId: context.subjectId,
         requestId,

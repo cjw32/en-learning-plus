@@ -42,11 +42,6 @@ The real AppModule regression exposed invalid interface/default-function DI in
 `LearningModule`; provider factories were made explicit, after which AppModule
 boot and all existing test suites passed.
 
-On 2026-09-08 the server regression configuration was rerun without a configured
-disposable database: three non-database tests passed and the one database-backed
-scenario skipped by its safety guard. No production or development database was
-used.
-
 ## Browser regression
 
 `pnpm exec playwright test apps/web/e2e/coach-environment.spec.ts

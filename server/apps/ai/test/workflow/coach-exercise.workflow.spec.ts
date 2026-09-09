@@ -70,10 +70,7 @@ function fixture(overrides: Partial<CoachExerciseWorkflowDependencies> = {}) {
     },
     async recommend() {
       order.push('recommend');
-      return {
-        nextAction: 'practice' as const,
-        nextActionReason: 'Start now.',
-      };
+      return { nextAction: 'practice' as const, nextActionReason: 'Start now.' };
     },
     authorizeTool(tool) {
       order.push(`budget:${tool}`);
@@ -144,3 +141,4 @@ describe('Coach CREATE_EXERCISE workflow', () => {
     expect(createExercise).not.toHaveBeenCalled();
   });
 });
+

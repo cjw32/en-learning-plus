@@ -1,14 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import {
   COACH_RESULT_SCHEMA_VERSION,
+  COACH_RAG_TOOL_SCHEMA_VERSION,
   COACH_TOOL_SCHEMA_VERSION,
   coachResultSchema,
   type GetDueWordsOutput,
   type GetLearnerProfileOutput,
   type SearchLearningMaterialsOutput,
+  type SearchLearningMaterialsV2Output,
 } from '@en/common/coach';
 import { ExerciseTargetingService } from '@libs/learning';
 import { resolveCoachRuntimeConfig } from '../governance/coach-config.schema';
+import { resolveRagRuntimeConfig } from '../governance/coach-config.schema';
 import { EnvironmentCoachRuntimeBudgetFactory } from '../governance/coach-runtime-budget.factory';
 import type { CoachBudgetService } from '../governance/coach-budget.service';
 import { CoachCancellationService } from '../governance/coach-cancellation.service';
@@ -20,6 +23,8 @@ import { GradeAnswerTool } from '../tools/grade-answer.tool';
 import { SaveAttemptTool } from '../tools/save-attempt.tool';
 import { SearchLearningMaterialsTool } from '../tools/search-learning-materials.tool';
 import type { CoachTraceService } from '../observability/coach-trace.service';
+import { createRagDiagnosticHash } from '../observability/coach-redaction';
+import type { RetrievalTraceMetadata } from '../observability/rag-trace.types';
 import {
   CoachAnswerWorkflow,
   CoachControlledStepRunner,
@@ -42,13 +47,139 @@ import {
   type NextActionDecision,
   type ProfileSignalState,
 } from './next-action.policy';
-import { buildSafeDegradedResult } from './final-result.validator';
+import {
+  buildSafeDegradedResult,
+  upgradeCoachResultToV2,
+} from './final-result.validator';
 import type { CoachPromptMaterial } from '../prompts/answer.prompt';
+import type { CoachRagEvidence } from './answer.nodes';
+import { RagRetrievalDegradationError } from './fallback.builder';
 
 type RuntimeInput = Parameters<CoachRuntimeWorkflow['run']>[0];
 type ProfileSuccess = Extract<GetLearnerProfileOutput, { ok: true }>;
 type DueSuccess = Extract<GetDueWordsOutput, { ok: true }>;
 type MaterialSuccess = Extract<SearchLearningMaterialsOutput, { ok: true }>;
+
+type PersonalizationApplication =
+  | 'APPLIED'
+  | 'MISSING'
+  | 'STALE'
+  | 'NOT_APPLICABLE'
+  | 'UNAVAILABLE';
+
+function applicationStatus(
+  profile: ProfileSuccess | null,
+  dimension: string,
+): PersonalizationApplication {
+  const status = profile?.signals.find(
+    (signal) => signal.dimension === dimension,
+  )?.status;
+  return status === 'AVAILABLE'
+    ? 'APPLIED'
+    : status === 'MISSING'
+      ? 'MISSING'
+      : status === 'STALE'
+        ? 'STALE'
+        : status === 'NOT_APPLICABLE'
+          ? 'NOT_APPLICABLE'
+          : 'UNAVAILABLE';
+}
+
+export function buildVerifiedRagPersonalization(
+  profile: ProfileSuccess | null,
+  due: DueSuccess | null,
+  privateContentEnabled: boolean,
+  now: Date,
+) {
+  const levelStatus = applicationStatus(profile, 'LEVEL');
+  const courseStatus = applicationStatus(profile, 'ACTIVE_COURSE');
+  const goalStatus = applicationStatus(profile, 'GOAL');
+  const weakStatus = applicationStatus(profile, 'WEAK_ITEMS');
+  const performanceStatus = applicationStatus(profile, 'RECENT_PERFORMANCE');
+  const level =
+    levelStatus === 'APPLIED' && profile?.level?.source === 'USER_DECLARED'
+      ? profile.level.cefr
+      : null;
+  const courseId =
+    courseStatus === 'APPLIED' ? (profile?.activeCourse?.id ?? null) : null;
+  const weakWordIds =
+    weakStatus === 'APPLIED'
+      ? (profile?.weakItems ?? [])
+          .filter(
+            (item) =>
+              item.targetType === 'WORD' &&
+              ((item.lastQuality !== null && item.lastQuality < 3) ||
+                (item.dueAt !== null && new Date(item.dueAt) <= now)),
+          )
+          .map((item) => item.targetKey)
+      : [];
+  const dueSnapshotAt = due ? Date.parse(due.asOf) : Number.NaN;
+  const dueCurrent =
+    Boolean(due) &&
+    Number.isFinite(dueSnapshotAt) &&
+    dueSnapshotAt <= now.getTime() &&
+    now.getTime() - dueSnapshotAt <= 24 * 60 * 60 * 1_000;
+  const dueWordIds = dueCurrent
+    ? due!.words
+        .filter((word) => new Date(word.dueAt) <= now)
+        .map((word) => word.wordId)
+    : [];
+  const privateSignalsApplied =
+    privateContentEnabled &&
+    (weakStatus === 'APPLIED' || performanceStatus === 'APPLIED');
+  const categories = [
+    'WORD_MEANING',
+    'WORD_TRANSLATION',
+    'WORD_PRONUNCIATION',
+    'WORD_FORM',
+    'WORD_USAGE',
+    'COLLOCATION',
+    'EXAMPLE_SENTENCE',
+    'GRAMMAR_RULE',
+    'GRAMMAR_EXCEPTION',
+    'COURSE_LESSON',
+    ...(privateSignalsApplied
+      ? (['USER_ERROR', 'LEARNING_SUMMARY'] as const)
+      : []),
+  ] as const;
+
+  return Object.freeze({
+    filters: Object.freeze({
+      levels: Object.freeze(level ? [level] : []),
+      categories: Object.freeze([...categories]),
+      sources: Object.freeze([] as string[]),
+      courseIds: Object.freeze(courseId ? [courseId] : []),
+      wordIds: Object.freeze(
+        [...new Set([...weakWordIds, ...dueWordIds])].slice(0, 50),
+      ),
+      accessScopes: Object.freeze([
+        'PUBLIC' as const,
+        ...(courseId ? (['OWNED_COURSE'] as const) : []),
+        ...(privateSignalsApplied ? (['PRIVATE_OWNER'] as const) : []),
+      ]),
+    }),
+    application: Object.freeze({
+      level: level ? 'APPLIED' : levelStatus,
+      course: courseId ? 'APPLIED' : courseStatus,
+      goal:
+        goalStatus === 'APPLIED' && profile?.goal
+          ? ('APPLIED' as const)
+          : goalStatus,
+      weakItems:
+        weakStatus === 'APPLIED' && weakWordIds.length === 0
+          ? ('NOT_APPLICABLE' as const)
+          : weakStatus,
+      dueWords: dueCurrent
+        ? dueWordIds.length > 0
+          ? ('APPLIED' as const)
+          : ('NOT_APPLICABLE' as const)
+        : due
+          ? ('STALE' as const)
+          : ('UNAVAILABLE' as const),
+      privateContent: privateSignalsApplied ? 'APPLIED' : 'UNAVAILABLE',
+    }),
+  });
+}
 
 function toolError(output: { ok: boolean; code?: string; message?: string }) {
   return Object.assign(new Error(output.message ?? 'Coach tool failed'), {
@@ -105,7 +236,7 @@ export class CoachRuntimeWorkflowService implements CoachRuntimeWorkflow {
       this.stream,
       this.cancellation,
     );
-    return runControlledCoachRuntimeGraph({
+    const output = await runControlledCoachRuntimeGraph({
       inputType: input.request.inputType,
       branches: {
         message: () => this.runMessage(input, runner, budget),
@@ -113,6 +244,10 @@ export class CoachRuntimeWorkflowService implements CoachRuntimeWorkflow {
         recommendation: () => this.runRecommendation(input, runner, budget),
       },
     });
+    const rag = resolveRagRuntimeConfig(process.env);
+    return rag.enabled && output.result.schemaVersion === 'coach.result.v1'
+      ? { ...output, result: upgradeCoachResultToV2(output.result) }
+      : output;
   }
 
   private async runMessage(
@@ -165,8 +300,8 @@ export class CoachRuntimeWorkflowService implements CoachRuntimeWorkflow {
   ) {
     let profile: ProfileSuccess | null = null;
     let generationAttempt = 0;
-    return new CoachAnswerWorkflow({
-      classifyIntent: () => Promise.resolve(intent),
+    const result = await new CoachAnswerWorkflow({
+      classifyIntent: async () => intent,
       getLearnerProfile: async () => {
         profile = await this.loadProfile(input, runner, budget);
         return profile;
@@ -177,31 +312,43 @@ export class CoachRuntimeWorkflowService implements CoachRuntimeWorkflow {
         generationAttempt += 1;
         if (generationAttempt > 1) input.trace.recordRetry();
         try {
+          await this.assertKnowledgeResultCurrent(input);
           return await this.modelStep(
             input,
             budget,
             'generate_answer',
             'generating',
             (signal, telemetry) =>
-              intent === 'CORRECTION'
-                ? this.model.generateCorrection(
+              materials.ragEvidence
+                ? this.model.generateGroundedAnswer(
                     {
                       message,
                       profile: profile!,
                       materials: materials.materials as CoachPromptMaterial[],
+                      correction: intent === 'CORRECTION',
                     },
                     signal,
                     telemetry,
                   )
-                : this.model.generateAnswer(
-                    {
-                      message,
-                      profile: profile!,
-                      materials: materials.materials as CoachPromptMaterial[],
-                    },
-                    signal,
-                    telemetry,
-                  ),
+                : intent === 'CORRECTION'
+                  ? this.model.generateCorrection(
+                      {
+                        message,
+                        profile: profile!,
+                        materials: materials.materials as CoachPromptMaterial[],
+                      },
+                      signal,
+                      telemetry,
+                    )
+                  : this.model.generateAnswer(
+                      {
+                        message,
+                        profile: profile!,
+                        materials: materials.materials as CoachPromptMaterial[],
+                      },
+                      signal,
+                      telemetry,
+                    ),
             runner,
           );
         } catch (error) {
@@ -209,20 +356,20 @@ export class CoachRuntimeWorkflowService implements CoachRuntimeWorkflow {
           throw error;
         }
       },
-      recommend: () => {
+      recommend: async () => {
         const decision = decideNextAction({
           validCurrentQualities: [],
           dueCount: 0,
           profileSignals: profile?.signals ?? [],
         });
         this.recordRecommendation(input.trace, decision, 'not_saved');
-        return Promise.resolve({
+        return {
           nextAction: decision.nextAction,
           nextActionReason: deterministicNextActionReason(decision),
-        });
+        };
       },
-      gradeAnswer: () => Promise.resolve(undefined),
-      saveAttempt: () => Promise.resolve(undefined),
+      gradeAnswer: async () => undefined,
+      saveAttempt: async () => undefined,
     }).run(
       {
         requestId: input.request.id,
@@ -232,6 +379,10 @@ export class CoachRuntimeWorkflowService implements CoachRuntimeWorkflow {
       },
       input.context,
     );
+    if (result.schemaVersion === 'coach.result.v2') {
+      input.trace.recordGrounding(result.groundedClaims);
+    }
+    return result;
   }
 
   private async exerciseWorkflow(
@@ -250,7 +401,7 @@ export class CoachRuntimeWorkflowService implements CoachRuntimeWorkflow {
         ? (input.request.inputPayload.exercisePreferences ?? {})
         : {};
     return new CoachExerciseWorkflow({
-      classifyIntent: () => Promise.resolve(intent),
+      classifyIntent: async () => intent,
       authorizeTool: (tool) => this.assertToolBudget(input, budget, tool),
       getLearnerProfile: async () => {
         profile = await this.loadProfile(input, runner, budget);
@@ -267,10 +418,12 @@ export class CoachRuntimeWorkflowService implements CoachRuntimeWorkflow {
           budget,
           preferences.topic ?? message,
           profile,
+          due,
         );
         return { ok: true as const, materials: materialResult.materials };
       },
       createExercise: async ({ materials }) => {
+        await this.assertKnowledgeResultCurrent(input);
         due ??= { words: [] } as unknown as DueSuccess;
         selected = this.targeting.select({
           profile: {
@@ -349,14 +502,13 @@ export class CoachRuntimeWorkflowService implements CoachRuntimeWorkflow {
             ),
         );
       },
-      recommend: () =>
-        Promise.resolve({
-          nextAction: 'practice' as const,
-          nextActionReason:
-            selected?.personalizationReason ?? '请完成本次个性化练习。',
-        }),
-      gradeAnswer: () => Promise.resolve(undefined),
-      saveAttempt: () => Promise.resolve(undefined),
+      recommend: async () => ({
+        nextAction: 'practice',
+        nextActionReason:
+          selected?.personalizationReason ?? '请完成本次个性化练习。',
+      }),
+      gradeAnswer: async () => undefined,
+      saveAttempt: async () => undefined,
     }).run(
       {
         requestId: input.request.id,
@@ -384,54 +536,20 @@ export class CoachRuntimeWorkflowService implements CoachRuntimeWorkflow {
     const payload = input.request.inputPayload;
     const runtimeConfig = resolveCoachRuntimeConfig(process.env);
     const result = await new CoachGradingWorkflow({
-      classifyIntent: () => Promise.resolve('GRADE_ANSWER'),
+      classifyIntent: async () => 'GRADE_ANSWER',
       authorizeTool: (tool) => this.assertToolBudget(input, budget, tool),
-      gradeAnswer: (gradeInput) =>
-        this.toolStep(
-          input,
-          budget,
-          'grade_answer',
-          'grading',
-          runner,
-          (signal) =>
-            this.grading.execute(
-              input.context,
-              {
-                requestId: input.request.id,
-                signal,
-                beforeModelCall: () => {
-                  const projection = this.budgets.projectModelUsage(this.now());
-                  budget.assertCanStartNode({
-                    ...projection,
-                    elapsedMs: this.elapsedMs(input),
-                  });
-                },
-                modelTelemetry: {
-                  onFirstOutput: () =>
-                    input.trace.recordFirstToken(this.now().getTime()),
-                  onUsage: (usage) => {
-                    const actual = this.budgets.measureModelUsage({
-                      ...usage,
-                      at: this.now(),
-                    });
-                    budget.record(actual);
-                    input.trace.recordModelStart(actual.inputTokens);
-                    input.trace.recordModelEnd(
-                      actual.outputTokens,
-                      actual.costMicros,
-                    );
-                  },
-                },
-                onSchemaFailure: () => input.trace.recordSchemaFailure(),
-                onRetry: () => input.trace.recordRetry(),
-              },
-              {
-                schemaVersion: COACH_TOOL_SCHEMA_VERSION,
-                exerciseId: gradeInput.exerciseId,
-                answers: gradeInput.answers,
-                idempotencyKey: gradeInput.idempotencyKey,
-              },
-            ),
+      gradeAnswer: async (gradeInput) =>
+        this.toolStep(input, budget, 'grade_answer', 'grading', runner, () =>
+          this.grading.execute(
+            input.context,
+            { requestId: input.request.id },
+            {
+              schemaVersion: COACH_TOOL_SCHEMA_VERSION,
+              exerciseId: gradeInput.exerciseId,
+              answers: gradeInput.answers,
+              idempotencyKey: gradeInput.idempotencyKey,
+            },
+          ),
         ),
       saveAttempt: async (saveInput) => {
         if (!runtimeConfig.writeEnabled) {
@@ -474,11 +592,10 @@ export class CoachRuntimeWorkflowService implements CoachRuntimeWorkflow {
             ),
         );
       },
-      recommend: ({ decision }) =>
-        Promise.resolve({
-          nextAction: decision.nextAction,
-          nextActionReason: deterministicNextActionReason(decision),
-        }),
+      recommend: async ({ decision }) => ({
+        nextAction: decision.nextAction,
+        nextActionReason: deterministicNextActionReason(decision),
+      }),
       onRecommendation: ({ decision, learningSaveStatus }) =>
         this.recordRecommendation(input.trace, decision, learningSaveStatus),
     }).run(
@@ -594,7 +711,10 @@ export class CoachRuntimeWorkflowService implements CoachRuntimeWorkflow {
     budget: CoachBudgetService,
     query: string,
     profile: ProfileSuccess | null,
-  ): Promise<Pick<MaterialSuccess, 'materials' | 'unavailableTypes'>> {
+  ): Promise<
+    Pick<MaterialSuccess, 'materials' | 'unavailableTypes'> &
+      Readonly<{ ragEvidence?: CoachRagEvidence }>
+  > {
     const output = await this.searchMaterialsRaw(
       input,
       runner,
@@ -605,6 +725,9 @@ export class CoachRuntimeWorkflowService implements CoachRuntimeWorkflow {
     return {
       materials: output.materials,
       unavailableTypes: output.unavailableTypes,
+      ...('ragEvidence' in output
+        ? { ragEvidence: output.ragEvidence as CoachRagEvidence }
+        : {}),
     };
   }
 
@@ -614,24 +737,107 @@ export class CoachRuntimeWorkflowService implements CoachRuntimeWorkflow {
     budget: CoachBudgetService,
     query: string,
     profile: ProfileSuccess | null,
+    due: DueSuccess | null = null,
   ) {
+    const rag = resolveRagRuntimeConfig(process.env);
+    const personalization = buildVerifiedRagPersonalization(
+      profile,
+      due,
+      rag.privateContentEnabled,
+      this.now(),
+    );
     const output = await this.toolStep(
       input,
       budget,
       'search_learning_materials',
       'finding_materials',
       runner,
-      () =>
-        this.materials.execute(input.context, {
+      async () => {
+        const retrievalStartedAt = this.now().getTime();
+        const legacyInput = {
           schemaVersion: COACH_TOOL_SCHEMA_VERSION,
           query,
-          materialTypes: ['word', 'course', 'grammar'],
+          materialTypes: ['word', 'course', 'grammar'] as const,
           cefrLevel: profile?.level?.cefr ?? null,
           ...(profile?.activeCourse?.id
             ? { courseId: profile.activeCourse.id }
             : {}),
           limit: 20,
-        }),
+        };
+        if (!rag.enabled && !rag.shadowEnabled) {
+          return this.materials.execute(input.context, legacyInput);
+        }
+        const ragOutput = await this.materials.execute(
+          input.context,
+          {
+            schemaVersion: COACH_RAG_TOOL_SCHEMA_VERSION,
+            query,
+            filters: personalization.filters,
+            topK: rag.topK,
+            minimumRelevance: rag.minimumRelevance,
+          },
+          {
+            requestId: input.request.id,
+            deadline: input.request.deadlineAt,
+            signal: input.signal,
+          },
+        );
+        if (ragOutput.schemaVersion === COACH_RAG_TOOL_SCHEMA_VERSION) {
+          this.recordRagRetrievalTrace(
+            input,
+            ragOutput,
+            retrievalStartedAt,
+            rag.enabled,
+          );
+        }
+        await this.assertKnowledgeResultCurrent(input);
+        if (rag.shadowEnabled && !rag.enabled) {
+          return this.materials.executeLegacy(input.context, legacyInput);
+        }
+        if (ragOutput.schemaVersion !== COACH_RAG_TOOL_SCHEMA_VERSION) {
+          throw new Error('RAG_TOOL_SCHEMA_INVALID');
+        }
+        if (!ragOutput.ok) {
+          throw new RagRetrievalDegradationError(
+            'failed',
+            ragOutput.failure.code,
+          );
+        }
+        if (ragOutput.retrievalStatus === 'insufficient') {
+          throw new RagRetrievalDegradationError(
+            'insufficient',
+            'RETRIEVAL_INSUFFICIENT',
+          );
+        }
+        return {
+          schemaVersion: COACH_TOOL_SCHEMA_VERSION,
+          ok: true as const,
+          query: ragOutput.query,
+          materials: ragOutput.results.map((result) => ({
+            citation: {
+              citationId: result.citationId,
+              sourceId: result.sourceId,
+              materialType: result.category.startsWith('GRAMMAR_')
+                ? ('grammar' as const)
+                : result.category === 'COURSE_LESSON'
+                  ? ('course' as const)
+                  : ('word' as const),
+              title: result.title,
+              category: result.category,
+              locator: null,
+              supports: result.excerpt,
+              accessScope: result.accessScope as 'PUBLIC',
+            },
+            summary: result.excerpt,
+            freshness: this.now().toISOString(),
+          })),
+          unavailableTypes: [],
+          ragEvidence: {
+            citations: ragOutput.citations,
+          },
+        };
+      },
+      { personalization: personalization.application },
     );
     if (!output.ok) throw toolError(output);
     return output;
@@ -708,29 +914,35 @@ export class CoachRuntimeWorkflowService implements CoachRuntimeWorkflow {
       | 'saving',
     runner: CoachControlledStepRunner,
     operation: (signal: AbortSignal) => Promise<T>,
+    metadata: Record<string, unknown> = {},
   ) {
     this.assertToolBudget(input, budget, tool);
-    return this.tracedStep(input, tool, async () => {
-      const result = await runner.execute({
-        requestId: input.request.id,
-        status,
-        tool,
-        timeoutMs: Math.max(
-          1,
-          input.request.deadlineAt.getTime() - this.now().getTime(),
-        ),
-        operation,
-        onSuccess: () => undefined,
-      });
-      budget.record({
-        inputTokens: 0,
-        outputTokens: 0,
-        modelCalls: 0,
-        toolCalls: 1,
-        costMicros: 0,
-      });
-      return result;
-    });
+    return this.tracedStep(
+      input,
+      tool,
+      async () => {
+        const result = await runner.execute({
+          requestId: input.request.id,
+          status,
+          tool,
+          timeoutMs: Math.max(
+            1,
+            input.request.deadlineAt.getTime() - this.now().getTime(),
+          ),
+          operation,
+          onSuccess: () => undefined,
+        });
+        budget.record({
+          inputTokens: 0,
+          outputTokens: 0,
+          modelCalls: 0,
+          toolCalls: 1,
+          costMicros: 0,
+        });
+        return result;
+      },
+      metadata,
+    );
   }
 
   private assertToolBudget(
@@ -756,13 +968,119 @@ export class CoachRuntimeWorkflowService implements CoachRuntimeWorkflow {
     );
   }
 
+  private async assertKnowledgeResultCurrent(input: RuntimeInput) {
+    const guard = this.cancellation as CoachCancellationService & {
+      assertCanConsumeKnowledgeResult?: (
+        context: RuntimeInput['context'],
+        requestId: string,
+        signal: AbortSignal,
+      ) => Promise<void>;
+    };
+    await guard.assertCanConsumeKnowledgeResult?.(
+      input.context,
+      input.request.id,
+      input.signal,
+    );
+  }
+
+  private recordRagRetrievalTrace(
+    input: RuntimeInput,
+    output: SearchLearningMaterialsV2Output,
+    startedAtMs: number,
+    enabled: boolean,
+  ): void {
+    const pepper =
+      process.env.COACH_TRACE_PEPPER ?? process.env.JWT_SECRET ?? '';
+    if (!pepper.trim()) throw new Error('RAG_TRACE_PEPPER_UNAVAILABLE');
+    const results = output.results;
+    const citationIds = output.citations.map((citation) => citation.citationId);
+    const usedCitationIds: string[] = [];
+    const metadata: RetrievalTraceMetadata = {
+      metadataVersion: 'rag-trace.v1',
+      queryHash: createRagDiagnosticHash(output.query, pepper).slice(3),
+      appliedFilters: {
+        levels: output.appliedFilters.levels,
+        categories: output.appliedFilters.categories,
+        sources: output.appliedFilters.sources,
+        courseIds: output.appliedFilters.courseIds,
+        wordIds: output.appliedFilters.wordIds,
+        accessScopes: output.appliedFilters.accessScopes,
+      },
+      topK: output.appliedFilters.topK,
+      minimumRelevance: output.appliedFilters.minimumRelevance,
+      versions: {
+        sourceRightsSnapshotVersion:
+          output.appliedFilters.sourceRightsSnapshotVersion,
+        contentVersion:
+          results[0]?.contentVersion ??
+          output.appliedFilters.contentVersionPolicy,
+        chunkingVersion: output.appliedFilters.chunkingVersion,
+        embeddingVersion: output.appliedFilters.embeddingVersion,
+        retrievalConfigVersion: output.appliedFilters.retrievalConfigVersion,
+        indexVersion: output.appliedFilters.indexVersion,
+      },
+      counts: {
+        rawRecall: results.length,
+        accessEligible: results.length,
+        relevanceEligible: results.length,
+        deduplicated: results.length,
+        contextSelected: enabled ? results.length : 0,
+      },
+      rankings: results.map((result) => ({
+        citationId: result.citationId,
+        sourceIdHash: createRagDiagnosticHash(result.sourceId, pepper).slice(3),
+        sourceCategory: result.source,
+        rank: result.rank,
+        relevanceScore: result.relevanceScore,
+        decision: 'unused',
+      })),
+      conflictCount: output.conflicts.length,
+      deduplicatedCount: 0,
+      retrievalDurationMs: Math.max(0, this.now().getTime() - startedAtMs),
+      contextTokens: enabled
+        ? Buffer.byteLength(
+            `<UNTRUSTED_KNOWLEDGE_JSON>${JSON.stringify(
+              results.map((result) => ({
+                chunkId: result.chunkId,
+                source: result.source,
+                sourceId: result.sourceId,
+                title: result.title,
+                category: result.category,
+                level: result.level,
+                courseId: result.courseId,
+                wordId: result.wordId,
+                contentVersion: result.contentVersion,
+                rank: result.rank,
+                relevanceScore: result.relevanceScore,
+                content: result.excerpt,
+              })),
+            )}</UNTRUSTED_KNOWLEDGE_JSON>`,
+            'utf8',
+          )
+        : 0,
+      tokenCountMode: 'fallback',
+      usedCitationIds,
+      unusedCitationIds: citationIds,
+      claimCitations: [],
+      status: output.retrievalStatus,
+      failureCode:
+        output.retrievalStatus === 'success'
+          ? null
+          : output.retrievalStatus === 'failed'
+            ? output.failure.code
+            : 'RETRIEVAL_INSUFFICIENT',
+    };
+    input.trace.recordRetrieval(metadata);
+  }
+
   private async tracedStep<T>(
     input: RuntimeInput,
     name: string,
     operation: () => Promise<T>,
+    metadata: Record<string, unknown> = {},
   ) {
     const startedAt = this.now().getTime();
-    input.trace.startStep(name, startedAt);
+    input.trace.startStep(name, startedAt, metadata);
     try {
       const result = await operation();
       input.trace.finishStep(name, 'SUCCEEDED', this.now().getTime());

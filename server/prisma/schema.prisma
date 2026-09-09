@@ -213,6 +213,110 @@ enum CoachDeletionStatus {
   COMPLETED
 }
 
+enum KnowledgeSourceStatus {
+  DRAFT
+  ACTIVE
+  SUSPENDED
+  EXPIRED
+  REVOKED
+  DELETED
+}
+
+enum KnowledgeAccessScope {
+  PUBLIC
+  OWNED_COURSE
+  PRIVATE_OWNER
+}
+
+enum KnowledgeDocumentStatus {
+  STAGED
+  ACTIVE
+  SUPERSEDED
+  INVALID
+  PURGING
+  PURGED
+}
+
+enum KnowledgeChunkStatus {
+  STAGED
+  ACTIVE
+  SUPERSEDED
+  INVALID
+  PURGING
+}
+
+enum KnowledgeEmbeddingStatus {
+  PENDING
+  READY
+  FAILED
+  INVALID
+  PURGING
+}
+
+enum KnowledgeReleaseStatus {
+  BUILDING
+  READY
+  ACTIVE
+  SUPERSEDED
+  INVALID
+  PURGED
+}
+
+enum KnowledgeIngestionOperation {
+  UPSERT
+  REEMBED
+  INVALIDATE
+  PURGE
+}
+
+enum KnowledgeIngestionStatus {
+  PENDING
+  DISPATCHED
+  RUNNING
+  SUCCEEDED
+  RETRYABLE_FAILED
+  TERMINAL_FAILED
+  CANCELLED
+}
+
+enum KnowledgeCitationStatus {
+  ACTIVE
+  SUPERSEDED
+  SOURCE_INVALID
+  ACCESS_REVOKED
+  SOURCE_DELETED
+  PRIVATE_DATA_DELETED
+  PURGED
+}
+
+enum KnowledgeCategory {
+  WORD_MEANING
+  WORD_TRANSLATION
+  WORD_PRONUNCIATION
+  WORD_FORM
+  WORD_USAGE
+  COLLOCATION
+  EXAMPLE_SENTENCE
+  GRAMMAR_RULE
+  GRAMMAR_EXCEPTION
+  COURSE_LESSON
+  EXERCISE_KNOWLEDGE
+  USER_ERROR
+  LEARNING_SUMMARY
+}
+
+enum PrivateLearningSummaryTopicType {
+  WORD
+  ERROR_TYPE
+  COURSE_TOPIC
+}
+
+enum PrivateLearningSummaryStatus {
+  ACTIVE
+  SUPERSEDED
+  DELETING
+}
+
 //用户表
 model User {
   id                   String                @id @default(cuid()) // 用户ID
@@ -244,6 +348,8 @@ model User {
   learningAttempts     LearningAttempt[]
   coachFeedback        CoachFeedback[]
   traceSubjectMapping  TraceSubjectMapping?
+  knowledgeDocuments   KnowledgeDocument[]
+  privateLearningSummaries PrivateLearningSummary[]
 }
 
 //记录已操作的单词
@@ -253,7 +359,7 @@ model WordBookRecord {
   isMaster  Boolean  @default(false) // 是否掌握
   createdAt DateTime @default(now()) // 创建时间
   updatedAt DateTime @updatedAt // 更新时间
-  userId    String // 用户ID
+  userId    String // 用户ID 
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   word      WordBook @relation(fields: [wordId], references: [id], onDelete: Cascade)
 
@@ -277,8 +383,8 @@ model WordBook {
   gk                  Boolean? // 高考
   zk                  Boolean? // 中考
   gre                 Boolean? // GRE
-  toefl               Boolean? // TOEFL
-  ielts               Boolean? // IELTS
+  toefl               Boolean? // TOEFL 
+  ielts               Boolean? // IELTS 
   cet6                Boolean? // 大学英语六级
   cet4                Boolean? // 大学英语四级
   ky                  Boolean? // 考研
@@ -287,6 +393,7 @@ model WordBook {
   wordBookRecords     WordBookRecord[]
   learningItemStates  LearningItemState[]
   exerciseItemTargets ExerciseItemTarget[]
+  knowledgeDocuments  KnowledgeDocument[]
 
   @@index([word])
   @@index([tag])
@@ -339,6 +446,7 @@ model Course {
   updatedAt       DateTime         @updatedAt // 更新时间
   courseRecords   CourseRecord[]
   learnerProfiles LearnerProfile[]
+  knowledgeDocuments KnowledgeDocument[]
 }
 
 model LearnerProfile {
@@ -478,6 +586,7 @@ model CoachRequest {
   savedAttempt             LearningAttempt?      @relation("AttemptSaveRequest")
   trace                    CoachTrace?
   feedback                 CoachFeedback[]
+  knowledgeCitations       KnowledgeCitation[]
 
   @@unique([userId, clientRequestKey])
   @@index([conversationId, status, createdAt])
@@ -704,6 +813,226 @@ model TraceSubjectMapping {
   createdAt      DateTime     @default(now())
   user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   traces         CoachTrace[]
+}
+
+model KnowledgeSource {
+  id                  String                       @id @default(cuid())
+  sourceKey           String                       @unique @db.VarChar(128)
+  name                String                       @db.VarChar(300)
+  sourceType          String                       @db.VarChar(64)
+  licenseRef          String?                      @db.VarChar(500)
+  rightsVersion       String                       @db.VarChar(128)
+  status              KnowledgeSourceStatus        @default(DRAFT)
+  allowEmbedding      Boolean                      @default(false)
+  allowExcerptDisplay Boolean                      @default(false)
+  allowEvaluation     Boolean                      @default(false)
+  verifiedAt          DateTime?
+  validFrom           DateTime?
+  validUntil          DateTime?
+  revokedAt           DateTime?
+  deletedAt           DateTime?
+  createdAt           DateTime                     @default(now())
+  updatedAt           DateTime                     @updatedAt
+  fieldPolicies       KnowledgeSourceFieldPolicy[]
+  documents           KnowledgeDocument[]
+  ingestionJobs       KnowledgeIngestionJob[]
+
+  @@index([status, validUntil])
+}
+
+model KnowledgeSourceFieldPolicy {
+  id                  String            @id @default(cuid())
+  knowledgeSourceId   String
+  recordType          String            @db.VarChar(64)
+  fieldName           String            @db.VarChar(128)
+  allowEmbedding      Boolean           @default(false)
+  allowExcerptDisplay Boolean           @default(false)
+  allowEvaluation     Boolean           @default(false)
+  contentCategory     KnowledgeCategory
+  policyVersion       String            @db.VarChar(128)
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+  knowledgeSource     KnowledgeSource   @relation(fields: [knowledgeSourceId], references: [id], onDelete: Cascade)
+
+  @@unique([knowledgeSourceId, recordType, fieldName, policyVersion])
+}
+
+model KnowledgeRelease {
+  id                       String                 @id @default(cuid())
+  scopeKey                 String                 @db.VarChar(300)
+  contentVersion           String                 @db.VarChar(128)
+  rightsVersion            String                 @db.VarChar(128)
+  chunkingVersion          String                 @db.VarChar(128)
+  embeddingVersion         String                 @db.VarChar(256)
+  retrievalConfigVersion   String                 @db.VarChar(128)
+  indexVersion             String                 @db.VarChar(128)
+  expectedChunkCount       Int                    @default(0)
+  readyEmbeddingCount      Int                    @default(0)
+  status                   KnowledgeReleaseStatus @default(BUILDING)
+  activatedAt              DateTime?
+  invalidatedAt            DateTime?
+  createdAt                DateTime               @default(now())
+  updatedAt                DateTime               @updatedAt
+  documents                KnowledgeDocument[]
+
+  @@unique([scopeKey, contentVersion, rightsVersion, chunkingVersion, embeddingVersion])
+  @@index([status, embeddingVersion, retrievalConfigVersion])
+}
+
+model KnowledgeDocument {
+  id                  String                  @id @default(cuid())
+  knowledgeSourceId   String
+  releaseId           String
+  source              String                  @db.VarChar(128)
+  sourceId            String                  @db.VarChar(300)
+  sourceRecordType    String                  @db.VarChar(64)
+  sourceRecordId      String                  @db.VarChar(128)
+  title               String                  @db.VarChar(300)
+  contentVersion      String                  @db.VarChar(128)
+  visibility          String                  @db.VarChar(16)
+  accessScope         KnowledgeAccessScope
+  userId              String?
+  courseId            String?
+  wordId              String?
+  status              KnowledgeDocumentStatus @default(STAGED)
+  sourceUpdatedAt     DateTime
+  createdAt           DateTime                @default(now())
+  updatedAt           DateTime                @updatedAt
+  knowledgeSource     KnowledgeSource         @relation(fields: [knowledgeSourceId], references: [id], onDelete: Cascade)
+  release             KnowledgeRelease        @relation(fields: [releaseId], references: [id], onDelete: Cascade)
+  user                User?                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course              Course?                 @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  word                WordBook?               @relation(fields: [wordId], references: [id], onDelete: Cascade)
+  chunks              KnowledgeChunk[]
+  citations           KnowledgeCitation[]
+
+  @@unique([knowledgeSourceId, sourceRecordType, sourceRecordId, contentVersion])
+  @@index([status, accessScope, userId])
+  @@index([status, courseId])
+  @@index([wordId])
+}
+
+model KnowledgeChunk {
+  id               String               @id @default(cuid())
+  documentId       String
+  chunkKey         String               @db.VarChar(200)
+  ordinal          Int
+  content          String
+  contentHash      String               @db.VarChar(128)
+  chunkingVersion  String               @db.VarChar(128)
+  source           String               @db.VarChar(128)
+  sourceId         String               @db.VarChar(300)
+  title            String               @db.VarChar(300)
+  category         KnowledgeCategory
+  level            CefrLevel?
+  courseId         String?
+  wordId           String?
+  userId           String?
+  visibility       String               @db.VarChar(16)
+  contentVersion   String               @db.VarChar(128)
+  factKey          String?              @db.VarChar(300)
+  factValueHash    String?              @db.VarChar(128)
+  authorityRank    Int?
+  status           KnowledgeChunkStatus @default(STAGED)
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
+  document         KnowledgeDocument    @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  embeddings       KnowledgeEmbedding[]
+  citations        KnowledgeCitation[]
+
+  @@unique([documentId, chunkingVersion, chunkKey, contentHash])
+  @@index([documentId, status])
+  @@index([category, level])
+  @@index([courseId, status])
+  @@index([wordId, status])
+  @@index([userId, status])
+  @@index([factKey])
+}
+
+model KnowledgeEmbedding {
+  id               String                   @id @default(cuid())
+  chunkId          String
+  provider         String                   @db.VarChar(64)
+  model            String                   @db.VarChar(128)
+  dimensions       Int
+  embeddingVersion String                   @db.VarChar(256)
+  inputHash        String                   @db.VarChar(128)
+  embedding        Unsupported("vector")?
+  status           KnowledgeEmbeddingStatus @default(PENDING)
+  failureCode      String?                  @db.VarChar(64)
+  createdAt        DateTime                 @default(now())
+  updatedAt        DateTime                 @updatedAt
+  chunk            KnowledgeChunk           @relation(fields: [chunkId], references: [id], onDelete: Cascade)
+
+  @@unique([chunkId, embeddingVersion, inputHash])
+  @@index([embeddingVersion, dimensions, status, chunkId])
+}
+
+model KnowledgeIngestionJob {
+  id                  String                      @id @default(cuid())
+  operation           KnowledgeIngestionOperation
+  knowledgeSourceId   String
+  sourceRecordType    String                      @db.VarChar(64)
+  sourceRecordId      String                      @db.VarChar(128)
+  contentVersion      String?                     @db.VarChar(128)
+  pipelineVersion     String                      @db.VarChar(256)
+  ownerUserId         String?
+  status              KnowledgeIngestionStatus    @default(PENDING)
+  attemptCount        Int                         @default(0)
+  nextAttemptAt       DateTime?
+  claimedAt           DateTime?
+  finishedAt          DateTime?
+  failureCode         String?                     @db.VarChar(64)
+  createdAt           DateTime                    @default(now())
+  updatedAt           DateTime                    @updatedAt
+  knowledgeSource     KnowledgeSource             @relation(fields: [knowledgeSourceId], references: [id], onDelete: Cascade)
+
+  @@unique([operation, sourceRecordType, sourceRecordId, contentVersion, pipelineVersion])
+  @@index([status, nextAttemptAt, createdAt])
+}
+
+model PrivateLearningSummary {
+  id              String                            @id @default(cuid())
+  userId          String
+  topicType       PrivateLearningSummaryTopicType
+  topicKey        String                            @db.VarChar(128)
+  windowStart     DateTime
+  windowEnd       DateTime
+  summaryFacts    Json
+  evidenceVersion String                            @db.VarChar(128)
+  status          PrivateLearningSummaryStatus      @default(ACTIVE)
+  createdAt       DateTime                          @default(now())
+  updatedAt       DateTime                          @updatedAt
+  user            User                              @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, topicType, topicKey, status])
+}
+
+model KnowledgeCitation {
+  id                String                  @id @db.VarChar(64)
+  requestId         String
+  chunkId           String?
+  documentId        String?
+  sourceId          String?                 @db.VarChar(300)
+  sourceIdHash      String                  @db.VarChar(128)
+  contentVersion    String                  @db.VarChar(128)
+  embeddingVersion  String                  @db.VarChar(256)
+  excerpt           String?                 @db.VarChar(2000)
+  excerptHash       String                  @db.VarChar(128)
+  rank              Int
+  relevanceScore    Decimal                 @db.Decimal(8, 7)
+  status            KnowledgeCitationStatus @default(ACTIVE)
+  invalidatedAt     DateTime?
+  createdAt         DateTime                @default(now())
+  updatedAt         DateTime                @updatedAt
+  request           CoachRequest            @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  chunk             KnowledgeChunk?         @relation(fields: [chunkId], references: [id], onDelete: SetNull)
+  document          KnowledgeDocument?      @relation(fields: [documentId], references: [id], onDelete: SetNull)
+
+  @@unique([requestId, chunkId, contentVersion])
+  @@index([requestId, status])
+  @@index([chunkId, status])
+  @@index([sourceIdHash, contentVersion])
 }
 
 //访客表(UV)

@@ -104,9 +104,7 @@ export function loadEvalCases(path: string): CoachEvalCase[] {
       try {
         return evalCaseSchema.parse(JSON.parse(line));
       } catch (error) {
-        throw new Error(
-          `Invalid eval case at line ${index + 1}: ${String(error)}`,
-        );
+        throw new Error(`Invalid eval case at line ${index + 1}: ${String(error)}`);
       }
     });
 }
@@ -117,18 +115,16 @@ export function validateDeterministicEvalSuite(input: {
   securityGates: unknown;
 }) {
   const failures: string[] = [];
-  const toolPaths = z
-    .record(
-      intent,
-      z
-        .object({
-          allowedTools: z.array(toolName),
-          forbiddenTools: z.array(toolName),
-          toolOrder: z.array(toolName),
-        })
-        .strict(),
-    )
-    .safeParse(input.toolPaths);
+  const toolPaths = z.record(
+    intent,
+    z
+      .object({
+        allowedTools: z.array(toolName),
+        forbiddenTools: z.array(toolName),
+        toolOrder: z.array(toolName),
+      })
+      .strict(),
+  ).safeParse(input.toolPaths);
   const security = z
     .object({
       version: z.string().min(1),
@@ -141,24 +137,18 @@ export function validateDeterministicEvalSuite(input: {
     .strict()
     .safeParse(input.securityGates);
   if (!toolPaths.success) failures.push('tool paths are incomplete or invalid');
-  if (!security.success)
-    failures.push('security gates are incomplete or invalid');
+  if (!security.success) failures.push('security gates are incomplete or invalid');
 
   const ids = new Set<string>();
   for (const item of input.cases) {
     if (ids.has(item.id)) failures.push(`${item.id}: duplicate id`);
     ids.add(item.id);
     const unsafe = findCoachSensitiveMatches(JSON.stringify(item));
-    if (unsafe.length)
-      failures.push(`${item.id}: sensitive data ${unsafe.join(',')}`);
-    if (
-      item.expected.intent === 'GRADE_ANSWER' &&
-      !item.expected.gradeBeforeSave
-    ) {
+    if (unsafe.length) failures.push(`${item.id}: sensitive data ${unsafe.join(',')}`);
+    if (item.expected.intent === 'GRADE_ANSWER' && !item.expected.gradeBeforeSave) {
       failures.push(`${item.id}: grading must require grade-before-save`);
     }
-    if (!item.expected.idempotent)
-      failures.push(`${item.id}: idempotency missing`);
+    if (!item.expected.idempotent) failures.push(`${item.id}: idempotency missing`);
     if (
       item.expected.citationSourceIds.some(
         (sourceId) => !item.accessibleSourceIds.includes(sourceId),
@@ -197,9 +187,7 @@ export function validateDeterministicEvalSuite(input: {
       ...new Set(
         input.cases
           .map((item) => item.request.exerciseType)
-          .filter(
-            (value): value is NonNullable<typeof value> => value !== null,
-          ),
+          .filter((value): value is NonNullable<typeof value> => value !== null),
       ),
     ],
     categories: [...new Set(input.cases.map((item) => item.category))],

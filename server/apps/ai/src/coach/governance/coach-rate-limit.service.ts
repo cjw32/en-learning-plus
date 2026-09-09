@@ -7,10 +7,10 @@ export interface CoachRateLimitStore {
 export class InMemoryRateLimitStore implements CoachRateLimitStore {
   private readonly counts = new Map<string, number>();
 
-  increment(key: string): Promise<number> {
+  async increment(key: string): Promise<number> {
     const count = (this.counts.get(key) ?? 0) + 1;
     this.counts.set(key, count);
-    return Promise.resolve(count);
+    return count;
   }
 }
 
@@ -39,7 +39,9 @@ export class CoachRateLimitService {
 
   private async consumeIdentity(identity: string, operation: string) {
     const subjectHash = createHash('sha256').update(identity).digest('hex');
-    const window = Math.floor(this.now() / (this.policy.windowSeconds * 1000));
+    const window = Math.floor(
+      this.now() / (this.policy.windowSeconds * 1000),
+    );
     const key = `coach:rate:${subjectHash}:${operation}:${window}`;
     const count = await this.store.increment(key, this.policy.windowSeconds);
     if (count > this.policy.limit) {

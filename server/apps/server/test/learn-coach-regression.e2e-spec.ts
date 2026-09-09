@@ -8,23 +8,17 @@ function fixture() {
   let wordNumber = 0;
   const transaction = {
     wordBookRecord: {
-      createMany: jest.fn(
-        async ({
-          data,
-        }: {
-          data: Array<{ userId: string; wordId: string }>;
-        }) => {
-          let count = 0;
-          for (const record of data) {
-            const key = `${record.userId}:${record.wordId}`;
-            if (!records.has(key)) {
-              records.add(key);
-              count += 1;
-            }
+      createMany: jest.fn(async ({ data }: { data: Array<{ userId: string; wordId: string }> }) => {
+        let count = 0;
+        for (const record of data) {
+          const key = `${record.userId}:${record.wordId}`;
+          if (!records.has(key)) {
+            records.add(key);
+            count += 1;
           }
-          return { count };
-        },
-      ),
+        }
+        return { count };
+      }),
     },
     learnerProfile: {
       findUnique: jest.fn(async () => ({ timezone: 'Asia/Shanghai' })),
@@ -44,9 +38,8 @@ function fixture() {
     },
   };
   const prisma = {
-    $transaction: jest.fn(
-      async (operation: (tx: typeof transaction) => unknown) =>
-        operation(transaction),
+    $transaction: jest.fn(async (operation: (tx: typeof transaction) => unknown) =>
+      operation(transaction),
     ),
     courseRecord: { findFirst: jest.fn() },
     wordBook: { findMany: jest.fn() },
@@ -71,9 +64,7 @@ describe('legacy learn flow remains compatible with Coach state', () => {
   it('keeps the ten-word response contract and initializes review state atomically', async () => {
     const test = fixture();
     const wordIds = Array.from({ length: 10 }, (_, index) => `word-${index}`);
-    await expect(
-      test.service.saveWordMaster(wordIds, 'user-a'),
-    ).resolves.toEqual({
+    await expect(test.service.saveWordMaster(wordIds, 'user-a')).resolves.toEqual({
       data: { wordNumber: 10 },
       code: 0,
       message: 'Success',
@@ -97,9 +88,9 @@ describe('legacy learn flow remains compatible with Coach state', () => {
     expect((await test.service.saveWordMaster(ids, 'user-a')).data).toEqual({
       wordNumber: 2,
     });
-    expect((await test.service.saveWordMaster(ids, 'user-a')).data).toEqual({
-      wordNumber: 2,
-    });
+    expect(
+      (await test.service.saveWordMaster(ids, 'user-a')).data,
+    ).toEqual({ wordNumber: 2 });
     expect(test.records.size).toBe(2);
     expect(test.states.size).toBe(2);
   });

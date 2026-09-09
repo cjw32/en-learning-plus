@@ -42,6 +42,17 @@ import {
   LearningDataDeletionService,
   PrismaLearningDataDeletionRepository,
 } from './privacy/learning-data-deletion.service';
+import {
+  PrismaKnowledgeSourceRightsRepository,
+  SourceRightsService,
+} from './knowledge/ingestion/source-rights.service';
+import {
+  KnowledgeOutboxRepository,
+  PrismaKnowledgeOutboxPersistence,
+} from './knowledge/ingestion/knowledge-outbox.repository';
+import { PrismaKnowledgeVectorRepository } from './knowledge/retrieval/vector.repository';
+import { PrismaCitationRepository } from './knowledge/citations/citation.repository';
+import { CitationProjectionService } from './knowledge/citations/citation-projection.service';
 
 @Module({
   imports: [PrismaModule],
@@ -135,6 +146,40 @@ import {
       useFactory: (repository: PrismaLearningDataDeletionRepository) =>
         new LearningDataDeletionService(repository),
     },
+    {
+      provide: SourceRightsService,
+      inject: [PrismaService],
+      useFactory: (prisma: PrismaService) =>
+        new SourceRightsService(
+          new PrismaKnowledgeSourceRightsRepository(prisma),
+        ),
+    },
+    {
+      provide: KnowledgeOutboxRepository,
+      inject: [PrismaService],
+      useFactory: (prisma: PrismaService) =>
+        new KnowledgeOutboxRepository(
+          new PrismaKnowledgeOutboxPersistence(prisma),
+        ),
+    },
+    {
+      provide: PrismaKnowledgeVectorRepository,
+      inject: [PrismaService],
+      useFactory: (prisma: PrismaService) =>
+        new PrismaKnowledgeVectorRepository(prisma),
+    },
+    {
+      provide: PrismaCitationRepository,
+      inject: [PrismaService],
+      useFactory: (prisma: PrismaService) =>
+        new PrismaCitationRepository(prisma),
+    },
+    {
+      provide: CitationProjectionService,
+      inject: [PrismaCitationRepository],
+      useFactory: (repository: PrismaCitationRepository) =>
+        new CitationProjectionService(repository),
+    },
   ],
   exports: [
     OwnedResourceService,
@@ -148,6 +193,11 @@ import {
     AttemptService,
     LegacyReviewInitializerService,
     LearningDataDeletionService,
+    SourceRightsService,
+    KnowledgeOutboxRepository,
+    PrismaKnowledgeVectorRepository,
+    PrismaCitationRepository,
+    CitationProjectionService,
   ],
 })
 export class LearningModule {}

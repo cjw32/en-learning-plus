@@ -6,8 +6,16 @@ import { PromptModule } from './prompt/prompt.module';
 import { SharedModule } from '@libs/shared';
 import { DigestModule } from './digest/digest.module';
 import { CoachModule } from './coach/coach.module';
+import { KnowledgeModule } from './knowledge/knowledge.module';
 @Module({
-  imports: [ChatModule, PromptModule, SharedModule, DigestModule, CoachModule],
+  imports: [
+    ChatModule,
+    PromptModule,
+    SharedModule,
+    DigestModule,
+    CoachModule,
+    KnowledgeModule,
+  ],
   controllers: [AiController],
   providers: [AiService],
 })

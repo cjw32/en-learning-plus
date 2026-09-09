@@ -11,6 +11,9 @@ import {
   OwnedGradingService,
   ReviewScheduleService,
   LearningModule,
+  CitationProjectionService,
+  RAG_LEARNING_MATERIAL_SEARCH,
+  type RagLearningMaterialSearchPort,
 } from '@libs/learning';
 import { AuthGuard, SharedModule } from '@libs/shared';
 import { CoachApiService } from './api/coach-api.service';
@@ -34,7 +37,11 @@ import {
   type CoachSseAccessRepository,
 } from './streaming/coach-sse-session.service';
 import { CoachSseController } from './streaming/coach-sse.controller';
-import { coachResultSchema } from '@en/common/coach';
+import {
+  coachResultSchema,
+  publicCoachResultV2Schema,
+  storedCoachResultV2Schema,
+} from '@en/common/coach';
 import {
   COACH_CANCELLATION_REPOSITORY,
   COACH_CANCELLATION_SIGNAL_STORE,
@@ -83,28 +90,30 @@ import {
   CoachAdmissionService,
   RedisCoachGovernanceStore,
 } from './governance/coach-admission.service';
-import { CoachEnabledGuard } from './governance/coach-enabled.guard';
+import { resolveRagRuntimeConfig } from './governance/coach-config.schema';
+import { KnowledgeModule } from '../knowledge/knowledge.module';
 
 @Module({
   imports: [
     SharedModule,
     LearningModule,
+    KnowledgeModule,
     CoachRedisModule,
     BullModule.registerQueue({ name: COACH_QUEUE_NAME }),
   ],
   controllers: [CoachController, CoachSseController],
   providers: [
     AuthGuard,
-    CoachEnabledGuard,
     CoachRequestRepository,
     RedisCoachEventStore,
     { provide: COACH_EVENT_STORE, useExisting: RedisCoachEventStore },
     CoachEventStreamService,
     {
       provide: COACH_SSE_ACCESS_REPOSITORY,
-      inject: [CoachRequestRepository],
+      inject: [CoachRequestRepository, CitationProjectionService],
       useFactory: (
         repository: CoachRequestRepository,
+        citationProjection: CitationProjectionService,
       ): CoachSseAccessRepository => ({
         async findOwned(subjectId, requestId) {
           const request = await repository.findOwnedRequest(
@@ -112,11 +121,30 @@ import { CoachEnabledGuard } from './governance/coach-enabled.guard';
             requestId,
           );
           if (!request) return null;
-          const result = coachResultSchema.safeParse(request.finalResult);
+          const v1 = coachResultSchema.safeParse(request.finalResult);
+          const storedV2 = storedCoachResultV2Schema.safeParse(
+            request.finalResult,
+          );
+          const publicV2 = publicCoachResultV2Schema.safeParse(
+            request.finalResult,
+          );
+          const result = v1.success
+            ? v1.data
+            : storedV2.success
+              ? await citationProjection.projectResult(
+                  subjectId,
+                  storedV2.data,
+                )
+              : publicV2.success
+                ? await citationProjection.projectResult(
+                    subjectId,
+                    publicV2.data,
+                  )
+                : null;
           return {
             id: request.id,
             status: request.status,
-            finalResult: result.success ? result.data : null,
+            finalResult: result,
           };
         },
       }),
@@ -201,7 +229,11 @@ import { CoachEnabledGuard } from './governance/coach-enabled.guard';
         checkpoints: CheckpointPurgeService,
         learningDeletion: LearningDataDeletionService,
       ) =>
-        new CoachRetentionProcessor(repository, checkpoints, learningDeletion),
+        new CoachRetentionProcessor(
+          repository,
+          checkpoints,
+          learningDeletion,
+        ),
     },
     {
       provide: CoachRequestService,
@@ -216,7 +248,22 @@ import { CoachEnabledGuard } from './governance/coach-enabled.guard';
       useFactory: (schedules: ReviewScheduleService) =>
         new GetDueWordsTool(schedules),
     },
-    SearchLearningMaterialsTool,
+    {
+      provide: SearchLearningMaterialsTool,
+      inject: [LearningMaterialService, RAG_LEARNING_MATERIAL_SEARCH],
+      useFactory: (
+        materials: LearningMaterialService,
+        ragSearch: RagLearningMaterialSearchPort,
+      ) => {
+        const rag = resolveRagRuntimeConfig(process.env);
+        return new SearchLearningMaterialsTool(
+          materials,
+          rag.enabled || rag.shadowEnabled,
+          ragSearch,
+        );
+      },
+    },
+    GradeAnswerTool,
     SaveAttemptTool,
     ConfiguredCoachStructuredModel,
     {
@@ -224,12 +271,6 @@ import { CoachEnabledGuard } from './governance/coach-enabled.guard';
       inject: [ConfiguredCoachStructuredModel],
       useFactory: (model: ConfiguredCoachStructuredModel) =>
         new CoachModelGateway(model),
-    },
-    {
-      provide: GradeAnswerTool,
-      inject: [OwnedGradingService, CoachModelGateway],
-      useFactory: (grading: OwnedGradingService, model: CoachModelGateway) =>
-        new GradeAnswerTool(grading, model),
     },
     {
       provide: CoachModelExerciseGenerator,

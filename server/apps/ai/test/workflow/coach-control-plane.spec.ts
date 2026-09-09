@@ -57,9 +57,9 @@ describe('Coach controlled execution foundation', () => {
         allowedVariables: ['message'],
       },
     ]);
-    expect(
-      registry.resolve('classify_intent', 'coach.classify.v1').hash,
-    ).toMatch(/^[a-f0-9]{64}$/);
+    expect(registry.resolve('classify_intent', 'coach.classify.v1').hash).toMatch(
+      /^[a-f0-9]{64}$/,
+    );
     expect(() => registry.resolve('classify_intent', 'unknown')).toThrow();
     expect(() =>
       registry.render('classify_intent', 'coach.classify.v1', {

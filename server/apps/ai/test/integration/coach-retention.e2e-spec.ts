@@ -1,6 +1,6 @@
 import {
   CoachRetentionService,
-  PrismaCoachRetentionRepository,
+  COACH_RAG_RETENTION_POLICY,
   type CoachRetentionRepository,
   type CoachEphemeralDataStore,
 } from '../../src/coach/observability/coach-retention.service';
@@ -10,7 +10,6 @@ import {
   LearningDataDeletionService,
   type LearningDataDeletionRepository,
 } from '@libs/learning';
-import { Prisma } from '@libs/shared/generated/prisma/client';
 
 const hour = 60 * 60 * 1_000;
 const day = 24 * hour;
@@ -54,14 +53,7 @@ describe('Coach retention and deletion lifecycle', () => {
       learning,
       () => now,
     );
-    return {
-      repository,
-      ephemeral,
-      checkpointAdapter,
-      learningRepository,
-      service,
-      now,
-    };
+    return { repository, ephemeral, checkpointAdapter, learningRepository, service, now };
   }
 
   it('applies the 1h, 24h, 90d, 180d and 7d retention boundaries', async () => {
@@ -74,9 +66,7 @@ describe('Coach retention and deletion lifecycle', () => {
       new Date(test.now.getTime() - day),
     );
     expect(test.repository.expireConversations).toHaveBeenCalledWith(test.now);
-    expect(test.checkpointAdapter.deleteThread).toHaveBeenCalledWith(
-      'thread_expired_001',
-    );
+    expect(test.checkpointAdapter.deleteThread).toHaveBeenCalledWith('thread_expired_001');
     expect(test.repository.purgeTracesBefore).toHaveBeenCalledWith(
       new Date(test.now.getTime() - 180 * day),
     );
@@ -86,6 +76,13 @@ describe('Coach retention and deletion lifecycle', () => {
     expect(test.repository.purgeDiagnosticsBefore).toHaveBeenCalledWith(
       new Date(test.now.getTime() - 7 * day),
     );
+    expect(COACH_RAG_RETENTION_POLICY).toEqual({
+      privateContentPurgeMs: day,
+      diagnosticContentMs: 7 * day,
+      traceMetadataMs: 180 * day,
+      replayMs: hour,
+      reconciliationMs: day,
+    });
   });
 
   it('immediately hides data, clears ephemeral content and unlinks Trace identity', async () => {
@@ -96,10 +93,7 @@ describe('Coach retention and deletion lifecycle', () => {
       status: 'DELETING',
       purgeAfter: '2026-09-03T00:00:00.000Z',
     });
-    expect(test.learningRepository.hideImmediately).toHaveBeenCalledWith(
-      'user-a',
-      test.now,
-    );
+    expect(test.learningRepository.hideImmediately).toHaveBeenCalledWith('user-a', test.now);
     expect(test.repository.unlinkTraceSubject).toHaveBeenCalledWith('user-a');
     expect(test.ephemeral.purgeSubject).toHaveBeenCalledWith('user-a');
   });
@@ -107,9 +101,7 @@ describe('Coach retention and deletion lifecycle', () => {
   it('physically purges within 24h and prevents in-flight work from restoring data', async () => {
     const test = fixture();
     test.repository.isSubjectDeleting.mockResolvedValue(true);
-    await expect(
-      test.service.assertSubjectActive('user-a'),
-    ).rejects.toMatchObject({
+    await expect(test.service.assertSubjectActive('user-a')).rejects.toMatchObject({
       code: 'STATE_CONFLICT',
     });
 
@@ -124,13 +116,9 @@ describe('Coach retention and deletion lifecycle', () => {
       checkpointThreadIds: ['thread_user_001'],
       purgeAfter: new Date(test.now.getTime() + day),
     });
-    expect(test.learningRepository.purgeOwnedData).toHaveBeenCalledWith(
-      'user-a',
-    );
+    expect(test.learningRepository.purgeOwnedData).toHaveBeenCalledWith('user-a');
     expect(test.repository.purgeSubject).toHaveBeenCalledWith('user-a');
-    expect(test.checkpointAdapter.deleteThread).toHaveBeenCalledWith(
-      'thread_user_001',
-    );
+    expect(test.checkpointAdapter.deleteThread).toHaveBeenCalledWith('thread_user_001');
     expect(test.repository.completeTombstone).toHaveBeenCalledWith(
       'deletion_00001',
       expect.any(Date),
@@ -168,83 +156,5 @@ describe('Coach retention and deletion lifecycle', () => {
       'conversation-a',
     );
     expect(test.repository.completeTombstone).toHaveBeenCalledTimes(2);
-  });
-
-  it('redacts deleted conversation content without cascading saved learning progress', async () => {
-    const database = {
-      coachConversation: {
-        findFirst: jest.fn(async () => ({ id: 'conversation-a' })),
-        update: jest.fn(async () => undefined),
-        deleteMany: jest.fn(async () => ({ count: 0 })),
-      },
-      exercise: {
-        findMany: jest.fn(async () => [{ id: 'exercise-a' }]),
-        updateMany: jest.fn(async () => ({ count: 1 })),
-      },
-      exerciseItem: {
-        updateMany: jest.fn(async () => ({ count: 1 })),
-      },
-      exerciseSubmission: {
-        findMany: jest.fn(async () => [{ id: 'submission-a' }]),
-        updateMany: jest.fn(async () => ({ count: 1 })),
-      },
-      exerciseSubmissionItem: {
-        updateMany: jest.fn(async () => ({ count: 1 })),
-      },
-      coachRequest: {
-        findMany: jest.fn(async () => [{ id: 'request-a' }]),
-        updateMany: jest.fn(async () => ({ count: 1 })),
-      },
-      coachFeedback: {
-        deleteMany: jest.fn(async () => ({ count: 1 })),
-      },
-      coachMessage: {
-        deleteMany: jest.fn(async () => ({ count: 2 })),
-      },
-      learningAttempt: {
-        deleteMany: jest.fn(async () => ({ count: 0 })),
-      },
-    };
-    const prisma = {
-      $transaction: jest.fn(
-        async (operation: (client: typeof database) => Promise<unknown>) =>
-          operation(database),
-      ),
-    };
-    const repository = new PrismaCoachRetentionRepository(prisma as never);
-
-    await repository.purgeConversation('user-a', 'conversation-a');
-
-    expect(database.coachConversation.findFirst).toHaveBeenCalledWith({
-      where: {
-        id: 'conversation-a',
-        status: 'DELETING',
-        userId: 'user-a',
-      },
-      select: { id: true },
-    });
-    expect(database.exerciseSubmission.updateMany).toHaveBeenCalledWith(
-      expect.objectContaining({
-        data: expect.objectContaining({
-          answers: [],
-          gradingResult: { redacted: true },
-        }),
-      }),
-    );
-    expect(database.coachRequest.updateMany).toHaveBeenCalledWith(
-      expect.objectContaining({
-        data: expect.objectContaining({
-          finalResult: Prisma.DbNull,
-          finalResultSchemaVersion: null,
-        }),
-      }),
-    );
-    expect(database.coachConversation.update).toHaveBeenCalledWith(
-      expect.objectContaining({
-        data: expect.objectContaining({ status: 'DELETED', title: null }),
-      }),
-    );
-    expect(database.coachConversation.deleteMany).not.toHaveBeenCalled();
-    expect(database.learningAttempt.deleteMany).not.toHaveBeenCalled();
   });
 });
