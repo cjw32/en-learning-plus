@@ -412,7 +412,11 @@ export class PrismaGradingRepository implements GradingRepository {
       include: {
         items: {
           orderBy: { position: 'asc' },
-          include: { targets: true },
+          include: {
+            targets: {
+              where: { targetType: { in: ['WORD', 'ERROR_TYPE'] } },
+            },
+          },
         },
       },
     });
@@ -434,7 +438,9 @@ export class PrismaGradingRepository implements GradingRepository {
       maxScore: item.maxScore,
       citations: z.array(storedCitationSchema).parse(item.citations),
       targets: item.targets.map((target) => ({
-        targetType: target.targetType,
+        targetType: z
+          .enum(['WORD', 'ERROR_TYPE'])
+          .parse(target.targetType),
         targetKey: target.targetKey,
         weight: Number(target.weight),
       })),

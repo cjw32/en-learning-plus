@@ -7,6 +7,7 @@ import { SharedModule } from '@libs/shared';
 import { DigestModule } from './digest/digest.module';
 import { CoachModule } from './coach/coach.module';
 import { KnowledgeModule } from './knowledge/knowledge.module';
+import { PronunciationModule } from './pronunciation';
 @Module({
   imports: [
     ChatModule,
@@ -15,6 +16,7 @@ import { KnowledgeModule } from './knowledge/knowledge.module';
     DigestModule,
     CoachModule,
     KnowledgeModule,
+    PronunciationModule,
   ],
   controllers: [AiController],
   providers: [AiService],

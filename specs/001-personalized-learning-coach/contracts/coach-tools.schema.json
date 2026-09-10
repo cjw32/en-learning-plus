@@ -1123,6 +1123,371 @@
       ],
       "type": "object"
     },
+    "get_pronunciation_summary": {
+      "additionalProperties": false,
+      "properties": {
+        "input": {
+          "additionalProperties": false,
+          "properties": {
+            "assessmentId": {
+              "maxLength": 64,
+              "minLength": 10,
+              "type": "string"
+            },
+            "schemaVersion": {
+              "const": "coach.tool.v1",
+              "type": "string"
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "assessmentId"
+          ],
+          "type": "object"
+        },
+        "output": {
+          "anyOf": [
+            {
+              "additionalProperties": false,
+              "properties": {
+                "assessmentId": {
+                  "maxLength": 64,
+                  "minLength": 10,
+                  "type": "string"
+                },
+                "assessmentStatus": {
+                  "enum": [
+                    "COMPLETED",
+                    "REFERENCE_ONLY",
+                    "UNRECOGNIZABLE",
+                    "REJECTED",
+                    "CANCELLED",
+                    "TIMED_OUT",
+                    "FAILED"
+                  ],
+                  "type": "string"
+                },
+                "confidenceTier": {
+                  "anyOf": [
+                    {
+                      "enum": [
+                        "RELIABLE",
+                        "REFERENCE_ONLY",
+                        "REJECTED"
+                      ],
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "learningWriteStatus": {
+                  "enum": [
+                    "NOT_ELIGIBLE",
+                    "PENDING",
+                    "SAVED",
+                    "FAILED",
+                    "COMPENSATING",
+                    "COMPENSATED"
+                  ],
+                  "type": "string"
+                },
+                "nextAction": {
+                  "enum": [
+                    "retry",
+                    "review",
+                    "continue"
+                  ],
+                  "type": "string"
+                },
+                "ok": {
+                  "const": true,
+                  "type": "boolean"
+                },
+                "recommendationReason": {
+                  "maxLength": 500,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "reviewChanges": {
+                  "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "nextReviewAt": {
+                        "format": "date-time",
+                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                        "type": "string"
+                      },
+                      "nextReviewState": {
+                        "enum": [
+                          "LEARNING",
+                          "REVIEW",
+                          "MASTERED"
+                        ],
+                        "type": "string"
+                      },
+                      "targetPosition": {
+                        "maximum": 29,
+                        "minimum": 0,
+                        "type": "integer"
+                      },
+                      "word": {
+                        "maxLength": 100,
+                        "minLength": 1,
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "targetPosition",
+                      "word",
+                      "nextReviewState",
+                      "nextReviewAt"
+                    ],
+                    "type": "object"
+                  },
+                  "maxItems": 30,
+                  "type": "array"
+                },
+                "schemaVersion": {
+                  "const": "coach.tool.v1",
+                  "type": "string"
+                },
+                "scores": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "accuracy": {
+                      "anyOf": [
+                        {
+                          "maximum": 100,
+                          "minimum": 0,
+                          "type": "number"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "completeness": {
+                      "anyOf": [
+                        {
+                          "maximum": 100,
+                          "minimum": 0,
+                          "type": "number"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "fluency": {
+                      "anyOf": [
+                        {
+                          "maximum": 100,
+                          "minimum": 0,
+                          "type": "number"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "overall": {
+                      "anyOf": [
+                        {
+                          "maximum": 100,
+                          "minimum": 0,
+                          "type": "number"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "prosody": {
+                      "anyOf": [
+                        {
+                          "maximum": 100,
+                          "minimum": 0,
+                          "type": "number"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "overall",
+                    "accuracy",
+                    "completeness",
+                    "fluency",
+                    "prosody"
+                  ],
+                  "type": "object"
+                },
+                "sourceStatus": {
+                  "enum": [
+                    "ACTIVE",
+                    "UNAVAILABLE"
+                  ],
+                  "type": "string"
+                },
+                "versions": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "assessmentRule": {
+                      "maxLength": 64,
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "confidencePolicy": {
+                      "maxLength": 64,
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "learningMapping": {
+                      "maxLength": 64,
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "resultSchema": {
+                      "maxLength": 64,
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "scheduler": {
+                      "maxLength": 64,
+                      "minLength": 1,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "resultSchema",
+                    "assessmentRule",
+                    "confidencePolicy",
+                    "learningMapping",
+                    "scheduler"
+                  ],
+                  "type": "object"
+                },
+                "weakWords": {
+                  "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "score": {
+                        "anyOf": [
+                          {
+                            "maximum": 100,
+                            "minimum": 0,
+                            "type": "number"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "status": {
+                        "enum": [
+                          "mispronounced",
+                          "omitted"
+                        ],
+                        "type": "string"
+                      },
+                      "targetPosition": {
+                        "maximum": 29,
+                        "minimum": 0,
+                        "type": "integer"
+                      },
+                      "word": {
+                        "maxLength": 100,
+                        "minLength": 1,
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "targetPosition",
+                      "word",
+                      "status",
+                      "score"
+                    ],
+                    "type": "object"
+                  },
+                  "maxItems": 30,
+                  "type": "array"
+                }
+              },
+              "required": [
+                "assessmentId",
+                "assessmentStatus",
+                "confidenceTier",
+                "scores",
+                "weakWords",
+                "reviewChanges",
+                "learningWriteStatus",
+                "sourceStatus",
+                "nextAction",
+                "recommendationReason",
+                "versions",
+                "schemaVersion",
+                "ok"
+              ],
+              "type": "object"
+            },
+            {
+              "additionalProperties": false,
+              "properties": {
+                "code": {
+                  "enum": [
+                    "FORBIDDEN",
+                    "RESOURCE_NOT_FOUND",
+                    "VALIDATION_FAILED",
+                    "DATA_NOT_AVAILABLE",
+                    "SCHEMA_INVALID",
+                    "TOOL_TIMEOUT",
+                    "BUDGET_EXCEEDED",
+                    "IDEMPOTENCY_CONFLICT",
+                    "STATE_CONFLICT",
+                    "CANCELLED",
+                    "INTERNAL_ERROR"
+                  ],
+                  "type": "string"
+                },
+                "message": {
+                  "maxLength": 500,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "ok": {
+                  "const": false,
+                  "type": "boolean"
+                },
+                "retryable": {
+                  "type": "boolean"
+                },
+                "schemaVersion": {
+                  "const": "coach.tool.v1",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "schemaVersion",
+                "ok",
+                "code",
+                "message",
+                "retryable"
+              ],
+              "type": "object"
+            }
+          ]
+        }
+      },
+      "required": [
+        "input",
+        "output"
+      ],
+      "type": "object"
+    },
     "grade_answer": {
       "additionalProperties": false,
       "properties": {
@@ -1916,7 +2281,8 @@
     "search_learning_materials",
     "create_exercise",
     "grade_answer",
-    "save_attempt"
+    "save_attempt",
+    "get_pronunciation_summary"
   ],
   "title": "CoachToolContractsV1",
   "type": "object"

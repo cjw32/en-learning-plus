@@ -52,10 +52,27 @@ export type LearnerGoalType = (typeof LearnerGoalType)[keyof typeof LearnerGoalT
 
 export const LearningTargetType = {
   WORD: 'WORD',
-  ERROR_TYPE: 'ERROR_TYPE'
+  ERROR_TYPE: 'ERROR_TYPE',
+  PRONUNCIATION_WORD: 'PRONUNCIATION_WORD'
 } as const
 
 export type LearningTargetType = (typeof LearningTargetType)[keyof typeof LearningTargetType]
+
+
+export const LearningAttemptType = {
+  EXERCISE: 'EXERCISE',
+  PRONUNCIATION: 'PRONUNCIATION'
+} as const
+
+export type LearningAttemptType = (typeof LearningAttemptType)[keyof typeof LearningAttemptType]
+
+
+export const LearningEvidenceKind = {
+  EXERCISE_GRADING: 'EXERCISE_GRADING',
+  PRONUNCIATION_WORD: 'PRONUNCIATION_WORD'
+} as const
+
+export type LearningEvidenceKind = (typeof LearningEvidenceKind)[keyof typeof LearningEvidenceKind]
 
 
 export const LearningReviewState = {
@@ -418,3 +435,177 @@ export const PrivateLearningSummaryStatus = {
 } as const
 
 export type PrivateLearningSummaryStatus = (typeof PrivateLearningSummaryStatus)[keyof typeof PrivateLearningSummaryStatus]
+
+
+export const PronunciationAssessmentStatus = {
+  CREATED: 'CREATED',
+  AUDIO_VALIDATING: 'AUDIO_VALIDATING',
+  AUDIO_READY: 'AUDIO_READY',
+  QUEUED: 'QUEUED',
+  PROCESSING: 'PROCESSING',
+  COMPLETED: 'COMPLETED',
+  REFERENCE_ONLY: 'REFERENCE_ONLY',
+  UNRECOGNIZABLE: 'UNRECOGNIZABLE',
+  REJECTED: 'REJECTED',
+  CANCELLED: 'CANCELLED',
+  TIMED_OUT: 'TIMED_OUT',
+  FAILED: 'FAILED',
+  DELETING: 'DELETING',
+  DELETED: 'DELETED'
+} as const
+
+export type PronunciationAssessmentStatus = (typeof PronunciationAssessmentStatus)[keyof typeof PronunciationAssessmentStatus]
+
+
+export const PronunciationExerciseType = {
+  WORD: 'WORD',
+  PHRASE: 'PHRASE',
+  SENTENCE: 'SENTENCE'
+} as const
+
+export type PronunciationExerciseType = (typeof PronunciationExerciseType)[keyof typeof PronunciationExerciseType]
+
+
+export const PronunciationTargetSource = {
+  MANUAL: 'MANUAL',
+  WORD_BOOK: 'WORD_BOOK',
+  COURSE_WORD: 'COURSE_WORD',
+  RAG_CITATION: 'RAG_CITATION',
+  COACH_EXERCISE: 'COACH_EXERCISE'
+} as const
+
+export type PronunciationTargetSource = (typeof PronunciationTargetSource)[keyof typeof PronunciationTargetSource]
+
+
+export const PronunciationConfidenceTier = {
+  RELIABLE: 'RELIABLE',
+  REFERENCE_ONLY: 'REFERENCE_ONLY',
+  REJECTED: 'REJECTED'
+} as const
+
+export type PronunciationConfidenceTier = (typeof PronunciationConfidenceTier)[keyof typeof PronunciationConfidenceTier]
+
+
+export const PronunciationWordStatus = {
+  CORRECT: 'CORRECT',
+  MISPRONOUNCED: 'MISPRONOUNCED',
+  OMITTED: 'OMITTED',
+  INSERTED: 'INSERTED',
+  UNCERTAIN: 'UNCERTAIN'
+} as const
+
+export type PronunciationWordStatus = (typeof PronunciationWordStatus)[keyof typeof PronunciationWordStatus]
+
+
+export const PronunciationAudioStatus = {
+  UPLOADING: 'UPLOADING',
+  QUARANTINED: 'QUARANTINED',
+  VALIDATING: 'VALIDATING',
+  READY: 'READY',
+  INVALID: 'INVALID',
+  REVOKED: 'REVOKED',
+  PURGING: 'PURGING',
+  PURGED: 'PURGED'
+} as const
+
+export type PronunciationAudioStatus = (typeof PronunciationAudioStatus)[keyof typeof PronunciationAudioStatus]
+
+
+export const PronunciationLearningWriteStatus = {
+  NOT_ELIGIBLE: 'NOT_ELIGIBLE',
+  PENDING: 'PENDING',
+  SAVED: 'SAVED',
+  FAILED: 'FAILED',
+  COMPENSATING: 'COMPENSATING',
+  COMPENSATED: 'COMPENSATED'
+} as const
+
+export type PronunciationLearningWriteStatus = (typeof PronunciationLearningWriteStatus)[keyof typeof PronunciationLearningWriteStatus]
+
+
+export const PronunciationNextAction = {
+  RETRY: 'RETRY',
+  REVIEW: 'REVIEW',
+  CONTINUE: 'CONTINUE'
+} as const
+
+export type PronunciationNextAction = (typeof PronunciationNextAction)[keyof typeof PronunciationNextAction]
+
+
+export const PronunciationProviderCallStatus = {
+  STARTED: 'STARTED',
+  SUCCEEDED: 'SUCCEEDED',
+  UNRECOGNIZABLE: 'UNRECOGNIZABLE',
+  TIMED_OUT: 'TIMED_OUT',
+  RATE_LIMITED: 'RATE_LIMITED',
+  CANCELLED: 'CANCELLED',
+  FAILED: 'FAILED',
+  INVALID_RESPONSE: 'INVALID_RESPONSE'
+} as const
+
+export type PronunciationProviderCallStatus = (typeof PronunciationProviderCallStatus)[keyof typeof PronunciationProviderCallStatus]
+
+
+export const PronunciationProviderRetryDecision = {
+  NOT_NEEDED: 'NOT_NEEDED',
+  SAFE_NOT_ACCEPTED: 'SAFE_NOT_ACCEPTED',
+  PROVIDER_IDEMPOTENT: 'PROVIDER_IDEMPOTENT',
+  UNKNOWN_ACCEPTANCE_NO_RETRY: 'UNKNOWN_ACCEPTANCE_NO_RETRY',
+  LIMIT_REACHED: 'LIMIT_REACHED'
+} as const
+
+export type PronunciationProviderRetryDecision = (typeof PronunciationProviderRetryDecision)[keyof typeof PronunciationProviderRetryDecision]
+
+
+export const PronunciationTraceStepName = {
+  UPLOAD: 'UPLOAD',
+  VALIDATE_AUDIO: 'VALIDATE_AUDIO',
+  QUEUE: 'QUEUE',
+  PROVIDER: 'PROVIDER',
+  VALIDATE_RESULT: 'VALIDATE_RESULT',
+  SAVE_LEARNING: 'SAVE_LEARNING',
+  PURGE: 'PURGE'
+} as const
+
+export type PronunciationTraceStepName = (typeof PronunciationTraceStepName)[keyof typeof PronunciationTraceStepName]
+
+
+export const PronunciationTraceStepStatus = {
+  STARTED: 'STARTED',
+  SUCCEEDED: 'SUCCEEDED',
+  FAILED: 'FAILED',
+  SKIPPED: 'SKIPPED',
+  CANCELLED: 'CANCELLED',
+  TIMED_OUT: 'TIMED_OUT'
+} as const
+
+export type PronunciationTraceStepStatus = (typeof PronunciationTraceStepStatus)[keyof typeof PronunciationTraceStepStatus]
+
+
+export const PronunciationDeletionScope = {
+  PRONUNCIATION_AUDIO: 'PRONUNCIATION_AUDIO',
+  PRONUNCIATION_ASSESSMENT: 'PRONUNCIATION_ASSESSMENT'
+} as const
+
+export type PronunciationDeletionScope = (typeof PronunciationDeletionScope)[keyof typeof PronunciationDeletionScope]
+
+
+export const PronunciationDeletionStatus = {
+  ACCEPTED: 'ACCEPTED',
+  COMPENSATING: 'COMPENSATING',
+  PURGING: 'PURGING',
+  COMPLETED: 'COMPLETED',
+  FAILED: 'FAILED'
+} as const
+
+export type PronunciationDeletionStatus = (typeof PronunciationDeletionStatus)[keyof typeof PronunciationDeletionStatus]
+
+
+export const LearningStateRecalculationStatus = {
+  PENDING: 'PENDING',
+  RUNNING: 'RUNNING',
+  COMPLETED: 'COMPLETED',
+  FAILED: 'FAILED'
+} as const
+
+export type LearningStateRecalculationStatus = (typeof LearningStateRecalculationStatus)[keyof typeof LearningStateRecalculationStatus]

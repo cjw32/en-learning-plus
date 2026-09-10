@@ -251,6 +251,7 @@ export type CourseWhereInput = {
   courseRecords?: Prisma.CourseRecordListRelationFilter
   learnerProfiles?: Prisma.LearnerProfileListRelationFilter
   knowledgeDocuments?: Prisma.KnowledgeDocumentListRelationFilter
+  pronunciationTargets?: Prisma.PronunciationTargetListRelationFilter
 }
 
 export type CourseOrderByWithRelationInput = {
@@ -266,6 +267,7 @@ export type CourseOrderByWithRelationInput = {
   courseRecords?: Prisma.CourseRecordOrderByRelationAggregateInput
   learnerProfiles?: Prisma.LearnerProfileOrderByRelationAggregateInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentOrderByRelationAggregateInput
+  pronunciationTargets?: Prisma.PronunciationTargetOrderByRelationAggregateInput
 }
 
 export type CourseWhereUniqueInput = Prisma.AtLeast<{
@@ -284,6 +286,7 @@ export type CourseWhereUniqueInput = Prisma.AtLeast<{
   courseRecords?: Prisma.CourseRecordListRelationFilter
   learnerProfiles?: Prisma.LearnerProfileListRelationFilter
   knowledgeDocuments?: Prisma.KnowledgeDocumentListRelationFilter
+  pronunciationTargets?: Prisma.PronunciationTargetListRelationFilter
 }, "id">
 
 export type CourseOrderByWithAggregationInput = {
@@ -331,6 +334,7 @@ export type CourseCreateInput = {
   courseRecords?: Prisma.CourseRecordCreateNestedManyWithoutCourseInput
   learnerProfiles?: Prisma.LearnerProfileCreateNestedManyWithoutActiveCourseInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentCreateNestedManyWithoutCourseInput
+  pronunciationTargets?: Prisma.PronunciationTargetCreateNestedManyWithoutCourseInput
 }
 
 export type CourseUncheckedCreateInput = {
@@ -346,6 +350,7 @@ export type CourseUncheckedCreateInput = {
   courseRecords?: Prisma.CourseRecordUncheckedCreateNestedManyWithoutCourseInput
   learnerProfiles?: Prisma.LearnerProfileUncheckedCreateNestedManyWithoutActiveCourseInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentUncheckedCreateNestedManyWithoutCourseInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedCreateNestedManyWithoutCourseInput
 }
 
 export type CourseUpdateInput = {
@@ -361,6 +366,7 @@ export type CourseUpdateInput = {
   courseRecords?: Prisma.CourseRecordUpdateManyWithoutCourseNestedInput
   learnerProfiles?: Prisma.LearnerProfileUpdateManyWithoutActiveCourseNestedInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentUpdateManyWithoutCourseNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUpdateManyWithoutCourseNestedInput
 }
 
 export type CourseUncheckedUpdateInput = {
@@ -376,6 +382,7 @@ export type CourseUncheckedUpdateInput = {
   courseRecords?: Prisma.CourseRecordUncheckedUpdateManyWithoutCourseNestedInput
   learnerProfiles?: Prisma.LearnerProfileUncheckedUpdateManyWithoutActiveCourseNestedInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentUncheckedUpdateManyWithoutCourseNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedUpdateManyWithoutCourseNestedInput
 }
 
 export type CourseCreateManyInput = {
@@ -498,6 +505,22 @@ export type CourseUpdateOneWithoutLearnerProfilesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.CourseUpdateToOneWithWhereWithoutLearnerProfilesInput, Prisma.CourseUpdateWithoutLearnerProfilesInput>, Prisma.CourseUncheckedUpdateWithoutLearnerProfilesInput>
 }
 
+export type CourseCreateNestedOneWithoutPronunciationTargetsInput = {
+  create?: Prisma.XOR<Prisma.CourseCreateWithoutPronunciationTargetsInput, Prisma.CourseUncheckedCreateWithoutPronunciationTargetsInput>
+  connectOrCreate?: Prisma.CourseCreateOrConnectWithoutPronunciationTargetsInput
+  connect?: Prisma.CourseWhereUniqueInput
+}
+
+export type CourseUpdateOneWithoutPronunciationTargetsNestedInput = {
+  create?: Prisma.XOR<Prisma.CourseCreateWithoutPronunciationTargetsInput, Prisma.CourseUncheckedCreateWithoutPronunciationTargetsInput>
+  connectOrCreate?: Prisma.CourseCreateOrConnectWithoutPronunciationTargetsInput
+  upsert?: Prisma.CourseUpsertWithoutPronunciationTargetsInput
+  disconnect?: Prisma.CourseWhereInput | boolean
+  delete?: Prisma.CourseWhereInput | boolean
+  connect?: Prisma.CourseWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.CourseUpdateToOneWithWhereWithoutPronunciationTargetsInput, Prisma.CourseUpdateWithoutPronunciationTargetsInput>, Prisma.CourseUncheckedUpdateWithoutPronunciationTargetsInput>
+}
+
 export type CourseCreateNestedOneWithoutKnowledgeDocumentsInput = {
   create?: Prisma.XOR<Prisma.CourseCreateWithoutKnowledgeDocumentsInput, Prisma.CourseUncheckedCreateWithoutKnowledgeDocumentsInput>
   connectOrCreate?: Prisma.CourseCreateOrConnectWithoutKnowledgeDocumentsInput
@@ -526,6 +549,7 @@ export type CourseCreateWithoutCourseRecordsInput = {
   updatedAt?: Date | string
   learnerProfiles?: Prisma.LearnerProfileCreateNestedManyWithoutActiveCourseInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentCreateNestedManyWithoutCourseInput
+  pronunciationTargets?: Prisma.PronunciationTargetCreateNestedManyWithoutCourseInput
 }
 
 export type CourseUncheckedCreateWithoutCourseRecordsInput = {
@@ -540,6 +564,7 @@ export type CourseUncheckedCreateWithoutCourseRecordsInput = {
   updatedAt?: Date | string
   learnerProfiles?: Prisma.LearnerProfileUncheckedCreateNestedManyWithoutActiveCourseInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentUncheckedCreateNestedManyWithoutCourseInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedCreateNestedManyWithoutCourseInput
 }
 
 export type CourseCreateOrConnectWithoutCourseRecordsInput = {
@@ -570,6 +595,7 @@ export type CourseUpdateWithoutCourseRecordsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   learnerProfiles?: Prisma.LearnerProfileUpdateManyWithoutActiveCourseNestedInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentUpdateManyWithoutCourseNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUpdateManyWithoutCourseNestedInput
 }
 
 export type CourseUncheckedUpdateWithoutCourseRecordsInput = {
@@ -584,6 +610,7 @@ export type CourseUncheckedUpdateWithoutCourseRecordsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   learnerProfiles?: Prisma.LearnerProfileUncheckedUpdateManyWithoutActiveCourseNestedInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentUncheckedUpdateManyWithoutCourseNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedUpdateManyWithoutCourseNestedInput
 }
 
 export type CourseCreateWithoutLearnerProfilesInput = {
@@ -598,6 +625,7 @@ export type CourseCreateWithoutLearnerProfilesInput = {
   updatedAt?: Date | string
   courseRecords?: Prisma.CourseRecordCreateNestedManyWithoutCourseInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentCreateNestedManyWithoutCourseInput
+  pronunciationTargets?: Prisma.PronunciationTargetCreateNestedManyWithoutCourseInput
 }
 
 export type CourseUncheckedCreateWithoutLearnerProfilesInput = {
@@ -612,6 +640,7 @@ export type CourseUncheckedCreateWithoutLearnerProfilesInput = {
   updatedAt?: Date | string
   courseRecords?: Prisma.CourseRecordUncheckedCreateNestedManyWithoutCourseInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentUncheckedCreateNestedManyWithoutCourseInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedCreateNestedManyWithoutCourseInput
 }
 
 export type CourseCreateOrConnectWithoutLearnerProfilesInput = {
@@ -642,6 +671,7 @@ export type CourseUpdateWithoutLearnerProfilesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   courseRecords?: Prisma.CourseRecordUpdateManyWithoutCourseNestedInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentUpdateManyWithoutCourseNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUpdateManyWithoutCourseNestedInput
 }
 
 export type CourseUncheckedUpdateWithoutLearnerProfilesInput = {
@@ -655,6 +685,83 @@ export type CourseUncheckedUpdateWithoutLearnerProfilesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   courseRecords?: Prisma.CourseRecordUncheckedUpdateManyWithoutCourseNestedInput
+  knowledgeDocuments?: Prisma.KnowledgeDocumentUncheckedUpdateManyWithoutCourseNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedUpdateManyWithoutCourseNestedInput
+}
+
+export type CourseCreateWithoutPronunciationTargetsInput = {
+  id?: string
+  name: string
+  value: string
+  description?: string | null
+  teacher: string
+  url: string
+  price: runtime.Decimal | runtime.DecimalJsLike | number | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  courseRecords?: Prisma.CourseRecordCreateNestedManyWithoutCourseInput
+  learnerProfiles?: Prisma.LearnerProfileCreateNestedManyWithoutActiveCourseInput
+  knowledgeDocuments?: Prisma.KnowledgeDocumentCreateNestedManyWithoutCourseInput
+}
+
+export type CourseUncheckedCreateWithoutPronunciationTargetsInput = {
+  id?: string
+  name: string
+  value: string
+  description?: string | null
+  teacher: string
+  url: string
+  price: runtime.Decimal | runtime.DecimalJsLike | number | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  courseRecords?: Prisma.CourseRecordUncheckedCreateNestedManyWithoutCourseInput
+  learnerProfiles?: Prisma.LearnerProfileUncheckedCreateNestedManyWithoutActiveCourseInput
+  knowledgeDocuments?: Prisma.KnowledgeDocumentUncheckedCreateNestedManyWithoutCourseInput
+}
+
+export type CourseCreateOrConnectWithoutPronunciationTargetsInput = {
+  where: Prisma.CourseWhereUniqueInput
+  create: Prisma.XOR<Prisma.CourseCreateWithoutPronunciationTargetsInput, Prisma.CourseUncheckedCreateWithoutPronunciationTargetsInput>
+}
+
+export type CourseUpsertWithoutPronunciationTargetsInput = {
+  update: Prisma.XOR<Prisma.CourseUpdateWithoutPronunciationTargetsInput, Prisma.CourseUncheckedUpdateWithoutPronunciationTargetsInput>
+  create: Prisma.XOR<Prisma.CourseCreateWithoutPronunciationTargetsInput, Prisma.CourseUncheckedCreateWithoutPronunciationTargetsInput>
+  where?: Prisma.CourseWhereInput
+}
+
+export type CourseUpdateToOneWithWhereWithoutPronunciationTargetsInput = {
+  where?: Prisma.CourseWhereInput
+  data: Prisma.XOR<Prisma.CourseUpdateWithoutPronunciationTargetsInput, Prisma.CourseUncheckedUpdateWithoutPronunciationTargetsInput>
+}
+
+export type CourseUpdateWithoutPronunciationTargetsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  value?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  teacher?: Prisma.StringFieldUpdateOperationsInput | string
+  url?: Prisma.StringFieldUpdateOperationsInput | string
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  courseRecords?: Prisma.CourseRecordUpdateManyWithoutCourseNestedInput
+  learnerProfiles?: Prisma.LearnerProfileUpdateManyWithoutActiveCourseNestedInput
+  knowledgeDocuments?: Prisma.KnowledgeDocumentUpdateManyWithoutCourseNestedInput
+}
+
+export type CourseUncheckedUpdateWithoutPronunciationTargetsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  value?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  teacher?: Prisma.StringFieldUpdateOperationsInput | string
+  url?: Prisma.StringFieldUpdateOperationsInput | string
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  courseRecords?: Prisma.CourseRecordUncheckedUpdateManyWithoutCourseNestedInput
+  learnerProfiles?: Prisma.LearnerProfileUncheckedUpdateManyWithoutActiveCourseNestedInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentUncheckedUpdateManyWithoutCourseNestedInput
 }
 
@@ -670,6 +777,7 @@ export type CourseCreateWithoutKnowledgeDocumentsInput = {
   updatedAt?: Date | string
   courseRecords?: Prisma.CourseRecordCreateNestedManyWithoutCourseInput
   learnerProfiles?: Prisma.LearnerProfileCreateNestedManyWithoutActiveCourseInput
+  pronunciationTargets?: Prisma.PronunciationTargetCreateNestedManyWithoutCourseInput
 }
 
 export type CourseUncheckedCreateWithoutKnowledgeDocumentsInput = {
@@ -684,6 +792,7 @@ export type CourseUncheckedCreateWithoutKnowledgeDocumentsInput = {
   updatedAt?: Date | string
   courseRecords?: Prisma.CourseRecordUncheckedCreateNestedManyWithoutCourseInput
   learnerProfiles?: Prisma.LearnerProfileUncheckedCreateNestedManyWithoutActiveCourseInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedCreateNestedManyWithoutCourseInput
 }
 
 export type CourseCreateOrConnectWithoutKnowledgeDocumentsInput = {
@@ -714,6 +823,7 @@ export type CourseUpdateWithoutKnowledgeDocumentsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   courseRecords?: Prisma.CourseRecordUpdateManyWithoutCourseNestedInput
   learnerProfiles?: Prisma.LearnerProfileUpdateManyWithoutActiveCourseNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUpdateManyWithoutCourseNestedInput
 }
 
 export type CourseUncheckedUpdateWithoutKnowledgeDocumentsInput = {
@@ -728,6 +838,7 @@ export type CourseUncheckedUpdateWithoutKnowledgeDocumentsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   courseRecords?: Prisma.CourseRecordUncheckedUpdateManyWithoutCourseNestedInput
   learnerProfiles?: Prisma.LearnerProfileUncheckedUpdateManyWithoutActiveCourseNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedUpdateManyWithoutCourseNestedInput
 }
 
 
@@ -739,12 +850,14 @@ export type CourseCountOutputType = {
   courseRecords: number
   learnerProfiles: number
   knowledgeDocuments: number
+  pronunciationTargets: number
 }
 
 export type CourseCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   courseRecords?: boolean | CourseCountOutputTypeCountCourseRecordsArgs
   learnerProfiles?: boolean | CourseCountOutputTypeCountLearnerProfilesArgs
   knowledgeDocuments?: boolean | CourseCountOutputTypeCountKnowledgeDocumentsArgs
+  pronunciationTargets?: boolean | CourseCountOutputTypeCountPronunciationTargetsArgs
 }
 
 /**
@@ -778,6 +891,13 @@ export type CourseCountOutputTypeCountKnowledgeDocumentsArgs<ExtArgs extends run
   where?: Prisma.KnowledgeDocumentWhereInput
 }
 
+/**
+ * CourseCountOutputType without action
+ */
+export type CourseCountOutputTypeCountPronunciationTargetsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PronunciationTargetWhereInput
+}
+
 
 export type CourseSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -792,6 +912,7 @@ export type CourseSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   courseRecords?: boolean | Prisma.Course$courseRecordsArgs<ExtArgs>
   learnerProfiles?: boolean | Prisma.Course$learnerProfilesArgs<ExtArgs>
   knowledgeDocuments?: boolean | Prisma.Course$knowledgeDocumentsArgs<ExtArgs>
+  pronunciationTargets?: boolean | Prisma.Course$pronunciationTargetsArgs<ExtArgs>
   _count?: boolean | Prisma.CourseCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["course"]>
 
@@ -836,6 +957,7 @@ export type CourseInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   courseRecords?: boolean | Prisma.Course$courseRecordsArgs<ExtArgs>
   learnerProfiles?: boolean | Prisma.Course$learnerProfilesArgs<ExtArgs>
   knowledgeDocuments?: boolean | Prisma.Course$knowledgeDocumentsArgs<ExtArgs>
+  pronunciationTargets?: boolean | Prisma.Course$pronunciationTargetsArgs<ExtArgs>
   _count?: boolean | Prisma.CourseCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type CourseIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -847,6 +969,7 @@ export type $CoursePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     courseRecords: Prisma.$CourseRecordPayload<ExtArgs>[]
     learnerProfiles: Prisma.$LearnerProfilePayload<ExtArgs>[]
     knowledgeDocuments: Prisma.$KnowledgeDocumentPayload<ExtArgs>[]
+    pronunciationTargets: Prisma.$PronunciationTargetPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1255,6 +1378,7 @@ export interface Prisma__CourseClient<T, Null = never, ExtArgs extends runtime.T
   courseRecords<T extends Prisma.Course$courseRecordsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Course$courseRecordsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CourseRecordPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   learnerProfiles<T extends Prisma.Course$learnerProfilesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Course$learnerProfilesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LearnerProfilePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   knowledgeDocuments<T extends Prisma.Course$knowledgeDocumentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Course$knowledgeDocumentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$KnowledgeDocumentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  pronunciationTargets<T extends Prisma.Course$pronunciationTargetsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Course$pronunciationTargetsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PronunciationTargetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1755,6 +1879,30 @@ export type Course$knowledgeDocumentsArgs<ExtArgs extends runtime.Types.Extensio
   take?: number
   skip?: number
   distinct?: Prisma.KnowledgeDocumentScalarFieldEnum | Prisma.KnowledgeDocumentScalarFieldEnum[]
+}
+
+/**
+ * Course.pronunciationTargets
+ */
+export type Course$pronunciationTargetsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PronunciationTarget
+   */
+  select?: Prisma.PronunciationTargetSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PronunciationTarget
+   */
+  omit?: Prisma.PronunciationTargetOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PronunciationTargetInclude<ExtArgs> | null
+  where?: Prisma.PronunciationTargetWhereInput
+  orderBy?: Prisma.PronunciationTargetOrderByWithRelationInput | Prisma.PronunciationTargetOrderByWithRelationInput[]
+  cursor?: Prisma.PronunciationTargetWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PronunciationTargetScalarFieldEnum | Prisma.PronunciationTargetScalarFieldEnum[]
 }
 
 /**

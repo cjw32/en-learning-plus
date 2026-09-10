@@ -354,6 +354,7 @@ export type CoachRequestWhereInput = {
   trace?: Prisma.XOR<Prisma.CoachTraceNullableScalarRelationFilter, Prisma.CoachTraceWhereInput> | null
   feedback?: Prisma.CoachFeedbackListRelationFilter
   knowledgeCitations?: Prisma.KnowledgeCitationListRelationFilter
+  pronunciationTargets?: Prisma.PronunciationTargetListRelationFilter
 }
 
 export type CoachRequestOrderByWithRelationInput = {
@@ -395,6 +396,7 @@ export type CoachRequestOrderByWithRelationInput = {
   trace?: Prisma.CoachTraceOrderByWithRelationInput
   feedback?: Prisma.CoachFeedbackOrderByRelationAggregateInput
   knowledgeCitations?: Prisma.KnowledgeCitationOrderByRelationAggregateInput
+  pronunciationTargets?: Prisma.PronunciationTargetOrderByRelationAggregateInput
 }
 
 export type CoachRequestWhereUniqueInput = Prisma.AtLeast<{
@@ -440,6 +442,7 @@ export type CoachRequestWhereUniqueInput = Prisma.AtLeast<{
   trace?: Prisma.XOR<Prisma.CoachTraceNullableScalarRelationFilter, Prisma.CoachTraceWhereInput> | null
   feedback?: Prisma.CoachFeedbackListRelationFilter
   knowledgeCitations?: Prisma.KnowledgeCitationListRelationFilter
+  pronunciationTargets?: Prisma.PronunciationTargetListRelationFilter
 }, "id" | "userId_clientRequestKey">
 
 export type CoachRequestOrderByWithAggregationInput = {
@@ -541,6 +544,7 @@ export type CoachRequestCreateInput = {
   trace?: Prisma.CoachTraceCreateNestedOneWithoutRequestInput
   feedback?: Prisma.CoachFeedbackCreateNestedManyWithoutRequestInput
   knowledgeCitations?: Prisma.KnowledgeCitationCreateNestedManyWithoutRequestInput
+  pronunciationTargets?: Prisma.PronunciationTargetCreateNestedManyWithoutCoachRequestInput
 }
 
 export type CoachRequestUncheckedCreateInput = {
@@ -578,6 +582,7 @@ export type CoachRequestUncheckedCreateInput = {
   trace?: Prisma.CoachTraceUncheckedCreateNestedOneWithoutRequestInput
   feedback?: Prisma.CoachFeedbackUncheckedCreateNestedManyWithoutRequestInput
   knowledgeCitations?: Prisma.KnowledgeCitationUncheckedCreateNestedManyWithoutRequestInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedCreateNestedManyWithoutCoachRequestInput
 }
 
 export type CoachRequestUpdateInput = {
@@ -615,6 +620,7 @@ export type CoachRequestUpdateInput = {
   trace?: Prisma.CoachTraceUpdateOneWithoutRequestNestedInput
   feedback?: Prisma.CoachFeedbackUpdateManyWithoutRequestNestedInput
   knowledgeCitations?: Prisma.KnowledgeCitationUpdateManyWithoutRequestNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUpdateManyWithoutCoachRequestNestedInput
 }
 
 export type CoachRequestUncheckedUpdateInput = {
@@ -652,6 +658,7 @@ export type CoachRequestUncheckedUpdateInput = {
   trace?: Prisma.CoachTraceUncheckedUpdateOneWithoutRequestNestedInput
   feedback?: Prisma.CoachFeedbackUncheckedUpdateManyWithoutRequestNestedInput
   knowledgeCitations?: Prisma.KnowledgeCitationUncheckedUpdateManyWithoutRequestNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedUpdateManyWithoutCoachRequestNestedInput
 }
 
 export type CoachRequestCreateManyInput = {
@@ -1095,12 +1102,30 @@ export type CoachRequestCreateNestedOneWithoutSavedAttemptInput = {
   connect?: Prisma.CoachRequestWhereUniqueInput
 }
 
-export type CoachRequestUpdateOneRequiredWithoutSavedAttemptNestedInput = {
+export type CoachRequestUpdateOneWithoutSavedAttemptNestedInput = {
   create?: Prisma.XOR<Prisma.CoachRequestCreateWithoutSavedAttemptInput, Prisma.CoachRequestUncheckedCreateWithoutSavedAttemptInput>
   connectOrCreate?: Prisma.CoachRequestCreateOrConnectWithoutSavedAttemptInput
   upsert?: Prisma.CoachRequestUpsertWithoutSavedAttemptInput
+  disconnect?: Prisma.CoachRequestWhereInput | boolean
+  delete?: Prisma.CoachRequestWhereInput | boolean
   connect?: Prisma.CoachRequestWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.CoachRequestUpdateToOneWithWhereWithoutSavedAttemptInput, Prisma.CoachRequestUpdateWithoutSavedAttemptInput>, Prisma.CoachRequestUncheckedUpdateWithoutSavedAttemptInput>
+}
+
+export type CoachRequestCreateNestedOneWithoutPronunciationTargetsInput = {
+  create?: Prisma.XOR<Prisma.CoachRequestCreateWithoutPronunciationTargetsInput, Prisma.CoachRequestUncheckedCreateWithoutPronunciationTargetsInput>
+  connectOrCreate?: Prisma.CoachRequestCreateOrConnectWithoutPronunciationTargetsInput
+  connect?: Prisma.CoachRequestWhereUniqueInput
+}
+
+export type CoachRequestUpdateOneWithoutPronunciationTargetsNestedInput = {
+  create?: Prisma.XOR<Prisma.CoachRequestCreateWithoutPronunciationTargetsInput, Prisma.CoachRequestUncheckedCreateWithoutPronunciationTargetsInput>
+  connectOrCreate?: Prisma.CoachRequestCreateOrConnectWithoutPronunciationTargetsInput
+  upsert?: Prisma.CoachRequestUpsertWithoutPronunciationTargetsInput
+  disconnect?: Prisma.CoachRequestWhereInput | boolean
+  delete?: Prisma.CoachRequestWhereInput | boolean
+  connect?: Prisma.CoachRequestWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.CoachRequestUpdateToOneWithWhereWithoutPronunciationTargetsInput, Prisma.CoachRequestUpdateWithoutPronunciationTargetsInput>, Prisma.CoachRequestUncheckedUpdateWithoutPronunciationTargetsInput>
 }
 
 export type CoachRequestCreateNestedOneWithoutTraceInput = {
@@ -1179,6 +1204,7 @@ export type CoachRequestCreateWithoutUserInput = {
   trace?: Prisma.CoachTraceCreateNestedOneWithoutRequestInput
   feedback?: Prisma.CoachFeedbackCreateNestedManyWithoutRequestInput
   knowledgeCitations?: Prisma.KnowledgeCitationCreateNestedManyWithoutRequestInput
+  pronunciationTargets?: Prisma.PronunciationTargetCreateNestedManyWithoutCoachRequestInput
 }
 
 export type CoachRequestUncheckedCreateWithoutUserInput = {
@@ -1215,6 +1241,7 @@ export type CoachRequestUncheckedCreateWithoutUserInput = {
   trace?: Prisma.CoachTraceUncheckedCreateNestedOneWithoutRequestInput
   feedback?: Prisma.CoachFeedbackUncheckedCreateNestedManyWithoutRequestInput
   knowledgeCitations?: Prisma.KnowledgeCitationUncheckedCreateNestedManyWithoutRequestInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedCreateNestedManyWithoutCoachRequestInput
 }
 
 export type CoachRequestCreateOrConnectWithoutUserInput = {
@@ -1309,6 +1336,7 @@ export type CoachRequestCreateWithoutConversationInput = {
   trace?: Prisma.CoachTraceCreateNestedOneWithoutRequestInput
   feedback?: Prisma.CoachFeedbackCreateNestedManyWithoutRequestInput
   knowledgeCitations?: Prisma.KnowledgeCitationCreateNestedManyWithoutRequestInput
+  pronunciationTargets?: Prisma.PronunciationTargetCreateNestedManyWithoutCoachRequestInput
 }
 
 export type CoachRequestUncheckedCreateWithoutConversationInput = {
@@ -1345,6 +1373,7 @@ export type CoachRequestUncheckedCreateWithoutConversationInput = {
   trace?: Prisma.CoachTraceUncheckedCreateNestedOneWithoutRequestInput
   feedback?: Prisma.CoachFeedbackUncheckedCreateNestedManyWithoutRequestInput
   knowledgeCitations?: Prisma.KnowledgeCitationUncheckedCreateNestedManyWithoutRequestInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedCreateNestedManyWithoutCoachRequestInput
 }
 
 export type CoachRequestCreateOrConnectWithoutConversationInput = {
@@ -1407,6 +1436,7 @@ export type CoachRequestCreateWithoutMessagesInput = {
   trace?: Prisma.CoachTraceCreateNestedOneWithoutRequestInput
   feedback?: Prisma.CoachFeedbackCreateNestedManyWithoutRequestInput
   knowledgeCitations?: Prisma.KnowledgeCitationCreateNestedManyWithoutRequestInput
+  pronunciationTargets?: Prisma.PronunciationTargetCreateNestedManyWithoutCoachRequestInput
 }
 
 export type CoachRequestUncheckedCreateWithoutMessagesInput = {
@@ -1443,6 +1473,7 @@ export type CoachRequestUncheckedCreateWithoutMessagesInput = {
   trace?: Prisma.CoachTraceUncheckedCreateNestedOneWithoutRequestInput
   feedback?: Prisma.CoachFeedbackUncheckedCreateNestedManyWithoutRequestInput
   knowledgeCitations?: Prisma.KnowledgeCitationUncheckedCreateNestedManyWithoutRequestInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedCreateNestedManyWithoutCoachRequestInput
 }
 
 export type CoachRequestCreateOrConnectWithoutMessagesInput = {
@@ -1495,6 +1526,7 @@ export type CoachRequestUpdateWithoutMessagesInput = {
   trace?: Prisma.CoachTraceUpdateOneWithoutRequestNestedInput
   feedback?: Prisma.CoachFeedbackUpdateManyWithoutRequestNestedInput
   knowledgeCitations?: Prisma.KnowledgeCitationUpdateManyWithoutRequestNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUpdateManyWithoutCoachRequestNestedInput
 }
 
 export type CoachRequestUncheckedUpdateWithoutMessagesInput = {
@@ -1531,6 +1563,7 @@ export type CoachRequestUncheckedUpdateWithoutMessagesInput = {
   trace?: Prisma.CoachTraceUncheckedUpdateOneWithoutRequestNestedInput
   feedback?: Prisma.CoachFeedbackUncheckedUpdateManyWithoutRequestNestedInput
   knowledgeCitations?: Prisma.KnowledgeCitationUncheckedUpdateManyWithoutRequestNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedUpdateManyWithoutCoachRequestNestedInput
 }
 
 export type CoachRequestCreateWithoutRetriesInput = {
@@ -1567,6 +1600,7 @@ export type CoachRequestCreateWithoutRetriesInput = {
   trace?: Prisma.CoachTraceCreateNestedOneWithoutRequestInput
   feedback?: Prisma.CoachFeedbackCreateNestedManyWithoutRequestInput
   knowledgeCitations?: Prisma.KnowledgeCitationCreateNestedManyWithoutRequestInput
+  pronunciationTargets?: Prisma.PronunciationTargetCreateNestedManyWithoutCoachRequestInput
 }
 
 export type CoachRequestUncheckedCreateWithoutRetriesInput = {
@@ -1603,6 +1637,7 @@ export type CoachRequestUncheckedCreateWithoutRetriesInput = {
   trace?: Prisma.CoachTraceUncheckedCreateNestedOneWithoutRequestInput
   feedback?: Prisma.CoachFeedbackUncheckedCreateNestedManyWithoutRequestInput
   knowledgeCitations?: Prisma.KnowledgeCitationUncheckedCreateNestedManyWithoutRequestInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedCreateNestedManyWithoutCoachRequestInput
 }
 
 export type CoachRequestCreateOrConnectWithoutRetriesInput = {
@@ -1644,6 +1679,7 @@ export type CoachRequestCreateWithoutRetryOfRequestInput = {
   trace?: Prisma.CoachTraceCreateNestedOneWithoutRequestInput
   feedback?: Prisma.CoachFeedbackCreateNestedManyWithoutRequestInput
   knowledgeCitations?: Prisma.KnowledgeCitationCreateNestedManyWithoutRequestInput
+  pronunciationTargets?: Prisma.PronunciationTargetCreateNestedManyWithoutCoachRequestInput
 }
 
 export type CoachRequestUncheckedCreateWithoutRetryOfRequestInput = {
@@ -1680,6 +1716,7 @@ export type CoachRequestUncheckedCreateWithoutRetryOfRequestInput = {
   trace?: Prisma.CoachTraceUncheckedCreateNestedOneWithoutRequestInput
   feedback?: Prisma.CoachFeedbackUncheckedCreateNestedManyWithoutRequestInput
   knowledgeCitations?: Prisma.KnowledgeCitationUncheckedCreateNestedManyWithoutRequestInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedCreateNestedManyWithoutCoachRequestInput
 }
 
 export type CoachRequestCreateOrConnectWithoutRetryOfRequestInput = {
@@ -1737,6 +1774,7 @@ export type CoachRequestUpdateWithoutRetriesInput = {
   trace?: Prisma.CoachTraceUpdateOneWithoutRequestNestedInput
   feedback?: Prisma.CoachFeedbackUpdateManyWithoutRequestNestedInput
   knowledgeCitations?: Prisma.KnowledgeCitationUpdateManyWithoutRequestNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUpdateManyWithoutCoachRequestNestedInput
 }
 
 export type CoachRequestUncheckedUpdateWithoutRetriesInput = {
@@ -1773,6 +1811,7 @@ export type CoachRequestUncheckedUpdateWithoutRetriesInput = {
   trace?: Prisma.CoachTraceUncheckedUpdateOneWithoutRequestNestedInput
   feedback?: Prisma.CoachFeedbackUncheckedUpdateManyWithoutRequestNestedInput
   knowledgeCitations?: Prisma.KnowledgeCitationUncheckedUpdateManyWithoutRequestNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedUpdateManyWithoutCoachRequestNestedInput
 }
 
 export type CoachRequestUpsertWithWhereUniqueWithoutRetryOfRequestInput = {
@@ -1825,6 +1864,7 @@ export type CoachRequestCreateWithoutGeneratedExerciseInput = {
   trace?: Prisma.CoachTraceCreateNestedOneWithoutRequestInput
   feedback?: Prisma.CoachFeedbackCreateNestedManyWithoutRequestInput
   knowledgeCitations?: Prisma.KnowledgeCitationCreateNestedManyWithoutRequestInput
+  pronunciationTargets?: Prisma.PronunciationTargetCreateNestedManyWithoutCoachRequestInput
 }
 
 export type CoachRequestUncheckedCreateWithoutGeneratedExerciseInput = {
@@ -1861,6 +1901,7 @@ export type CoachRequestUncheckedCreateWithoutGeneratedExerciseInput = {
   trace?: Prisma.CoachTraceUncheckedCreateNestedOneWithoutRequestInput
   feedback?: Prisma.CoachFeedbackUncheckedCreateNestedManyWithoutRequestInput
   knowledgeCitations?: Prisma.KnowledgeCitationUncheckedCreateNestedManyWithoutRequestInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedCreateNestedManyWithoutCoachRequestInput
 }
 
 export type CoachRequestCreateOrConnectWithoutGeneratedExerciseInput = {
@@ -1902,6 +1943,7 @@ export type CoachRequestCreateWithoutExerciseInput = {
   trace?: Prisma.CoachTraceCreateNestedOneWithoutRequestInput
   feedback?: Prisma.CoachFeedbackCreateNestedManyWithoutRequestInput
   knowledgeCitations?: Prisma.KnowledgeCitationCreateNestedManyWithoutRequestInput
+  pronunciationTargets?: Prisma.PronunciationTargetCreateNestedManyWithoutCoachRequestInput
 }
 
 export type CoachRequestUncheckedCreateWithoutExerciseInput = {
@@ -1938,6 +1980,7 @@ export type CoachRequestUncheckedCreateWithoutExerciseInput = {
   trace?: Prisma.CoachTraceUncheckedCreateNestedOneWithoutRequestInput
   feedback?: Prisma.CoachFeedbackUncheckedCreateNestedManyWithoutRequestInput
   knowledgeCitations?: Prisma.KnowledgeCitationUncheckedCreateNestedManyWithoutRequestInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedCreateNestedManyWithoutCoachRequestInput
 }
 
 export type CoachRequestCreateOrConnectWithoutExerciseInput = {
@@ -1995,6 +2038,7 @@ export type CoachRequestUpdateWithoutGeneratedExerciseInput = {
   trace?: Prisma.CoachTraceUpdateOneWithoutRequestNestedInput
   feedback?: Prisma.CoachFeedbackUpdateManyWithoutRequestNestedInput
   knowledgeCitations?: Prisma.KnowledgeCitationUpdateManyWithoutRequestNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUpdateManyWithoutCoachRequestNestedInput
 }
 
 export type CoachRequestUncheckedUpdateWithoutGeneratedExerciseInput = {
@@ -2031,6 +2075,7 @@ export type CoachRequestUncheckedUpdateWithoutGeneratedExerciseInput = {
   trace?: Prisma.CoachTraceUncheckedUpdateOneWithoutRequestNestedInput
   feedback?: Prisma.CoachFeedbackUncheckedUpdateManyWithoutRequestNestedInput
   knowledgeCitations?: Prisma.KnowledgeCitationUncheckedUpdateManyWithoutRequestNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedUpdateManyWithoutCoachRequestNestedInput
 }
 
 export type CoachRequestUpsertWithWhereUniqueWithoutExerciseInput = {
@@ -2083,6 +2128,7 @@ export type CoachRequestCreateWithoutGradedSubmissionInput = {
   trace?: Prisma.CoachTraceCreateNestedOneWithoutRequestInput
   feedback?: Prisma.CoachFeedbackCreateNestedManyWithoutRequestInput
   knowledgeCitations?: Prisma.KnowledgeCitationCreateNestedManyWithoutRequestInput
+  pronunciationTargets?: Prisma.PronunciationTargetCreateNestedManyWithoutCoachRequestInput
 }
 
 export type CoachRequestUncheckedCreateWithoutGradedSubmissionInput = {
@@ -2119,6 +2165,7 @@ export type CoachRequestUncheckedCreateWithoutGradedSubmissionInput = {
   trace?: Prisma.CoachTraceUncheckedCreateNestedOneWithoutRequestInput
   feedback?: Prisma.CoachFeedbackUncheckedCreateNestedManyWithoutRequestInput
   knowledgeCitations?: Prisma.KnowledgeCitationUncheckedCreateNestedManyWithoutRequestInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedCreateNestedManyWithoutCoachRequestInput
 }
 
 export type CoachRequestCreateOrConnectWithoutGradedSubmissionInput = {
@@ -2171,6 +2218,7 @@ export type CoachRequestUpdateWithoutGradedSubmissionInput = {
   trace?: Prisma.CoachTraceUpdateOneWithoutRequestNestedInput
   feedback?: Prisma.CoachFeedbackUpdateManyWithoutRequestNestedInput
   knowledgeCitations?: Prisma.KnowledgeCitationUpdateManyWithoutRequestNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUpdateManyWithoutCoachRequestNestedInput
 }
 
 export type CoachRequestUncheckedUpdateWithoutGradedSubmissionInput = {
@@ -2207,6 +2255,7 @@ export type CoachRequestUncheckedUpdateWithoutGradedSubmissionInput = {
   trace?: Prisma.CoachTraceUncheckedUpdateOneWithoutRequestNestedInput
   feedback?: Prisma.CoachFeedbackUncheckedUpdateManyWithoutRequestNestedInput
   knowledgeCitations?: Prisma.KnowledgeCitationUncheckedUpdateManyWithoutRequestNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedUpdateManyWithoutCoachRequestNestedInput
 }
 
 export type CoachRequestCreateWithoutSavedAttemptInput = {
@@ -2243,6 +2292,7 @@ export type CoachRequestCreateWithoutSavedAttemptInput = {
   trace?: Prisma.CoachTraceCreateNestedOneWithoutRequestInput
   feedback?: Prisma.CoachFeedbackCreateNestedManyWithoutRequestInput
   knowledgeCitations?: Prisma.KnowledgeCitationCreateNestedManyWithoutRequestInput
+  pronunciationTargets?: Prisma.PronunciationTargetCreateNestedManyWithoutCoachRequestInput
 }
 
 export type CoachRequestUncheckedCreateWithoutSavedAttemptInput = {
@@ -2279,6 +2329,7 @@ export type CoachRequestUncheckedCreateWithoutSavedAttemptInput = {
   trace?: Prisma.CoachTraceUncheckedCreateNestedOneWithoutRequestInput
   feedback?: Prisma.CoachFeedbackUncheckedCreateNestedManyWithoutRequestInput
   knowledgeCitations?: Prisma.KnowledgeCitationUncheckedCreateNestedManyWithoutRequestInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedCreateNestedManyWithoutCoachRequestInput
 }
 
 export type CoachRequestCreateOrConnectWithoutSavedAttemptInput = {
@@ -2331,6 +2382,7 @@ export type CoachRequestUpdateWithoutSavedAttemptInput = {
   trace?: Prisma.CoachTraceUpdateOneWithoutRequestNestedInput
   feedback?: Prisma.CoachFeedbackUpdateManyWithoutRequestNestedInput
   knowledgeCitations?: Prisma.KnowledgeCitationUpdateManyWithoutRequestNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUpdateManyWithoutCoachRequestNestedInput
 }
 
 export type CoachRequestUncheckedUpdateWithoutSavedAttemptInput = {
@@ -2364,6 +2416,171 @@ export type CoachRequestUncheckedUpdateWithoutSavedAttemptInput = {
   generatedExercise?: Prisma.ExerciseUncheckedUpdateOneWithoutRequestNestedInput
   messages?: Prisma.CoachMessageUncheckedUpdateManyWithoutRequestNestedInput
   gradedSubmission?: Prisma.ExerciseSubmissionUncheckedUpdateOneWithoutGradeRequestNestedInput
+  trace?: Prisma.CoachTraceUncheckedUpdateOneWithoutRequestNestedInput
+  feedback?: Prisma.CoachFeedbackUncheckedUpdateManyWithoutRequestNestedInput
+  knowledgeCitations?: Prisma.KnowledgeCitationUncheckedUpdateManyWithoutRequestNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedUpdateManyWithoutCoachRequestNestedInput
+}
+
+export type CoachRequestCreateWithoutPronunciationTargetsInput = {
+  id?: string
+  clientRequestKey: string
+  requestBodyHash: string
+  inputPayload: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  inputType: $Enums.CoachRequestInputType
+  intent?: $Enums.CoachIntent | null
+  status?: $Enums.CoachRequestStatus
+  answerVersion?: string | null
+  promptVersion?: string | null
+  modelVersion?: string | null
+  budgetVersion?: string | null
+  deadlineAt: Date | string
+  finalResultSchemaVersion?: string | null
+  finalResult?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  errorCode?: $Enums.CoachErrorCode | null
+  cancelRequestedAt?: Date | string | null
+  queuedAt?: Date | string | null
+  startedAt?: Date | string | null
+  firstTokenAt?: Date | string | null
+  finishedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutCoachRequestsInput
+  conversation: Prisma.CoachConversationCreateNestedOneWithoutRequestsInput
+  retryOfRequest?: Prisma.CoachRequestCreateNestedOneWithoutRetriesInput
+  retries?: Prisma.CoachRequestCreateNestedManyWithoutRetryOfRequestInput
+  exercise?: Prisma.ExerciseCreateNestedOneWithoutContextualRequestsInput
+  generatedExercise?: Prisma.ExerciseCreateNestedOneWithoutRequestInput
+  messages?: Prisma.CoachMessageCreateNestedManyWithoutRequestInput
+  gradedSubmission?: Prisma.ExerciseSubmissionCreateNestedOneWithoutGradeRequestInput
+  savedAttempt?: Prisma.LearningAttemptCreateNestedOneWithoutSaveRequestInput
+  trace?: Prisma.CoachTraceCreateNestedOneWithoutRequestInput
+  feedback?: Prisma.CoachFeedbackCreateNestedManyWithoutRequestInput
+  knowledgeCitations?: Prisma.KnowledgeCitationCreateNestedManyWithoutRequestInput
+}
+
+export type CoachRequestUncheckedCreateWithoutPronunciationTargetsInput = {
+  id?: string
+  userId: string
+  conversationId: string
+  clientRequestKey: string
+  requestBodyHash: string
+  inputPayload: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  retryOfRequestId?: string | null
+  inputType: $Enums.CoachRequestInputType
+  intent?: $Enums.CoachIntent | null
+  status?: $Enums.CoachRequestStatus
+  exerciseId?: string | null
+  answerVersion?: string | null
+  promptVersion?: string | null
+  modelVersion?: string | null
+  budgetVersion?: string | null
+  deadlineAt: Date | string
+  finalResultSchemaVersion?: string | null
+  finalResult?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  errorCode?: $Enums.CoachErrorCode | null
+  cancelRequestedAt?: Date | string | null
+  queuedAt?: Date | string | null
+  startedAt?: Date | string | null
+  firstTokenAt?: Date | string | null
+  finishedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  retries?: Prisma.CoachRequestUncheckedCreateNestedManyWithoutRetryOfRequestInput
+  generatedExercise?: Prisma.ExerciseUncheckedCreateNestedOneWithoutRequestInput
+  messages?: Prisma.CoachMessageUncheckedCreateNestedManyWithoutRequestInput
+  gradedSubmission?: Prisma.ExerciseSubmissionUncheckedCreateNestedOneWithoutGradeRequestInput
+  savedAttempt?: Prisma.LearningAttemptUncheckedCreateNestedOneWithoutSaveRequestInput
+  trace?: Prisma.CoachTraceUncheckedCreateNestedOneWithoutRequestInput
+  feedback?: Prisma.CoachFeedbackUncheckedCreateNestedManyWithoutRequestInput
+  knowledgeCitations?: Prisma.KnowledgeCitationUncheckedCreateNestedManyWithoutRequestInput
+}
+
+export type CoachRequestCreateOrConnectWithoutPronunciationTargetsInput = {
+  where: Prisma.CoachRequestWhereUniqueInput
+  create: Prisma.XOR<Prisma.CoachRequestCreateWithoutPronunciationTargetsInput, Prisma.CoachRequestUncheckedCreateWithoutPronunciationTargetsInput>
+}
+
+export type CoachRequestUpsertWithoutPronunciationTargetsInput = {
+  update: Prisma.XOR<Prisma.CoachRequestUpdateWithoutPronunciationTargetsInput, Prisma.CoachRequestUncheckedUpdateWithoutPronunciationTargetsInput>
+  create: Prisma.XOR<Prisma.CoachRequestCreateWithoutPronunciationTargetsInput, Prisma.CoachRequestUncheckedCreateWithoutPronunciationTargetsInput>
+  where?: Prisma.CoachRequestWhereInput
+}
+
+export type CoachRequestUpdateToOneWithWhereWithoutPronunciationTargetsInput = {
+  where?: Prisma.CoachRequestWhereInput
+  data: Prisma.XOR<Prisma.CoachRequestUpdateWithoutPronunciationTargetsInput, Prisma.CoachRequestUncheckedUpdateWithoutPronunciationTargetsInput>
+}
+
+export type CoachRequestUpdateWithoutPronunciationTargetsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  clientRequestKey?: Prisma.StringFieldUpdateOperationsInput | string
+  requestBodyHash?: Prisma.StringFieldUpdateOperationsInput | string
+  inputPayload?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  inputType?: Prisma.EnumCoachRequestInputTypeFieldUpdateOperationsInput | $Enums.CoachRequestInputType
+  intent?: Prisma.NullableEnumCoachIntentFieldUpdateOperationsInput | $Enums.CoachIntent | null
+  status?: Prisma.EnumCoachRequestStatusFieldUpdateOperationsInput | $Enums.CoachRequestStatus
+  answerVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  promptVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  modelVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  budgetVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deadlineAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  finalResultSchemaVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  finalResult?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  errorCode?: Prisma.NullableEnumCoachErrorCodeFieldUpdateOperationsInput | $Enums.CoachErrorCode | null
+  cancelRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  queuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  firstTokenAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  finishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutCoachRequestsNestedInput
+  conversation?: Prisma.CoachConversationUpdateOneRequiredWithoutRequestsNestedInput
+  retryOfRequest?: Prisma.CoachRequestUpdateOneWithoutRetriesNestedInput
+  retries?: Prisma.CoachRequestUpdateManyWithoutRetryOfRequestNestedInput
+  exercise?: Prisma.ExerciseUpdateOneWithoutContextualRequestsNestedInput
+  generatedExercise?: Prisma.ExerciseUpdateOneWithoutRequestNestedInput
+  messages?: Prisma.CoachMessageUpdateManyWithoutRequestNestedInput
+  gradedSubmission?: Prisma.ExerciseSubmissionUpdateOneWithoutGradeRequestNestedInput
+  savedAttempt?: Prisma.LearningAttemptUpdateOneWithoutSaveRequestNestedInput
+  trace?: Prisma.CoachTraceUpdateOneWithoutRequestNestedInput
+  feedback?: Prisma.CoachFeedbackUpdateManyWithoutRequestNestedInput
+  knowledgeCitations?: Prisma.KnowledgeCitationUpdateManyWithoutRequestNestedInput
+}
+
+export type CoachRequestUncheckedUpdateWithoutPronunciationTargetsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  conversationId?: Prisma.StringFieldUpdateOperationsInput | string
+  clientRequestKey?: Prisma.StringFieldUpdateOperationsInput | string
+  requestBodyHash?: Prisma.StringFieldUpdateOperationsInput | string
+  inputPayload?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  retryOfRequestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  inputType?: Prisma.EnumCoachRequestInputTypeFieldUpdateOperationsInput | $Enums.CoachRequestInputType
+  intent?: Prisma.NullableEnumCoachIntentFieldUpdateOperationsInput | $Enums.CoachIntent | null
+  status?: Prisma.EnumCoachRequestStatusFieldUpdateOperationsInput | $Enums.CoachRequestStatus
+  exerciseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  answerVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  promptVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  modelVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  budgetVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deadlineAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  finalResultSchemaVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  finalResult?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  errorCode?: Prisma.NullableEnumCoachErrorCodeFieldUpdateOperationsInput | $Enums.CoachErrorCode | null
+  cancelRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  queuedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  firstTokenAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  finishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  retries?: Prisma.CoachRequestUncheckedUpdateManyWithoutRetryOfRequestNestedInput
+  generatedExercise?: Prisma.ExerciseUncheckedUpdateOneWithoutRequestNestedInput
+  messages?: Prisma.CoachMessageUncheckedUpdateManyWithoutRequestNestedInput
+  gradedSubmission?: Prisma.ExerciseSubmissionUncheckedUpdateOneWithoutGradeRequestNestedInput
+  savedAttempt?: Prisma.LearningAttemptUncheckedUpdateOneWithoutSaveRequestNestedInput
   trace?: Prisma.CoachTraceUncheckedUpdateOneWithoutRequestNestedInput
   feedback?: Prisma.CoachFeedbackUncheckedUpdateManyWithoutRequestNestedInput
   knowledgeCitations?: Prisma.KnowledgeCitationUncheckedUpdateManyWithoutRequestNestedInput
@@ -2403,6 +2620,7 @@ export type CoachRequestCreateWithoutTraceInput = {
   savedAttempt?: Prisma.LearningAttemptCreateNestedOneWithoutSaveRequestInput
   feedback?: Prisma.CoachFeedbackCreateNestedManyWithoutRequestInput
   knowledgeCitations?: Prisma.KnowledgeCitationCreateNestedManyWithoutRequestInput
+  pronunciationTargets?: Prisma.PronunciationTargetCreateNestedManyWithoutCoachRequestInput
 }
 
 export type CoachRequestUncheckedCreateWithoutTraceInput = {
@@ -2439,6 +2657,7 @@ export type CoachRequestUncheckedCreateWithoutTraceInput = {
   savedAttempt?: Prisma.LearningAttemptUncheckedCreateNestedOneWithoutSaveRequestInput
   feedback?: Prisma.CoachFeedbackUncheckedCreateNestedManyWithoutRequestInput
   knowledgeCitations?: Prisma.KnowledgeCitationUncheckedCreateNestedManyWithoutRequestInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedCreateNestedManyWithoutCoachRequestInput
 }
 
 export type CoachRequestCreateOrConnectWithoutTraceInput = {
@@ -2491,6 +2710,7 @@ export type CoachRequestUpdateWithoutTraceInput = {
   savedAttempt?: Prisma.LearningAttemptUpdateOneWithoutSaveRequestNestedInput
   feedback?: Prisma.CoachFeedbackUpdateManyWithoutRequestNestedInput
   knowledgeCitations?: Prisma.KnowledgeCitationUpdateManyWithoutRequestNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUpdateManyWithoutCoachRequestNestedInput
 }
 
 export type CoachRequestUncheckedUpdateWithoutTraceInput = {
@@ -2527,6 +2747,7 @@ export type CoachRequestUncheckedUpdateWithoutTraceInput = {
   savedAttempt?: Prisma.LearningAttemptUncheckedUpdateOneWithoutSaveRequestNestedInput
   feedback?: Prisma.CoachFeedbackUncheckedUpdateManyWithoutRequestNestedInput
   knowledgeCitations?: Prisma.KnowledgeCitationUncheckedUpdateManyWithoutRequestNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedUpdateManyWithoutCoachRequestNestedInput
 }
 
 export type CoachRequestCreateWithoutFeedbackInput = {
@@ -2563,6 +2784,7 @@ export type CoachRequestCreateWithoutFeedbackInput = {
   savedAttempt?: Prisma.LearningAttemptCreateNestedOneWithoutSaveRequestInput
   trace?: Prisma.CoachTraceCreateNestedOneWithoutRequestInput
   knowledgeCitations?: Prisma.KnowledgeCitationCreateNestedManyWithoutRequestInput
+  pronunciationTargets?: Prisma.PronunciationTargetCreateNestedManyWithoutCoachRequestInput
 }
 
 export type CoachRequestUncheckedCreateWithoutFeedbackInput = {
@@ -2599,6 +2821,7 @@ export type CoachRequestUncheckedCreateWithoutFeedbackInput = {
   savedAttempt?: Prisma.LearningAttemptUncheckedCreateNestedOneWithoutSaveRequestInput
   trace?: Prisma.CoachTraceUncheckedCreateNestedOneWithoutRequestInput
   knowledgeCitations?: Prisma.KnowledgeCitationUncheckedCreateNestedManyWithoutRequestInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedCreateNestedManyWithoutCoachRequestInput
 }
 
 export type CoachRequestCreateOrConnectWithoutFeedbackInput = {
@@ -2651,6 +2874,7 @@ export type CoachRequestUpdateWithoutFeedbackInput = {
   savedAttempt?: Prisma.LearningAttemptUpdateOneWithoutSaveRequestNestedInput
   trace?: Prisma.CoachTraceUpdateOneWithoutRequestNestedInput
   knowledgeCitations?: Prisma.KnowledgeCitationUpdateManyWithoutRequestNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUpdateManyWithoutCoachRequestNestedInput
 }
 
 export type CoachRequestUncheckedUpdateWithoutFeedbackInput = {
@@ -2687,6 +2911,7 @@ export type CoachRequestUncheckedUpdateWithoutFeedbackInput = {
   savedAttempt?: Prisma.LearningAttemptUncheckedUpdateOneWithoutSaveRequestNestedInput
   trace?: Prisma.CoachTraceUncheckedUpdateOneWithoutRequestNestedInput
   knowledgeCitations?: Prisma.KnowledgeCitationUncheckedUpdateManyWithoutRequestNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedUpdateManyWithoutCoachRequestNestedInput
 }
 
 export type CoachRequestCreateWithoutKnowledgeCitationsInput = {
@@ -2723,6 +2948,7 @@ export type CoachRequestCreateWithoutKnowledgeCitationsInput = {
   savedAttempt?: Prisma.LearningAttemptCreateNestedOneWithoutSaveRequestInput
   trace?: Prisma.CoachTraceCreateNestedOneWithoutRequestInput
   feedback?: Prisma.CoachFeedbackCreateNestedManyWithoutRequestInput
+  pronunciationTargets?: Prisma.PronunciationTargetCreateNestedManyWithoutCoachRequestInput
 }
 
 export type CoachRequestUncheckedCreateWithoutKnowledgeCitationsInput = {
@@ -2759,6 +2985,7 @@ export type CoachRequestUncheckedCreateWithoutKnowledgeCitationsInput = {
   savedAttempt?: Prisma.LearningAttemptUncheckedCreateNestedOneWithoutSaveRequestInput
   trace?: Prisma.CoachTraceUncheckedCreateNestedOneWithoutRequestInput
   feedback?: Prisma.CoachFeedbackUncheckedCreateNestedManyWithoutRequestInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedCreateNestedManyWithoutCoachRequestInput
 }
 
 export type CoachRequestCreateOrConnectWithoutKnowledgeCitationsInput = {
@@ -2811,6 +3038,7 @@ export type CoachRequestUpdateWithoutKnowledgeCitationsInput = {
   savedAttempt?: Prisma.LearningAttemptUpdateOneWithoutSaveRequestNestedInput
   trace?: Prisma.CoachTraceUpdateOneWithoutRequestNestedInput
   feedback?: Prisma.CoachFeedbackUpdateManyWithoutRequestNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUpdateManyWithoutCoachRequestNestedInput
 }
 
 export type CoachRequestUncheckedUpdateWithoutKnowledgeCitationsInput = {
@@ -2847,6 +3075,7 @@ export type CoachRequestUncheckedUpdateWithoutKnowledgeCitationsInput = {
   savedAttempt?: Prisma.LearningAttemptUncheckedUpdateOneWithoutSaveRequestNestedInput
   trace?: Prisma.CoachTraceUncheckedUpdateOneWithoutRequestNestedInput
   feedback?: Prisma.CoachFeedbackUncheckedUpdateManyWithoutRequestNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedUpdateManyWithoutCoachRequestNestedInput
 }
 
 export type CoachRequestCreateManyUserInput = {
@@ -2911,6 +3140,7 @@ export type CoachRequestUpdateWithoutUserInput = {
   trace?: Prisma.CoachTraceUpdateOneWithoutRequestNestedInput
   feedback?: Prisma.CoachFeedbackUpdateManyWithoutRequestNestedInput
   knowledgeCitations?: Prisma.KnowledgeCitationUpdateManyWithoutRequestNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUpdateManyWithoutCoachRequestNestedInput
 }
 
 export type CoachRequestUncheckedUpdateWithoutUserInput = {
@@ -2947,6 +3177,7 @@ export type CoachRequestUncheckedUpdateWithoutUserInput = {
   trace?: Prisma.CoachTraceUncheckedUpdateOneWithoutRequestNestedInput
   feedback?: Prisma.CoachFeedbackUncheckedUpdateManyWithoutRequestNestedInput
   knowledgeCitations?: Prisma.KnowledgeCitationUncheckedUpdateManyWithoutRequestNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedUpdateManyWithoutCoachRequestNestedInput
 }
 
 export type CoachRequestUncheckedUpdateManyWithoutUserInput = {
@@ -3039,6 +3270,7 @@ export type CoachRequestUpdateWithoutConversationInput = {
   trace?: Prisma.CoachTraceUpdateOneWithoutRequestNestedInput
   feedback?: Prisma.CoachFeedbackUpdateManyWithoutRequestNestedInput
   knowledgeCitations?: Prisma.KnowledgeCitationUpdateManyWithoutRequestNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUpdateManyWithoutCoachRequestNestedInput
 }
 
 export type CoachRequestUncheckedUpdateWithoutConversationInput = {
@@ -3075,6 +3307,7 @@ export type CoachRequestUncheckedUpdateWithoutConversationInput = {
   trace?: Prisma.CoachTraceUncheckedUpdateOneWithoutRequestNestedInput
   feedback?: Prisma.CoachFeedbackUncheckedUpdateManyWithoutRequestNestedInput
   knowledgeCitations?: Prisma.KnowledgeCitationUncheckedUpdateManyWithoutRequestNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedUpdateManyWithoutCoachRequestNestedInput
 }
 
 export type CoachRequestUncheckedUpdateManyWithoutConversationInput = {
@@ -3167,6 +3400,7 @@ export type CoachRequestUpdateWithoutRetryOfRequestInput = {
   trace?: Prisma.CoachTraceUpdateOneWithoutRequestNestedInput
   feedback?: Prisma.CoachFeedbackUpdateManyWithoutRequestNestedInput
   knowledgeCitations?: Prisma.KnowledgeCitationUpdateManyWithoutRequestNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUpdateManyWithoutCoachRequestNestedInput
 }
 
 export type CoachRequestUncheckedUpdateWithoutRetryOfRequestInput = {
@@ -3203,6 +3437,7 @@ export type CoachRequestUncheckedUpdateWithoutRetryOfRequestInput = {
   trace?: Prisma.CoachTraceUncheckedUpdateOneWithoutRequestNestedInput
   feedback?: Prisma.CoachFeedbackUncheckedUpdateManyWithoutRequestNestedInput
   knowledgeCitations?: Prisma.KnowledgeCitationUncheckedUpdateManyWithoutRequestNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedUpdateManyWithoutCoachRequestNestedInput
 }
 
 export type CoachRequestUncheckedUpdateManyWithoutRetryOfRequestInput = {
@@ -3295,6 +3530,7 @@ export type CoachRequestUpdateWithoutExerciseInput = {
   trace?: Prisma.CoachTraceUpdateOneWithoutRequestNestedInput
   feedback?: Prisma.CoachFeedbackUpdateManyWithoutRequestNestedInput
   knowledgeCitations?: Prisma.KnowledgeCitationUpdateManyWithoutRequestNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUpdateManyWithoutCoachRequestNestedInput
 }
 
 export type CoachRequestUncheckedUpdateWithoutExerciseInput = {
@@ -3331,6 +3567,7 @@ export type CoachRequestUncheckedUpdateWithoutExerciseInput = {
   trace?: Prisma.CoachTraceUncheckedUpdateOneWithoutRequestNestedInput
   feedback?: Prisma.CoachFeedbackUncheckedUpdateManyWithoutRequestNestedInput
   knowledgeCitations?: Prisma.KnowledgeCitationUncheckedUpdateManyWithoutRequestNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedUpdateManyWithoutCoachRequestNestedInput
 }
 
 export type CoachRequestUncheckedUpdateManyWithoutExerciseInput = {
@@ -3371,6 +3608,7 @@ export type CoachRequestCountOutputType = {
   messages: number
   feedback: number
   knowledgeCitations: number
+  pronunciationTargets: number
 }
 
 export type CoachRequestCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -3378,6 +3616,7 @@ export type CoachRequestCountOutputTypeSelect<ExtArgs extends runtime.Types.Exte
   messages?: boolean | CoachRequestCountOutputTypeCountMessagesArgs
   feedback?: boolean | CoachRequestCountOutputTypeCountFeedbackArgs
   knowledgeCitations?: boolean | CoachRequestCountOutputTypeCountKnowledgeCitationsArgs
+  pronunciationTargets?: boolean | CoachRequestCountOutputTypeCountPronunciationTargetsArgs
 }
 
 /**
@@ -3416,6 +3655,13 @@ export type CoachRequestCountOutputTypeCountFeedbackArgs<ExtArgs extends runtime
  */
 export type CoachRequestCountOutputTypeCountKnowledgeCitationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.KnowledgeCitationWhereInput
+}
+
+/**
+ * CoachRequestCountOutputType without action
+ */
+export type CoachRequestCountOutputTypeCountPronunciationTargetsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PronunciationTargetWhereInput
 }
 
 
@@ -3458,6 +3704,7 @@ export type CoachRequestSelect<ExtArgs extends runtime.Types.Extensions.Internal
   trace?: boolean | Prisma.CoachRequest$traceArgs<ExtArgs>
   feedback?: boolean | Prisma.CoachRequest$feedbackArgs<ExtArgs>
   knowledgeCitations?: boolean | Prisma.CoachRequest$knowledgeCitationsArgs<ExtArgs>
+  pronunciationTargets?: boolean | Prisma.CoachRequest$pronunciationTargetsArgs<ExtArgs>
   _count?: boolean | Prisma.CoachRequestCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["coachRequest"]>
 
@@ -3570,6 +3817,7 @@ export type CoachRequestInclude<ExtArgs extends runtime.Types.Extensions.Interna
   trace?: boolean | Prisma.CoachRequest$traceArgs<ExtArgs>
   feedback?: boolean | Prisma.CoachRequest$feedbackArgs<ExtArgs>
   knowledgeCitations?: boolean | Prisma.CoachRequest$knowledgeCitationsArgs<ExtArgs>
+  pronunciationTargets?: boolean | Prisma.CoachRequest$pronunciationTargetsArgs<ExtArgs>
   _count?: boolean | Prisma.CoachRequestCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type CoachRequestIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -3600,6 +3848,7 @@ export type $CoachRequestPayload<ExtArgs extends runtime.Types.Extensions.Intern
     trace: Prisma.$CoachTracePayload<ExtArgs> | null
     feedback: Prisma.$CoachFeedbackPayload<ExtArgs>[]
     knowledgeCitations: Prisma.$KnowledgeCitationPayload<ExtArgs>[]
+    pronunciationTargets: Prisma.$PronunciationTargetPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -4034,6 +4283,7 @@ export interface Prisma__CoachRequestClient<T, Null = never, ExtArgs extends run
   trace<T extends Prisma.CoachRequest$traceArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CoachRequest$traceArgs<ExtArgs>>): Prisma.Prisma__CoachTraceClient<runtime.Types.Result.GetResult<Prisma.$CoachTracePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   feedback<T extends Prisma.CoachRequest$feedbackArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CoachRequest$feedbackArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CoachFeedbackPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   knowledgeCitations<T extends Prisma.CoachRequest$knowledgeCitationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CoachRequest$knowledgeCitationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$KnowledgeCitationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  pronunciationTargets<T extends Prisma.CoachRequest$pronunciationTargetsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CoachRequest$pronunciationTargetsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PronunciationTargetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -4697,6 +4947,30 @@ export type CoachRequest$knowledgeCitationsArgs<ExtArgs extends runtime.Types.Ex
   take?: number
   skip?: number
   distinct?: Prisma.KnowledgeCitationScalarFieldEnum | Prisma.KnowledgeCitationScalarFieldEnum[]
+}
+
+/**
+ * CoachRequest.pronunciationTargets
+ */
+export type CoachRequest$pronunciationTargetsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PronunciationTarget
+   */
+  select?: Prisma.PronunciationTargetSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PronunciationTarget
+   */
+  omit?: Prisma.PronunciationTargetOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PronunciationTargetInclude<ExtArgs> | null
+  where?: Prisma.PronunciationTargetWhereInput
+  orderBy?: Prisma.PronunciationTargetOrderByWithRelationInput | Prisma.PronunciationTargetOrderByWithRelationInput[]
+  cursor?: Prisma.PronunciationTargetWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PronunciationTargetScalarFieldEnum | Prisma.PronunciationTargetScalarFieldEnum[]
 }
 
 /**

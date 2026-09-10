@@ -46,6 +46,17 @@ enum LearnerGoalType {
 enum LearningTargetType {
   WORD
   ERROR_TYPE
+  PRONUNCIATION_WORD
+}
+
+enum LearningAttemptType {
+  EXERCISE
+  PRONUNCIATION
+}
+
+enum LearningEvidenceKind {
+  EXERCISE_GRADING
+  PRONUNCIATION_WORD
 }
 
 enum LearningReviewState {
@@ -317,39 +328,171 @@ enum PrivateLearningSummaryStatus {
   DELETING
 }
 
+enum PronunciationAssessmentStatus {
+  CREATED
+  AUDIO_VALIDATING
+  AUDIO_READY
+  QUEUED
+  PROCESSING
+  COMPLETED
+  REFERENCE_ONLY
+  UNRECOGNIZABLE
+  REJECTED
+  CANCELLED
+  TIMED_OUT
+  FAILED
+  DELETING
+  DELETED
+}
+
+enum PronunciationExerciseType {
+  WORD
+  PHRASE
+  SENTENCE
+}
+
+enum PronunciationTargetSource {
+  MANUAL
+  WORD_BOOK
+  COURSE_WORD
+  RAG_CITATION
+  COACH_EXERCISE
+}
+
+enum PronunciationConfidenceTier {
+  RELIABLE
+  REFERENCE_ONLY
+  REJECTED
+}
+
+enum PronunciationWordStatus {
+  CORRECT
+  MISPRONOUNCED
+  OMITTED
+  INSERTED
+  UNCERTAIN
+}
+
+enum PronunciationAudioStatus {
+  UPLOADING
+  QUARANTINED
+  VALIDATING
+  READY
+  INVALID
+  REVOKED
+  PURGING
+  PURGED
+}
+
+enum PronunciationLearningWriteStatus {
+  NOT_ELIGIBLE
+  PENDING
+  SAVED
+  FAILED
+  COMPENSATING
+  COMPENSATED
+}
+
+enum PronunciationNextAction {
+  RETRY
+  REVIEW
+  CONTINUE
+}
+
+enum PronunciationProviderCallStatus {
+  STARTED
+  SUCCEEDED
+  UNRECOGNIZABLE
+  TIMED_OUT
+  RATE_LIMITED
+  CANCELLED
+  FAILED
+  INVALID_RESPONSE
+}
+
+enum PronunciationProviderRetryDecision {
+  NOT_NEEDED
+  SAFE_NOT_ACCEPTED
+  PROVIDER_IDEMPOTENT
+  UNKNOWN_ACCEPTANCE_NO_RETRY
+  LIMIT_REACHED
+}
+
+enum PronunciationTraceStepName {
+  UPLOAD
+  VALIDATE_AUDIO
+  QUEUE
+  PROVIDER
+  VALIDATE_RESULT
+  SAVE_LEARNING
+  PURGE
+}
+
+enum PronunciationTraceStepStatus {
+  STARTED
+  SUCCEEDED
+  FAILED
+  SKIPPED
+  CANCELLED
+  TIMED_OUT
+}
+
+enum PronunciationDeletionScope {
+  PRONUNCIATION_AUDIO
+  PRONUNCIATION_ASSESSMENT
+}
+
+enum PronunciationDeletionStatus {
+  ACCEPTED
+  COMPENSATING
+  PURGING
+  COMPLETED
+  FAILED
+}
+
+enum LearningStateRecalculationStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+}
+
 //用户表
 model User {
-  id                   String                @id @default(cuid()) // 用户ID
-  name                 String // 用户名
-  email                String?               @unique // 邮箱
-  phone                String                @unique // 手机号
-  address              String? // 地址
-  password             String // 密码
-  avatar               String? // 头像
-  bio                  String? // 签名  新增字段
-  isTimingTask         Boolean               @default(false) // 是否开启定时任务 新增字段
-  timingTaskTime       String                @default("00:00:00") //定时任务时间默认晚上0点开始，每隔24小时执行一次 新增字段
-  wordNumber           Int                   @default(0) // 单词数量
-  dayNumber            Int                   @default(0) // 打卡天数
-  createdAt            DateTime              @default(now()) // 创建时间
-  updatedAt            DateTime              @updatedAt // 更新时间
-  lastLoginAt          DateTime? // 最后登录时间
-  wordBookRecords      WordBookRecord[]
-  paymentRecords       PaymentRecord[]
-  courseRecords        CourseRecord[]
-  visitors             Visitor[] //User别忘记关联
-  learnerProfile       LearnerProfile?
-  learningItemStates   LearningItemState[]
-  learningReviewEvents LearningReviewEvent[]
-  coachConversations   CoachConversation[]
-  coachRequests        CoachRequest[]
-  exercises            Exercise[]
-  exerciseSubmissions  ExerciseSubmission[]
-  learningAttempts     LearningAttempt[]
-  coachFeedback        CoachFeedback[]
-  traceSubjectMapping  TraceSubjectMapping?
-  knowledgeDocuments   KnowledgeDocument[]
+  id                       String                    @id @default(cuid()) // 用户ID
+  name                     String // 用户名
+  email                    String?                   @unique // 邮箱
+  phone                    String                    @unique // 手机号
+  address                  String? // 地址
+  password                 String // 密码
+  avatar                   String? // 头像
+  bio                      String? // 签名  新增字段
+  isTimingTask             Boolean                   @default(false) // 是否开启定时任务 新增字段
+  timingTaskTime           String                    @default("00:00:00") //定时任务时间默认晚上0点开始，每隔24小时执行一次 新增字段
+  wordNumber               Int                       @default(0) // 单词数量
+  dayNumber                Int                       @default(0) // 打卡天数
+  createdAt                DateTime                  @default(now()) // 创建时间
+  updatedAt                DateTime                  @updatedAt // 更新时间
+  lastLoginAt              DateTime? // 最后登录时间
+  wordBookRecords          WordBookRecord[]
+  paymentRecords           PaymentRecord[]
+  courseRecords            CourseRecord[]
+  visitors                 Visitor[] //User别忘记关联
+  learnerProfile           LearnerProfile?
+  learningItemStates       LearningItemState[]
+  learningReviewEvents     LearningReviewEvent[]
+  coachConversations       CoachConversation[]
+  coachRequests            CoachRequest[]
+  exercises                Exercise[]
+  exerciseSubmissions      ExerciseSubmission[]
+  learningAttempts         LearningAttempt[]
+  coachFeedback            CoachFeedback[]
+  traceSubjectMapping      TraceSubjectMapping?
+  knowledgeDocuments       KnowledgeDocument[]
   privateLearningSummaries PrivateLearningSummary[]
+  pronunciationAssessments PronunciationAssessment[]
+  pronunciationTargets     PronunciationTarget[]
+  pronunciationAudioAssets PronunciationAudioAsset[]
 }
 
 //记录已操作的单词
@@ -368,32 +511,34 @@ model WordBookRecord {
 
 //单词表
 model WordBook {
-  id                  String               @id @default(cuid()) // 单词ID
-  word                String // 单词
-  phonetic            String? // 音标
-  definition          String? // 定义
-  translation         String? // 翻译
-  pos                 String? // 词性
-  collins             String? // 柯林斯
-  oxford              String? // 牛津
-  tag                 String? // 标签
-  bnc                 String? // BNC 英国国家语料库
-  frq                 String? // FRQ 频率
-  exchange            String? // 同义词
-  gk                  Boolean? // 高考
-  zk                  Boolean? // 中考
-  gre                 Boolean? // GRE
-  toefl               Boolean? // TOEFL
-  ielts               Boolean? // IELTS
-  cet6                Boolean? // 大学英语六级
-  cet4                Boolean? // 大学英语四级
-  ky                  Boolean? // 考研
-  createdAt           DateTime             @default(now()) // 创建时间
-  updatedAt           DateTime             @updatedAt // 更新时间
-  wordBookRecords     WordBookRecord[]
-  learningItemStates  LearningItemState[]
-  exerciseItemTargets ExerciseItemTarget[]
-  knowledgeDocuments  KnowledgeDocument[]
+  id                           String                        @id @default(cuid()) // 单词ID
+  word                         String // 单词
+  phonetic                     String? // 音标
+  definition                   String? // 定义
+  translation                  String? // 翻译
+  pos                          String? // 词性
+  collins                      String? // 柯林斯
+  oxford                       String? // 牛津
+  tag                          String? // 标签
+  bnc                          String? // BNC 英国国家语料库
+  frq                          String? // FRQ 频率
+  exchange                     String? // 同义词
+  gk                           Boolean? // 高考
+  zk                           Boolean? // 中考
+  gre                          Boolean? // GRE
+  toefl                        Boolean? // TOEFL
+  ielts                        Boolean? // IELTS
+  cet6                         Boolean? // 大学英语六级
+  cet4                         Boolean? // 大学英语四级
+  ky                           Boolean? // 考研
+  createdAt                    DateTime                      @default(now()) // 创建时间
+  updatedAt                    DateTime                      @updatedAt // 更新时间
+  wordBookRecords              WordBookRecord[]
+  learningItemStates           LearningItemState[]
+  exerciseItemTargets          ExerciseItemTarget[]
+  knowledgeDocuments           KnowledgeDocument[]
+  pronunciationTargets         PronunciationTarget[]
+  pronunciationWordAssessments PronunciationWordAssessment[]
 
   @@index([word])
   @@index([tag])
@@ -435,18 +580,19 @@ model CourseRecord {
 }
 
 model Course {
-  id              String           @id @default(cuid()) // 课程ID
-  name            String // 课程名
-  value           String // 课程value
-  description     String? // 课程描述
-  teacher         String // 教师
-  url             String // 课程url
-  price           Decimal // 课程价格
-  createdAt       DateTime         @default(now()) // 创建时间
-  updatedAt       DateTime         @updatedAt // 更新时间
-  courseRecords   CourseRecord[]
-  learnerProfiles LearnerProfile[]
-  knowledgeDocuments KnowledgeDocument[]
+  id                   String                @id @default(cuid()) // 课程ID
+  name                 String // 课程名
+  value                String // 课程value
+  description          String? // 课程描述
+  teacher              String // 教师
+  url                  String // 课程url
+  price                Decimal // 课程价格
+  createdAt            DateTime              @default(now()) // 创建时间
+  updatedAt            DateTime              @updatedAt // 更新时间
+  courseRecords        CourseRecord[]
+  learnerProfiles      LearnerProfile[]
+  knowledgeDocuments   KnowledgeDocument[]
+  pronunciationTargets PronunciationTarget[]
 }
 
 model LearnerProfile {
@@ -467,25 +613,26 @@ model LearnerProfile {
 }
 
 model LearningItemState {
-  id              String                @id @default(cuid())
-  userId          String
-  targetType      LearningTargetType
-  targetKey       String                @db.VarChar(128)
-  wordId          String?
-  reviewState     LearningReviewState   @default(NEW)
-  repetitionCount Int                   @default(0)
-  easeFactor      Decimal               @default(2.5) @db.Decimal(4, 2)
-  intervalDays    Int                   @default(0)
-  dueAt           DateTime?
-  lastReviewedAt  DateTime?
-  lastQuality     Int?
-  lastAttemptId   String?
-  createdAt       DateTime              @default(now())
-  updatedAt       DateTime              @updatedAt
-  user            User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  word            WordBook?             @relation(fields: [wordId], references: [id], onDelete: Cascade)
-  lastAttempt     LearningAttempt?      @relation("LatestItemAttempt", fields: [lastAttemptId], references: [id], onDelete: SetNull)
-  reviewEvents    LearningReviewEvent[]
+  id                  String                            @id @default(cuid())
+  userId              String
+  targetType          LearningTargetType
+  targetKey           String                            @db.VarChar(128)
+  wordId              String?
+  reviewState         LearningReviewState               @default(NEW)
+  repetitionCount     Int                               @default(0)
+  easeFactor          Decimal                           @default(2.5) @db.Decimal(4, 2)
+  intervalDays        Int                               @default(0)
+  dueAt               DateTime?
+  lastReviewedAt      DateTime?
+  lastQuality         Int?
+  lastAttemptId       String?
+  createdAt           DateTime                          @default(now())
+  updatedAt           DateTime                          @updatedAt
+  user                User                              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  word                WordBook?                         @relation(fields: [wordId], references: [id], onDelete: Cascade)
+  lastAttempt         LearningAttempt?                  @relation("LatestItemAttempt", fields: [lastAttemptId], references: [id], onDelete: SetNull)
+  reviewEvents        LearningReviewEvent[]
+  recalculationEvents LearningStateRecalculationEvent[]
 
   @@unique([userId, targetType, targetKey])
   @@index([userId, targetType, dueAt])
@@ -493,20 +640,24 @@ model LearningItemState {
 }
 
 model LearningReviewEvent {
-  id            String             @id @default(cuid())
-  userId        String
-  itemStateId   String
-  attemptId     String
-  targetType    LearningTargetType
-  targetKey     String             @db.VarChar(128)
-  itemScore     Int
-  quality       Int
-  previousState Json
-  nextState     Json
-  createdAt     DateTime           @default(now())
-  user          User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-  itemState     LearningItemState  @relation(fields: [itemStateId], references: [id], onDelete: Cascade)
-  attempt       LearningAttempt    @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  id               String               @id @default(cuid())
+  userId           String
+  itemStateId      String
+  attemptId        String
+  targetType       LearningTargetType
+  targetKey        String               @db.VarChar(128)
+  itemScore        Int
+  quality          Int
+  previousState    Json
+  nextState        Json
+  evidenceKind     LearningEvidenceKind @default(EXERCISE_GRADING)
+  schedulerVersion String               @default("SM2_V1") @db.VarChar(64)
+  policyVersion    String               @default("coach-attempt.v1") @db.VarChar(64)
+  voidedAt         DateTime?
+  createdAt        DateTime             @default(now())
+  user             User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  itemState        LearningItemState    @relation(fields: [itemStateId], references: [id], onDelete: Cascade)
+  attempt          LearningAttempt      @relation(fields: [attemptId], references: [id], onDelete: Cascade)
 
   @@unique([attemptId, targetType, targetKey])
   @@index([userId, createdAt])
@@ -587,6 +738,7 @@ model CoachRequest {
   trace                    CoachTrace?
   feedback                 CoachFeedback[]
   knowledgeCitations       KnowledgeCitation[]
+  pronunciationTargets     PronunciationTarget[]
 
   @@unique([userId, clientRequestKey])
   @@index([conversationId, status, createdAt])
@@ -696,24 +848,330 @@ model ExerciseSubmissionItem {
 }
 
 model LearningAttempt {
-  id               String                @id @default(cuid())
-  userId           String
-  exerciseId       String
-  submissionId     String                @unique
-  saveRequestId    String                @unique
-  score            Int
-  errorTypes       Json
-  gradingHash      String                @db.VarChar(128)
-  savedAt          DateTime              @default(now())
-  user             User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  exercise         Exercise              @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
-  submission       ExerciseSubmission    @relation(fields: [submissionId], references: [id], onDelete: Cascade)
-  saveRequest      CoachRequest          @relation("AttemptSaveRequest", fields: [saveRequestId], references: [id], onDelete: Cascade)
-  reviewEvents     LearningReviewEvent[]
-  latestItemStates LearningItemState[]   @relation("LatestItemAttempt")
+  id                        String                   @id @default(cuid())
+  userId                    String
+  attemptType               LearningAttemptType      @default(EXERCISE)
+  exerciseId                String?
+  submissionId              String?                  @unique
+  saveRequestId             String?                  @unique
+  pronunciationAssessmentId String?                  @unique
+  score                     Int
+  errorTypes                Json
+  gradingHash               String?                  @db.VarChar(128)
+  evidenceHash              String?                  @db.VarChar(128)
+  policyVersion             String?                  @db.VarChar(64)
+  savedAt                   DateTime                 @default(now())
+  user                      User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  exercise                  Exercise?                @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+  submission                ExerciseSubmission?      @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  saveRequest               CoachRequest?            @relation("AttemptSaveRequest", fields: [saveRequestId], references: [id], onDelete: Cascade)
+  pronunciationAssessment   PronunciationAssessment? @relation(fields: [pronunciationAssessmentId], references: [id], onDelete: Cascade)
+  reviewEvents              LearningReviewEvent[]
+  latestItemStates          LearningItemState[]      @relation("LatestItemAttempt")
 
   @@unique([userId, exerciseId, submissionId])
   @@index([userId, savedAt])
+  @@index([userId, attemptType, savedAt])
+}
+
+model PronunciationAssessment {
+  id                      String                           @id @default(cuid())
+  userId                  String
+  clientIdempotencyKey    String                           @db.VarChar(128)
+  requestBodyHash         String                           @db.VarChar(128)
+  contentFingerprint      String?                          @db.VarChar(128)
+  retryOfAssessmentId     String?
+  status                  PronunciationAssessmentStatus    @default(CREATED)
+  exerciseType            PronunciationExerciseType
+  confidenceTier          PronunciationConfidenceTier?
+  recognizedText          String?                          @db.VarChar(500)
+  overallScore            Decimal?                         @db.Decimal(5, 2)
+  accuracyScore           Decimal?                         @db.Decimal(5, 2)
+  completenessScore       Decimal?                         @db.Decimal(5, 2)
+  fluencyScore            Decimal?                         @db.Decimal(5, 2)
+  prosodyScore            Decimal?                         @db.Decimal(5, 2)
+  confidence              Decimal?                         @db.Decimal(4, 3)
+  summary                 String?                          @db.VarChar(1000)
+  suggestions             Json?
+  nextAction              PronunciationNextAction?
+  resultSchemaVersion     String?                          @db.VarChar(64)
+  resultHash              String?                          @db.VarChar(128)
+  provider                String?                          @db.VarChar(64)
+  modelVersion            String?                          @db.VarChar(128)
+  providerAdapterVersion  String?                          @db.VarChar(64)
+  providerApiVersion      String?                          @db.VarChar(64)
+  assessmentRuleVersion   String?                          @db.VarChar(64)
+  normalizationVersion    String?                          @db.VarChar(64)
+  alignmentVersion        String?                          @db.VarChar(64)
+  confidencePolicyVersion String?                          @db.VarChar(64)
+  weaknessMappingVersion  String?                          @db.VarChar(64)
+  schedulerVersion        String?                          @db.VarChar(64)
+  budgetVersion           String?                          @db.VarChar(64)
+  priceVersion            String?                          @db.VarChar(64)
+  publicErrorCode         String?                          @db.VarChar(64)
+  learningWriteStatus     PronunciationLearningWriteStatus @default(NOT_ELIGIBLE)
+  deadlineAt              DateTime
+  cancelRequestedAt       DateTime?
+  queuedAt                DateTime?
+  startedAt               DateTime?
+  finishedAt              DateTime?
+  hiddenAt                DateTime?
+  deletedAt               DateTime?
+  createdAt               DateTime                         @default(now())
+  updatedAt               DateTime                         @updatedAt
+  user                    User                             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  retryOfAssessment       PronunciationAssessment?         @relation("PronunciationAssessmentRetries", fields: [retryOfAssessmentId], references: [id], onDelete: SetNull)
+  retries                 PronunciationAssessment[]        @relation("PronunciationAssessmentRetries")
+  target                  PronunciationTarget?
+  audioAsset              PronunciationAudioAsset?
+  words                   PronunciationWordAssessment[]
+  providerCalls           PronunciationProviderCall[]
+  trace                   PronunciationTrace?
+  learningAttempt         LearningAttempt?
+
+  @@unique([userId, clientIdempotencyKey])
+  @@index([userId, createdAt(sort: Desc), id(sort: Desc)])
+  @@index([status, deadlineAt])
+  @@index([retryOfAssessmentId])
+}
+
+model PronunciationTarget {
+  id                  String                    @id @default(cuid())
+  assessmentId        String                    @unique
+  userId              String
+  sourceType          PronunciationTargetSource
+  exerciseType        PronunciationExerciseType
+  languageTag         String                    @db.VarChar(16)
+  referenceText       String                    @db.VarChar(200)
+  normalizedTokens    Json
+  targetHash          String                    @db.VarChar(128)
+  wordId              String?
+  courseId            String?
+  knowledgeCitationId String?
+  coachRequestId      String?
+  exerciseId          String?
+  itemId              String?
+  sourceRecordType    String?                   @db.VarChar(64)
+  sourceRecordId      String?                   @db.VarChar(128)
+  sourceVersion       String?                   @db.VarChar(128)
+  sourceContentHash   String?                   @db.VarChar(128)
+  sourceRightsVersion String?                   @db.VarChar(128)
+  authorizedAt        DateTime
+  expiresAt           DateTime?
+  createdAt           DateTime                  @default(now())
+  assessment          PronunciationAssessment   @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  user                User                      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  word                WordBook?                 @relation(fields: [wordId], references: [id], onDelete: SetNull)
+  course              Course?                   @relation(fields: [courseId], references: [id], onDelete: SetNull)
+  knowledgeCitation   KnowledgeCitation?        @relation(fields: [knowledgeCitationId], references: [id], onDelete: SetNull)
+  coachRequest        CoachRequest?             @relation(fields: [coachRequestId], references: [id], onDelete: SetNull)
+
+  @@index([userId, sourceType])
+  @@index([wordId])
+  @@index([courseId])
+  @@index([knowledgeCitationId])
+  @@index([coachRequestId])
+}
+
+model PronunciationAudioAsset {
+  id                String                   @id @default(cuid())
+  assessmentId      String                   @unique
+  userId            String
+  objectKey         String                   @unique @db.VarChar(256)
+  declaredMediaType String                   @db.VarChar(128)
+  detectedMediaType String?                  @db.VarChar(128)
+  container         String?                  @db.VarChar(64)
+  codec             String?                  @db.VarChar(64)
+  byteSize          Int
+  durationMs        Int?
+  sampleRate        Int?
+  channelCount      Int?
+  sha256            String                   @db.VarChar(64)
+  qualityStatus     String?                  @db.VarChar(64)
+  status            PronunciationAudioStatus @default(UPLOADING)
+  expiresAt         DateTime
+  accessRevokedAt   DateTime?
+  purgedAt          DateTime?
+  createdAt         DateTime                 @default(now())
+  updatedAt         DateTime                 @updatedAt
+  assessment        PronunciationAssessment  @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  user              User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([status, expiresAt])
+  @@index([userId, createdAt])
+}
+
+model PronunciationWordAssessment {
+  id                     String                  @id @default(cuid())
+  assessmentId           String
+  sequence               Int
+  targetPosition         Int?
+  insertionAfterPosition Int?
+  word                   String                  @db.VarChar(100)
+  normalizedWord         String                  @db.VarChar(100)
+  startMs                Int?
+  endMs                  Int?
+  score                  Decimal?                @db.Decimal(5, 2)
+  status                 PronunciationWordStatus
+  feedback               String?                 @db.VarChar(500)
+  wordId                 String?
+  alignmentConfidence    Decimal?                @db.Decimal(4, 3)
+  alignmentReliable      Boolean                 @default(false)
+  quality                Int?
+  mappingVersion         String                  @db.VarChar(64)
+  createdAt              DateTime                @default(now())
+  assessment             PronunciationAssessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  wordRecord             WordBook?               @relation(fields: [wordId], references: [id], onDelete: SetNull)
+
+  @@unique([assessmentId, sequence])
+  @@index([assessmentId, targetPosition])
+  @@index([wordId])
+}
+
+model PronunciationProviderCall {
+  id                      String                             @id @default(cuid())
+  assessmentId            String
+  attemptNo               Int
+  provider                String                             @db.VarChar(64)
+  modelVersion            String                             @db.VarChar(128)
+  providerAdapterVersion  String                             @db.VarChar(64)
+  apiContractVersion      String                             @db.VarChar(64)
+  capabilityVersion       String                             @db.VarChar(64)
+  applicationConnectionId String                             @db.VarChar(128)
+  providerRequestId       String?                            @db.VarChar(256)
+  inputHash               String                             @db.VarChar(128)
+  status                  PronunciationProviderCallStatus    @default(STARTED)
+  providerAccepted        Boolean?
+  startedAt               DateTime
+  finishedAt              DateTime?
+  latencyMs               Int?
+  billableDurationMs      Int?
+  cost                    Decimal                            @default(0) @db.Decimal(18, 8)
+  currency                String                             @db.VarChar(8)
+  priceVersion            String                             @db.VarChar(128)
+  failureCode             String?                            @db.VarChar(64)
+  retryDecision           PronunciationProviderRetryDecision @default(NOT_NEEDED)
+  lateResultDiscardedAt   DateTime?
+  responseHash            String?                            @db.VarChar(128)
+  createdAt               DateTime                           @default(now())
+  updatedAt               DateTime                           @updatedAt
+  assessment              PronunciationAssessment            @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+
+  @@unique([assessmentId, attemptNo])
+  @@unique([provider, providerRequestId])
+  @@index([assessmentId, status])
+}
+
+model PronunciationTrace {
+  id                      String                           @id
+  assessmentId            String                           @unique
+  traceSubjectId          String                           @db.VarChar(128)
+  exerciseType            PronunciationExerciseType
+  targetWordCount         Int
+  targetCharacterCount    Int
+  audioMediaType          String?                          @db.VarChar(128)
+  audioByteSize           Int?
+  audioDurationMs         Int?
+  provider                String?                          @db.VarChar(64)
+  modelVersion            String?                          @db.VarChar(128)
+  uploadDurationMs        Int?
+  queueDurationMs         Int?
+  decodeDurationMs        Int?
+  providerDurationMs      Int?
+  totalDurationMs         Int?
+  terminalStatus          PronunciationAssessmentStatus?
+  confidence              Decimal?                         @db.Decimal(4, 3)
+  confidenceTier          PronunciationConfidenceTier?
+  retryCount              Int                              @default(0)
+  cancelled               Boolean                          @default(false)
+  timedOut                Boolean                          @default(false)
+  degraded                Boolean                          @default(false)
+  learningWriteStatus     PronunciationLearningWriteStatus @default(NOT_ELIGIBLE)
+  learningWriteCount      Int                              @default(0)
+  estimatedCost           Decimal                          @default(0) @db.Decimal(18, 8)
+  actualCost              Decimal                          @default(0) @db.Decimal(18, 8)
+  currency                String                           @db.VarChar(8)
+  resultSchemaVersion     String?                          @db.VarChar(64)
+  providerAdapterVersion  String?                          @db.VarChar(64)
+  providerApiVersion      String?                          @db.VarChar(64)
+  normalizationVersion    String?                          @db.VarChar(64)
+  alignmentVersion        String?                          @db.VarChar(64)
+  assessmentRuleVersion   String?                          @db.VarChar(64)
+  confidencePolicyVersion String?                          @db.VarChar(64)
+  learningMappingVersion  String?                          @db.VarChar(64)
+  schedulerVersion        String?                          @db.VarChar(64)
+  budgetVersion           String?                          @db.VarChar(64)
+  priceVersion            String?                          @db.VarChar(128)
+  createdAt               DateTime                         @default(now())
+  expiresAt               DateTime
+  assessment              PronunciationAssessment          @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  steps                   PronunciationTraceStep[]
+
+  @@index([traceSubjectId, createdAt])
+  @@index([expiresAt])
+}
+
+model PronunciationTraceStep {
+  id               String                       @id @default(cuid())
+  traceId          String
+  sequence         Int
+  stepName         PronunciationTraceStepName
+  status           PronunciationTraceStepStatus
+  durationMs       Int?
+  errorCode        String?                      @db.VarChar(64)
+  redactedMetadata Json?
+  createdAt        DateTime                     @default(now())
+  trace            PronunciationTrace           @relation(fields: [traceId], references: [id], onDelete: Cascade)
+
+  @@unique([traceId, sequence])
+}
+
+model PronunciationDeletionTombstone {
+  id                 String                            @id
+  subjectHash        String                            @db.VarChar(128)
+  resourceHash       String                            @db.VarChar(128)
+  scope              PronunciationDeletionScope
+  status             PronunciationDeletionStatus       @default(ACCEPTED)
+  idempotencyKeyHash String                            @db.VarChar(128)
+  requestedAt        DateTime
+  hiddenAt           DateTime
+  purgeDeadline      DateTime
+  completedAt        DateTime?
+  failureCode        String?                           @db.VarChar(64)
+  expiresAt          DateTime
+  claimedAt          DateTime?
+  createdAt          DateTime                          @default(now())
+  updatedAt          DateTime                          @updatedAt
+  recalculations     LearningStateRecalculationEvent[]
+
+  @@unique([subjectHash, scope, resourceHash])
+  @@unique([subjectHash, idempotencyKeyHash])
+  @@index([status, purgeDeadline])
+  @@index([expiresAt])
+}
+
+model LearningStateRecalculationEvent {
+  id                   String                           @id @default(cuid())
+  deletionId           String
+  itemStateId          String
+  sourceAttemptHash    String                           @db.VarChar(128)
+  previousState        Json
+  nextState            Json
+  schedulerVersion     String                           @db.VarChar(64)
+  policyVersion        String                           @db.VarChar(64)
+  recalculationVersion String                           @db.VarChar(64)
+  replayedEventCount   Int
+  status               LearningStateRecalculationStatus @default(PENDING)
+  startedAt            DateTime?
+  finishedAt           DateTime?
+  createdAt            DateTime                         @default(now())
+  updatedAt            DateTime                         @updatedAt
+  deletion             PronunciationDeletionTombstone   @relation(fields: [deletionId], references: [id], onDelete: Cascade)
+  itemState            LearningItemState                @relation(fields: [itemStateId], references: [id], onDelete: Cascade)
+
+  @@unique([deletionId, itemStateId])
+  @@index([itemStateId, createdAt])
+  @@index([status, createdAt])
 }
 
 model CoachTrace {
@@ -858,53 +1316,53 @@ model KnowledgeSourceFieldPolicy {
 }
 
 model KnowledgeRelease {
-  id                       String                 @id @default(cuid())
-  scopeKey                 String                 @db.VarChar(300)
-  contentVersion           String                 @db.VarChar(128)
-  rightsVersion            String                 @db.VarChar(128)
-  chunkingVersion          String                 @db.VarChar(128)
-  embeddingVersion         String                 @db.VarChar(256)
-  retrievalConfigVersion   String                 @db.VarChar(128)
-  indexVersion             String                 @db.VarChar(128)
-  expectedChunkCount       Int                    @default(0)
-  readyEmbeddingCount      Int                    @default(0)
-  status                   KnowledgeReleaseStatus @default(BUILDING)
-  activatedAt              DateTime?
-  invalidatedAt            DateTime?
-  createdAt                DateTime               @default(now())
-  updatedAt                DateTime               @updatedAt
-  documents                KnowledgeDocument[]
+  id                     String                 @id @default(cuid())
+  scopeKey               String                 @db.VarChar(300)
+  contentVersion         String                 @db.VarChar(128)
+  rightsVersion          String                 @db.VarChar(128)
+  chunkingVersion        String                 @db.VarChar(128)
+  embeddingVersion       String                 @db.VarChar(256)
+  retrievalConfigVersion String                 @db.VarChar(128)
+  indexVersion           String                 @db.VarChar(128)
+  expectedChunkCount     Int                    @default(0)
+  readyEmbeddingCount    Int                    @default(0)
+  status                 KnowledgeReleaseStatus @default(BUILDING)
+  activatedAt            DateTime?
+  invalidatedAt          DateTime?
+  createdAt              DateTime               @default(now())
+  updatedAt              DateTime               @updatedAt
+  documents              KnowledgeDocument[]
 
   @@unique([scopeKey, contentVersion, rightsVersion, chunkingVersion, embeddingVersion])
   @@index([status, embeddingVersion, retrievalConfigVersion])
 }
 
 model KnowledgeDocument {
-  id                  String                  @id @default(cuid())
-  knowledgeSourceId   String
-  releaseId           String
-  source              String                  @db.VarChar(128)
-  sourceId            String                  @db.VarChar(300)
-  sourceRecordType    String                  @db.VarChar(64)
-  sourceRecordId      String                  @db.VarChar(128)
-  title               String                  @db.VarChar(300)
-  contentVersion      String                  @db.VarChar(128)
-  visibility          String                  @db.VarChar(16)
-  accessScope         KnowledgeAccessScope
-  userId              String?
-  courseId            String?
-  wordId              String?
-  status              KnowledgeDocumentStatus @default(STAGED)
-  sourceUpdatedAt     DateTime
-  createdAt           DateTime                @default(now())
-  updatedAt           DateTime                @updatedAt
-  knowledgeSource     KnowledgeSource         @relation(fields: [knowledgeSourceId], references: [id], onDelete: Cascade)
-  release             KnowledgeRelease        @relation(fields: [releaseId], references: [id], onDelete: Cascade)
-  user                User?                   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  course              Course?                 @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  word                WordBook?               @relation(fields: [wordId], references: [id], onDelete: Cascade)
-  chunks              KnowledgeChunk[]
-  citations           KnowledgeCitation[]
+  id                String                  @id @default(cuid())
+  knowledgeSourceId String
+  releaseId         String
+  source            String                  @db.VarChar(128)
+  sourceId          String                  @db.VarChar(300)
+  sourceRecordType  String                  @db.VarChar(64)
+  sourceRecordId    String                  @db.VarChar(128)
+  title             String                  @db.VarChar(300)
+  contentVersion    String                  @db.VarChar(128)
+  visibility        String                  @db.VarChar(16)
+  accessScope       KnowledgeAccessScope
+  userId            String?
+  courseId          String?
+  wordId            String?
+  status            KnowledgeDocumentStatus @default(STAGED)
+  sourceUpdatedAt   DateTime
+  createdAt         DateTime                @default(now())
+  updatedAt         DateTime                @updatedAt
+  knowledgeSource   KnowledgeSource         @relation(fields: [knowledgeSourceId], references: [id], onDelete: Cascade)
+  release           KnowledgeRelease        @relation(fields: [releaseId], references: [id], onDelete: Cascade)
+  user              User?                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course            Course?                 @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  word              WordBook?               @relation(fields: [wordId], references: [id], onDelete: Cascade)
+  chunks            KnowledgeChunk[]
+  citations         KnowledgeCitation[]
 
   @@unique([knowledgeSourceId, sourceRecordType, sourceRecordId, contentVersion])
   @@index([status, accessScope, userId])
@@ -913,32 +1371,32 @@ model KnowledgeDocument {
 }
 
 model KnowledgeChunk {
-  id               String               @id @default(cuid())
-  documentId       String
-  chunkKey         String               @db.VarChar(200)
-  ordinal          Int
-  content          String
-  contentHash      String               @db.VarChar(128)
-  chunkingVersion  String               @db.VarChar(128)
-  source           String               @db.VarChar(128)
-  sourceId         String               @db.VarChar(300)
-  title            String               @db.VarChar(300)
-  category         KnowledgeCategory
-  level            CefrLevel?
-  courseId         String?
-  wordId           String?
-  userId           String?
-  visibility       String               @db.VarChar(16)
-  contentVersion   String               @db.VarChar(128)
-  factKey          String?              @db.VarChar(300)
-  factValueHash    String?              @db.VarChar(128)
-  authorityRank    Int?
-  status           KnowledgeChunkStatus @default(STAGED)
-  createdAt        DateTime             @default(now())
-  updatedAt        DateTime             @updatedAt
-  document         KnowledgeDocument    @relation(fields: [documentId], references: [id], onDelete: Cascade)
-  embeddings       KnowledgeEmbedding[]
-  citations        KnowledgeCitation[]
+  id              String               @id @default(cuid())
+  documentId      String
+  chunkKey        String               @db.VarChar(200)
+  ordinal         Int
+  content         String
+  contentHash     String               @db.VarChar(128)
+  chunkingVersion String               @db.VarChar(128)
+  source          String               @db.VarChar(128)
+  sourceId        String               @db.VarChar(300)
+  title           String               @db.VarChar(300)
+  category        KnowledgeCategory
+  level           CefrLevel?
+  courseId        String?
+  wordId          String?
+  userId          String?
+  visibility      String               @db.VarChar(16)
+  contentVersion  String               @db.VarChar(128)
+  factKey         String?              @db.VarChar(300)
+  factValueHash   String?              @db.VarChar(128)
+  authorityRank   Int?
+  status          KnowledgeChunkStatus @default(STAGED)
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
+  document        KnowledgeDocument    @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  embeddings      KnowledgeEmbedding[]
+  citations       KnowledgeCitation[]
 
   @@unique([documentId, chunkingVersion, chunkKey, contentHash])
   @@index([documentId, status])
@@ -969,65 +1427,66 @@ model KnowledgeEmbedding {
 }
 
 model KnowledgeIngestionJob {
-  id                  String                      @id @default(cuid())
-  operation           KnowledgeIngestionOperation
-  knowledgeSourceId   String
-  sourceRecordType    String                      @db.VarChar(64)
-  sourceRecordId      String                      @db.VarChar(128)
-  contentVersion      String?                     @db.VarChar(128)
-  pipelineVersion     String                      @db.VarChar(256)
-  ownerUserId         String?
-  status              KnowledgeIngestionStatus    @default(PENDING)
-  attemptCount        Int                         @default(0)
-  nextAttemptAt       DateTime?
-  claimedAt           DateTime?
-  finishedAt          DateTime?
-  failureCode         String?                     @db.VarChar(64)
-  createdAt           DateTime                    @default(now())
-  updatedAt           DateTime                    @updatedAt
-  knowledgeSource     KnowledgeSource             @relation(fields: [knowledgeSourceId], references: [id], onDelete: Cascade)
+  id                String                      @id @default(cuid())
+  operation         KnowledgeIngestionOperation
+  knowledgeSourceId String
+  sourceRecordType  String                      @db.VarChar(64)
+  sourceRecordId    String                      @db.VarChar(128)
+  contentVersion    String?                     @db.VarChar(128)
+  pipelineVersion   String                      @db.VarChar(256)
+  ownerUserId       String?
+  status            KnowledgeIngestionStatus    @default(PENDING)
+  attemptCount      Int                         @default(0)
+  nextAttemptAt     DateTime?
+  claimedAt         DateTime?
+  finishedAt        DateTime?
+  failureCode       String?                     @db.VarChar(64)
+  createdAt         DateTime                    @default(now())
+  updatedAt         DateTime                    @updatedAt
+  knowledgeSource   KnowledgeSource             @relation(fields: [knowledgeSourceId], references: [id], onDelete: Cascade)
 
   @@unique([operation, sourceRecordType, sourceRecordId, contentVersion, pipelineVersion])
   @@index([status, nextAttemptAt, createdAt])
 }
 
 model PrivateLearningSummary {
-  id              String                            @id @default(cuid())
+  id              String                          @id @default(cuid())
   userId          String
   topicType       PrivateLearningSummaryTopicType
-  topicKey        String                            @db.VarChar(128)
+  topicKey        String                          @db.VarChar(128)
   windowStart     DateTime
   windowEnd       DateTime
   summaryFacts    Json
-  evidenceVersion String                            @db.VarChar(128)
-  status          PrivateLearningSummaryStatus      @default(ACTIVE)
-  createdAt       DateTime                          @default(now())
-  updatedAt       DateTime                          @updatedAt
-  user            User                              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  evidenceVersion String                          @db.VarChar(128)
+  status          PrivateLearningSummaryStatus    @default(ACTIVE)
+  createdAt       DateTime                        @default(now())
+  updatedAt       DateTime                        @updatedAt
+  user            User                            @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, topicType, topicKey, status])
 }
 
 model KnowledgeCitation {
-  id                String                  @id @db.VarChar(64)
-  requestId         String
-  chunkId           String?
-  documentId        String?
-  sourceId          String?                 @db.VarChar(300)
-  sourceIdHash      String                  @db.VarChar(128)
-  contentVersion    String                  @db.VarChar(128)
-  embeddingVersion  String                  @db.VarChar(256)
-  excerpt           String?                 @db.VarChar(2000)
-  excerptHash       String                  @db.VarChar(128)
-  rank              Int
-  relevanceScore    Decimal                 @db.Decimal(8, 7)
-  status            KnowledgeCitationStatus @default(ACTIVE)
-  invalidatedAt     DateTime?
-  createdAt         DateTime                @default(now())
-  updatedAt         DateTime                @updatedAt
-  request           CoachRequest            @relation(fields: [requestId], references: [id], onDelete: Cascade)
-  chunk             KnowledgeChunk?         @relation(fields: [chunkId], references: [id], onDelete: SetNull)
-  document          KnowledgeDocument?      @relation(fields: [documentId], references: [id], onDelete: SetNull)
+  id                   String                  @id @db.VarChar(64)
+  requestId            String
+  chunkId              String?
+  documentId           String?
+  sourceId             String?                 @db.VarChar(300)
+  sourceIdHash         String                  @db.VarChar(128)
+  contentVersion       String                  @db.VarChar(128)
+  embeddingVersion     String                  @db.VarChar(256)
+  excerpt              String?                 @db.VarChar(2000)
+  excerptHash          String                  @db.VarChar(128)
+  rank                 Int
+  relevanceScore       Decimal                 @db.Decimal(8, 7)
+  status               KnowledgeCitationStatus @default(ACTIVE)
+  invalidatedAt        DateTime?
+  createdAt            DateTime                @default(now())
+  updatedAt            DateTime                @updatedAt
+  request              CoachRequest            @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  chunk                KnowledgeChunk?         @relation(fields: [chunkId], references: [id], onDelete: SetNull)
+  document             KnowledgeDocument?      @relation(fields: [documentId], references: [id], onDelete: SetNull)
+  pronunciationTargets PronunciationTarget[]
 
   @@unique([requestId, chunkId, contentVersion])
   @@index([requestId, status])

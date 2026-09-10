@@ -21,6 +21,7 @@ import { GetDueWordsTool } from '../tools/get-due-words.tool';
 import { GetLearnerProfileTool } from '../tools/get-learner-profile.tool';
 import { GradeAnswerTool } from '../tools/grade-answer.tool';
 import { SaveAttemptTool } from '../tools/save-attempt.tool';
+import { GetPronunciationSummaryTool } from '../tools/get-pronunciation-summary.tool';
 import { SearchLearningMaterialsTool } from '../tools/search-learning-materials.tool';
 import type { CoachTraceService } from '../observability/coach-trace.service';
 import { createRagDiagnosticHash } from '../observability/coach-redaction';
@@ -214,6 +215,7 @@ export class CoachRuntimeWorkflowService implements CoachRuntimeWorkflow {
     private readonly grading: GradeAnswerTool,
     private readonly attempts: SaveAttemptTool,
     private readonly now: () => Date = () => new Date(),
+    private readonly pronunciationSummary?: GetPronunciationSummaryTool,
   ) {}
 
   metadata() {
@@ -653,6 +655,12 @@ export class CoachRuntimeWorkflowService implements CoachRuntimeWorkflow {
     runner: CoachControlledStepRunner,
     budget: CoachBudgetService,
   ) {
+    if (
+      input.request.inputPayload.type === 'RECOMMENDATION' &&
+      input.request.inputPayload.assessmentId
+    ) {
+      return this.runPronunciationRecommendation(input, runner, budget);
+    }
     const profile = await this.loadProfile(input, runner, budget);
     const due = await this.loadDueWords(input, runner, budget, profile);
     const decision = decideNextAction({
@@ -678,6 +686,95 @@ export class CoachRuntimeWorkflowService implements CoachRuntimeWorkflow {
         supports: word.citation.supports,
       })),
       nextActionReason: deterministicNextActionReason(decision),
+      traceId: `trace_${input.request.id}`,
+    });
+    return { intent: 'REVIEW_RECOMMENDATION' as const, result };
+  }
+
+  private async runPronunciationRecommendation(
+    input: RuntimeInput,
+    runner: CoachControlledStepRunner,
+    budget: CoachBudgetService,
+  ) {
+    const payload = input.request.inputPayload;
+    if (payload.type !== 'RECOMMENDATION' || !payload.assessmentId) {
+      return this.degraded('REVIEW_RECOMMENDATION', input);
+    }
+    this.assertToolBudget(input, budget, 'get_pronunciation_summary');
+    const output = await this.tracedStep(input, 'recommend', async () => {
+      const result = await runner.execute({
+        requestId: input.request.id,
+        status: 'recommending',
+        timeoutMs: Math.max(
+          1,
+          input.request.deadlineAt.getTime() - this.now().getTime(),
+        ),
+        operation: () =>
+          this.pronunciationSummary
+            ? this.pronunciationSummary.execute(input.context, {
+                schemaVersion: COACH_TOOL_SCHEMA_VERSION,
+                assessmentId: payload.assessmentId,
+              })
+            : Promise.resolve({
+                schemaVersion: COACH_TOOL_SCHEMA_VERSION,
+                ok: false as const,
+                code: 'DATA_NOT_AVAILABLE' as const,
+                message: '发音评测摘要暂不可用',
+                retryable: false,
+              }),
+        onSuccess: () => undefined,
+      });
+      budget.record({
+        inputTokens: 0,
+        outputTokens: 0,
+        modelCalls: 0,
+        toolCalls: 1,
+        costMicros: 0,
+      });
+      return result;
+    });
+
+    const available = output.ok;
+    const summary = available
+      ? this.model.validatePronunciationSummaryContext(
+          (({ schemaVersion: _schema, ok: _ok, ...facts }) => facts)(output),
+        )
+      : null;
+    const nextAction =
+      summary?.nextAction === 'review'
+        ? 'review'
+        : summary?.nextAction === 'continue'
+          ? 'continue'
+          : 'practice';
+    const decision: NextActionDecision = {
+      nextAction,
+      evidenceCodes: [
+        nextAction === 'continue'
+          ? 'NO_LOW_QUALITY_OR_DUE_ITEMS'
+          : nextAction === 'review'
+            ? 'DUE_ITEMS_AVAILABLE'
+            : 'CURRENT_QUALITY_BELOW_FOUR',
+      ],
+    };
+    this.recordRecommendation(input.trace, decision, 'not_saved');
+    const explanation = summary
+      ? summary.recommendationReason
+      : '本次评测摘要当前不可用，请返回评测页确认状态或重新评测。';
+    const result = coachResultSchema.parse({
+      schemaVersion: COACH_RESULT_SCHEMA_VERSION,
+      responseType: 'recommendation',
+      correction: '',
+      explanation,
+      examples: summary?.weakWords.slice(0, 3).map((word) =>
+        word.status === 'omitted'
+          ? `重新朗读并完整读出 “${word.word}”。`
+          : `放慢速度练习 “${word.word}”，再进行一次完整朗读。`,
+      ) ?? [],
+      errorTypes: [],
+      score: null,
+      nextAction,
+      citations: [],
+      nextActionReason: explanation,
       traceId: `trace_${input.request.id}`,
     });
     return { intent: 'REVIEW_RECOMMENDATION' as const, result };

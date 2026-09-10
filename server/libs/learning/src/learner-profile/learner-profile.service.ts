@@ -77,7 +77,12 @@ export class PrismaLearnerProfileRepository implements LearnerProfileRepository 
       this.prisma.wordBookRecord.count({
         where: { userId: subjectId, isMaster: true },
       }),
-      this.prisma.learningItemState.count({ where: { userId: subjectId } }),
+      this.prisma.learningItemState.count({
+        where: {
+          userId: subjectId,
+          targetType: { in: ['WORD', 'ERROR_TYPE'] },
+        },
+      }),
       this.prisma.learningItemState.findMany({
         where: { userId: subjectId, targetType: 'WORD', wordId: { not: null } },
         take: limit,
@@ -87,6 +92,7 @@ export class PrismaLearnerProfileRepository implements LearnerProfileRepository 
       this.prisma.learningItemState.findMany({
         where: {
           userId: subjectId,
+          targetType: { in: ['WORD', 'ERROR_TYPE'] },
           reviewState: { in: ['LEARNING', 'REVIEW', 'MASTERED'] },
           OR: [{ lastQuality: { lt: 3 } }, { dueAt: { lte: new Date() } }],
         },
@@ -104,7 +110,11 @@ export class PrismaLearnerProfileRepository implements LearnerProfileRepository 
         orderBy: [{ lastReviewedAt: 'desc' }, { targetKey: 'asc' }],
       }),
       this.prisma.learningAttempt.aggregate({
-        where: { userId: subjectId, savedAt: { gte: windowStart } },
+        where: {
+          userId: subjectId,
+          attemptType: 'EXERCISE',
+          savedAt: { gte: windowStart },
+        },
         _count: { id: true },
         _avg: { score: true },
       }),
@@ -120,7 +130,10 @@ export class PrismaLearnerProfileRepository implements LearnerProfileRepository 
           state: state.reviewState as 'LEARNING' | 'REVIEW' | 'MASTERED',
         })),
       weakItems: weakStates.map((state) => ({
-        targetType: state.targetType,
+        targetType:
+          state.targetType === 'WORD'
+            ? ('WORD' as const)
+            : ('ERROR_TYPE' as const),
         targetKey: state.targetKey,
         label: state.word?.word ?? state.targetKey,
         reviewState: state.reviewState as 'LEARNING' | 'REVIEW' | 'MASTERED',

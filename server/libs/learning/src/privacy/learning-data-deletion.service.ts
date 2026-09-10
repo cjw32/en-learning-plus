@@ -7,16 +7,37 @@ export interface LearningDataDeletionRepository {
   purgeOwnedData(subjectId: string): Promise<void>;
 }
 
+export interface PronunciationAccountDataCleanup {
+  revokeAudioAccess(subjectId: string): Promise<void>;
+  purgeCaches(subjectId: string): Promise<void>;
+  revokeTemporaryLinks(subjectId: string): Promise<void>;
+  unlinkTraceSubject(subjectId: string): Promise<void>;
+  purgeAudioObjects(subjectId: string): Promise<void>;
+}
+
 @Injectable()
 export class LearningDataDeletionService {
-  constructor(private readonly repository: LearningDataDeletionRepository) {}
+  constructor(
+    private readonly repository: LearningDataDeletionRepository,
+    private pronunciation?: PronunciationAccountDataCleanup,
+  ) {}
 
-  hideImmediately(subjectId: string, requestedAt: Date): Promise<void> {
-    return this.repository.hideImmediately(subjectId, requestedAt);
+  configurePronunciationCleanup(cleanup: PronunciationAccountDataCleanup): void {
+    this.pronunciation = cleanup;
   }
 
-  purgeOwnedData(subjectId: string): Promise<void> {
-    return this.repository.purgeOwnedData(subjectId);
+  async hideImmediately(subjectId: string, requestedAt: Date): Promise<void> {
+    await this.repository.hideImmediately(subjectId, requestedAt);
+    if (!this.pronunciation) return;
+    await this.pronunciation.revokeAudioAccess(subjectId);
+    await this.pronunciation.purgeCaches(subjectId);
+    await this.pronunciation.revokeTemporaryLinks(subjectId);
+    await this.pronunciation.unlinkTraceSubject(subjectId);
+  }
+
+  async purgeOwnedData(subjectId: string): Promise<void> {
+    await this.pronunciation?.purgeAudioObjects(subjectId);
+    await this.repository.purgeOwnedData(subjectId);
   }
 }
 
@@ -130,6 +151,18 @@ export class PrismaLearningDataDeletionRepository implements LearningDataDeletio
         where: { userId: subjectId, status: 'ACTIVE' },
         data: { status: 'DELETING', deletedAt: requestedAt },
       });
+      await database.pronunciationAssessment.updateMany({
+        where: { userId: subjectId, hiddenAt: null },
+        data: {
+          status: 'DELETING',
+          hiddenAt: requestedAt,
+          cancelRequestedAt: requestedAt,
+        },
+      });
+      await database.pronunciationAudioAsset.updateMany({
+        where: { userId: subjectId, accessRevokedAt: null },
+        data: { status: 'REVOKED', accessRevokedAt: requestedAt },
+      });
     });
   }
 
@@ -181,6 +214,12 @@ export class PrismaLearningDataDeletionRepository implements LearningDataDeletio
         where: { userId: subjectId },
       });
       await database.learningItemState.deleteMany({
+        where: { userId: subjectId },
+      });
+      await database.pronunciationTrace.deleteMany({
+        where: { assessment: { userId: subjectId } },
+      });
+      await database.pronunciationAssessment.deleteMany({
         where: { userId: subjectId },
       });
       await database.learnerProfile.deleteMany({

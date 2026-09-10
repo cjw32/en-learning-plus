@@ -316,6 +316,9 @@ export type UserWhereInput = {
   traceSubjectMapping?: Prisma.XOR<Prisma.TraceSubjectMappingNullableScalarRelationFilter, Prisma.TraceSubjectMappingWhereInput> | null
   knowledgeDocuments?: Prisma.KnowledgeDocumentListRelationFilter
   privateLearningSummaries?: Prisma.PrivateLearningSummaryListRelationFilter
+  pronunciationAssessments?: Prisma.PronunciationAssessmentListRelationFilter
+  pronunciationTargets?: Prisma.PronunciationTargetListRelationFilter
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -350,6 +353,9 @@ export type UserOrderByWithRelationInput = {
   traceSubjectMapping?: Prisma.TraceSubjectMappingOrderByWithRelationInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentOrderByRelationAggregateInput
   privateLearningSummaries?: Prisma.PrivateLearningSummaryOrderByRelationAggregateInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentOrderByRelationAggregateInput
+  pronunciationTargets?: Prisma.PronunciationTargetOrderByRelationAggregateInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -387,6 +393,9 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   traceSubjectMapping?: Prisma.XOR<Prisma.TraceSubjectMappingNullableScalarRelationFilter, Prisma.TraceSubjectMappingWhereInput> | null
   knowledgeDocuments?: Prisma.KnowledgeDocumentListRelationFilter
   privateLearningSummaries?: Prisma.PrivateLearningSummaryListRelationFilter
+  pronunciationAssessments?: Prisma.PronunciationAssessmentListRelationFilter
+  pronunciationTargets?: Prisma.PronunciationTargetListRelationFilter
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetListRelationFilter
 }, "id" | "email" | "phone">
 
 export type UserOrderByWithAggregationInput = {
@@ -465,6 +474,9 @@ export type UserCreateInput = {
   traceSubjectMapping?: Prisma.TraceSubjectMappingCreateNestedOneWithoutUserInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentCreateNestedManyWithoutUserInput
   privateLearningSummaries?: Prisma.PrivateLearningSummaryCreateNestedManyWithoutUserInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentCreateNestedManyWithoutUserInput
+  pronunciationTargets?: Prisma.PronunciationTargetCreateNestedManyWithoutUserInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -499,6 +511,9 @@ export type UserUncheckedCreateInput = {
   traceSubjectMapping?: Prisma.TraceSubjectMappingUncheckedCreateNestedOneWithoutUserInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentUncheckedCreateNestedManyWithoutUserInput
   privateLearningSummaries?: Prisma.PrivateLearningSummaryUncheckedCreateNestedManyWithoutUserInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentUncheckedCreateNestedManyWithoutUserInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedCreateNestedManyWithoutUserInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -533,6 +548,9 @@ export type UserUpdateInput = {
   traceSubjectMapping?: Prisma.TraceSubjectMappingUpdateOneWithoutUserNestedInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentUpdateManyWithoutUserNestedInput
   privateLearningSummaries?: Prisma.PrivateLearningSummaryUpdateManyWithoutUserNestedInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentUpdateManyWithoutUserNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUpdateManyWithoutUserNestedInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -567,6 +585,9 @@ export type UserUncheckedUpdateInput = {
   traceSubjectMapping?: Prisma.TraceSubjectMappingUncheckedUpdateOneWithoutUserNestedInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentUncheckedUpdateManyWithoutUserNestedInput
   privateLearningSummaries?: Prisma.PrivateLearningSummaryUncheckedUpdateManyWithoutUserNestedInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentUncheckedUpdateManyWithoutUserNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedUpdateManyWithoutUserNestedInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -879,6 +900,48 @@ export type UserUpdateOneRequiredWithoutLearningAttemptsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutLearningAttemptsInput, Prisma.UserUpdateWithoutLearningAttemptsInput>, Prisma.UserUncheckedUpdateWithoutLearningAttemptsInput>
 }
 
+export type UserCreateNestedOneWithoutPronunciationAssessmentsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutPronunciationAssessmentsInput, Prisma.UserUncheckedCreateWithoutPronunciationAssessmentsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPronunciationAssessmentsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutPronunciationAssessmentsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutPronunciationAssessmentsInput, Prisma.UserUncheckedCreateWithoutPronunciationAssessmentsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPronunciationAssessmentsInput
+  upsert?: Prisma.UserUpsertWithoutPronunciationAssessmentsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutPronunciationAssessmentsInput, Prisma.UserUpdateWithoutPronunciationAssessmentsInput>, Prisma.UserUncheckedUpdateWithoutPronunciationAssessmentsInput>
+}
+
+export type UserCreateNestedOneWithoutPronunciationTargetsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutPronunciationTargetsInput, Prisma.UserUncheckedCreateWithoutPronunciationTargetsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPronunciationTargetsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutPronunciationTargetsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutPronunciationTargetsInput, Prisma.UserUncheckedCreateWithoutPronunciationTargetsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPronunciationTargetsInput
+  upsert?: Prisma.UserUpsertWithoutPronunciationTargetsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutPronunciationTargetsInput, Prisma.UserUpdateWithoutPronunciationTargetsInput>, Prisma.UserUncheckedUpdateWithoutPronunciationTargetsInput>
+}
+
+export type UserCreateNestedOneWithoutPronunciationAudioAssetsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutPronunciationAudioAssetsInput, Prisma.UserUncheckedCreateWithoutPronunciationAudioAssetsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPronunciationAudioAssetsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutPronunciationAudioAssetsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutPronunciationAudioAssetsInput, Prisma.UserUncheckedCreateWithoutPronunciationAudioAssetsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPronunciationAudioAssetsInput
+  upsert?: Prisma.UserUpsertWithoutPronunciationAudioAssetsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutPronunciationAudioAssetsInput, Prisma.UserUpdateWithoutPronunciationAudioAssetsInput>, Prisma.UserUncheckedUpdateWithoutPronunciationAudioAssetsInput>
+}
+
 export type UserCreateNestedOneWithoutCoachFeedbackInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutCoachFeedbackInput, Prisma.UserUncheckedCreateWithoutCoachFeedbackInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutCoachFeedbackInput
@@ -984,6 +1047,9 @@ export type UserCreateWithoutWordBookRecordsInput = {
   traceSubjectMapping?: Prisma.TraceSubjectMappingCreateNestedOneWithoutUserInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentCreateNestedManyWithoutUserInput
   privateLearningSummaries?: Prisma.PrivateLearningSummaryCreateNestedManyWithoutUserInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentCreateNestedManyWithoutUserInput
+  pronunciationTargets?: Prisma.PronunciationTargetCreateNestedManyWithoutUserInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutWordBookRecordsInput = {
@@ -1017,6 +1083,9 @@ export type UserUncheckedCreateWithoutWordBookRecordsInput = {
   traceSubjectMapping?: Prisma.TraceSubjectMappingUncheckedCreateNestedOneWithoutUserInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentUncheckedCreateNestedManyWithoutUserInput
   privateLearningSummaries?: Prisma.PrivateLearningSummaryUncheckedCreateNestedManyWithoutUserInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentUncheckedCreateNestedManyWithoutUserInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedCreateNestedManyWithoutUserInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutWordBookRecordsInput = {
@@ -1066,6 +1135,9 @@ export type UserUpdateWithoutWordBookRecordsInput = {
   traceSubjectMapping?: Prisma.TraceSubjectMappingUpdateOneWithoutUserNestedInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentUpdateManyWithoutUserNestedInput
   privateLearningSummaries?: Prisma.PrivateLearningSummaryUpdateManyWithoutUserNestedInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentUpdateManyWithoutUserNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUpdateManyWithoutUserNestedInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutWordBookRecordsInput = {
@@ -1099,6 +1171,9 @@ export type UserUncheckedUpdateWithoutWordBookRecordsInput = {
   traceSubjectMapping?: Prisma.TraceSubjectMappingUncheckedUpdateOneWithoutUserNestedInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentUncheckedUpdateManyWithoutUserNestedInput
   privateLearningSummaries?: Prisma.PrivateLearningSummaryUncheckedUpdateManyWithoutUserNestedInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentUncheckedUpdateManyWithoutUserNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedUpdateManyWithoutUserNestedInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutPaymentRecordsInput = {
@@ -1132,6 +1207,9 @@ export type UserCreateWithoutPaymentRecordsInput = {
   traceSubjectMapping?: Prisma.TraceSubjectMappingCreateNestedOneWithoutUserInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentCreateNestedManyWithoutUserInput
   privateLearningSummaries?: Prisma.PrivateLearningSummaryCreateNestedManyWithoutUserInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentCreateNestedManyWithoutUserInput
+  pronunciationTargets?: Prisma.PronunciationTargetCreateNestedManyWithoutUserInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutPaymentRecordsInput = {
@@ -1165,6 +1243,9 @@ export type UserUncheckedCreateWithoutPaymentRecordsInput = {
   traceSubjectMapping?: Prisma.TraceSubjectMappingUncheckedCreateNestedOneWithoutUserInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentUncheckedCreateNestedManyWithoutUserInput
   privateLearningSummaries?: Prisma.PrivateLearningSummaryUncheckedCreateNestedManyWithoutUserInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentUncheckedCreateNestedManyWithoutUserInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedCreateNestedManyWithoutUserInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutPaymentRecordsInput = {
@@ -1214,6 +1295,9 @@ export type UserUpdateWithoutPaymentRecordsInput = {
   traceSubjectMapping?: Prisma.TraceSubjectMappingUpdateOneWithoutUserNestedInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentUpdateManyWithoutUserNestedInput
   privateLearningSummaries?: Prisma.PrivateLearningSummaryUpdateManyWithoutUserNestedInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentUpdateManyWithoutUserNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUpdateManyWithoutUserNestedInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPaymentRecordsInput = {
@@ -1247,6 +1331,9 @@ export type UserUncheckedUpdateWithoutPaymentRecordsInput = {
   traceSubjectMapping?: Prisma.TraceSubjectMappingUncheckedUpdateOneWithoutUserNestedInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentUncheckedUpdateManyWithoutUserNestedInput
   privateLearningSummaries?: Prisma.PrivateLearningSummaryUncheckedUpdateManyWithoutUserNestedInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentUncheckedUpdateManyWithoutUserNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedUpdateManyWithoutUserNestedInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutCourseRecordsInput = {
@@ -1280,6 +1367,9 @@ export type UserCreateWithoutCourseRecordsInput = {
   traceSubjectMapping?: Prisma.TraceSubjectMappingCreateNestedOneWithoutUserInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentCreateNestedManyWithoutUserInput
   privateLearningSummaries?: Prisma.PrivateLearningSummaryCreateNestedManyWithoutUserInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentCreateNestedManyWithoutUserInput
+  pronunciationTargets?: Prisma.PronunciationTargetCreateNestedManyWithoutUserInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutCourseRecordsInput = {
@@ -1313,6 +1403,9 @@ export type UserUncheckedCreateWithoutCourseRecordsInput = {
   traceSubjectMapping?: Prisma.TraceSubjectMappingUncheckedCreateNestedOneWithoutUserInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentUncheckedCreateNestedManyWithoutUserInput
   privateLearningSummaries?: Prisma.PrivateLearningSummaryUncheckedCreateNestedManyWithoutUserInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentUncheckedCreateNestedManyWithoutUserInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedCreateNestedManyWithoutUserInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutCourseRecordsInput = {
@@ -1362,6 +1455,9 @@ export type UserUpdateWithoutCourseRecordsInput = {
   traceSubjectMapping?: Prisma.TraceSubjectMappingUpdateOneWithoutUserNestedInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentUpdateManyWithoutUserNestedInput
   privateLearningSummaries?: Prisma.PrivateLearningSummaryUpdateManyWithoutUserNestedInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentUpdateManyWithoutUserNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUpdateManyWithoutUserNestedInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCourseRecordsInput = {
@@ -1395,6 +1491,9 @@ export type UserUncheckedUpdateWithoutCourseRecordsInput = {
   traceSubjectMapping?: Prisma.TraceSubjectMappingUncheckedUpdateOneWithoutUserNestedInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentUncheckedUpdateManyWithoutUserNestedInput
   privateLearningSummaries?: Prisma.PrivateLearningSummaryUncheckedUpdateManyWithoutUserNestedInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentUncheckedUpdateManyWithoutUserNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedUpdateManyWithoutUserNestedInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutLearnerProfileInput = {
@@ -1428,6 +1527,9 @@ export type UserCreateWithoutLearnerProfileInput = {
   traceSubjectMapping?: Prisma.TraceSubjectMappingCreateNestedOneWithoutUserInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentCreateNestedManyWithoutUserInput
   privateLearningSummaries?: Prisma.PrivateLearningSummaryCreateNestedManyWithoutUserInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentCreateNestedManyWithoutUserInput
+  pronunciationTargets?: Prisma.PronunciationTargetCreateNestedManyWithoutUserInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutLearnerProfileInput = {
@@ -1461,6 +1563,9 @@ export type UserUncheckedCreateWithoutLearnerProfileInput = {
   traceSubjectMapping?: Prisma.TraceSubjectMappingUncheckedCreateNestedOneWithoutUserInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentUncheckedCreateNestedManyWithoutUserInput
   privateLearningSummaries?: Prisma.PrivateLearningSummaryUncheckedCreateNestedManyWithoutUserInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentUncheckedCreateNestedManyWithoutUserInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedCreateNestedManyWithoutUserInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutLearnerProfileInput = {
@@ -1510,6 +1615,9 @@ export type UserUpdateWithoutLearnerProfileInput = {
   traceSubjectMapping?: Prisma.TraceSubjectMappingUpdateOneWithoutUserNestedInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentUpdateManyWithoutUserNestedInput
   privateLearningSummaries?: Prisma.PrivateLearningSummaryUpdateManyWithoutUserNestedInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentUpdateManyWithoutUserNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUpdateManyWithoutUserNestedInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutLearnerProfileInput = {
@@ -1543,6 +1651,9 @@ export type UserUncheckedUpdateWithoutLearnerProfileInput = {
   traceSubjectMapping?: Prisma.TraceSubjectMappingUncheckedUpdateOneWithoutUserNestedInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentUncheckedUpdateManyWithoutUserNestedInput
   privateLearningSummaries?: Prisma.PrivateLearningSummaryUncheckedUpdateManyWithoutUserNestedInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentUncheckedUpdateManyWithoutUserNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedUpdateManyWithoutUserNestedInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutLearningItemStatesInput = {
@@ -1576,6 +1687,9 @@ export type UserCreateWithoutLearningItemStatesInput = {
   traceSubjectMapping?: Prisma.TraceSubjectMappingCreateNestedOneWithoutUserInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentCreateNestedManyWithoutUserInput
   privateLearningSummaries?: Prisma.PrivateLearningSummaryCreateNestedManyWithoutUserInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentCreateNestedManyWithoutUserInput
+  pronunciationTargets?: Prisma.PronunciationTargetCreateNestedManyWithoutUserInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutLearningItemStatesInput = {
@@ -1609,6 +1723,9 @@ export type UserUncheckedCreateWithoutLearningItemStatesInput = {
   traceSubjectMapping?: Prisma.TraceSubjectMappingUncheckedCreateNestedOneWithoutUserInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentUncheckedCreateNestedManyWithoutUserInput
   privateLearningSummaries?: Prisma.PrivateLearningSummaryUncheckedCreateNestedManyWithoutUserInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentUncheckedCreateNestedManyWithoutUserInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedCreateNestedManyWithoutUserInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutLearningItemStatesInput = {
@@ -1658,6 +1775,9 @@ export type UserUpdateWithoutLearningItemStatesInput = {
   traceSubjectMapping?: Prisma.TraceSubjectMappingUpdateOneWithoutUserNestedInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentUpdateManyWithoutUserNestedInput
   privateLearningSummaries?: Prisma.PrivateLearningSummaryUpdateManyWithoutUserNestedInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentUpdateManyWithoutUserNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUpdateManyWithoutUserNestedInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutLearningItemStatesInput = {
@@ -1691,6 +1811,9 @@ export type UserUncheckedUpdateWithoutLearningItemStatesInput = {
   traceSubjectMapping?: Prisma.TraceSubjectMappingUncheckedUpdateOneWithoutUserNestedInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentUncheckedUpdateManyWithoutUserNestedInput
   privateLearningSummaries?: Prisma.PrivateLearningSummaryUncheckedUpdateManyWithoutUserNestedInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentUncheckedUpdateManyWithoutUserNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedUpdateManyWithoutUserNestedInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutLearningReviewEventsInput = {
@@ -1724,6 +1847,9 @@ export type UserCreateWithoutLearningReviewEventsInput = {
   traceSubjectMapping?: Prisma.TraceSubjectMappingCreateNestedOneWithoutUserInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentCreateNestedManyWithoutUserInput
   privateLearningSummaries?: Prisma.PrivateLearningSummaryCreateNestedManyWithoutUserInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentCreateNestedManyWithoutUserInput
+  pronunciationTargets?: Prisma.PronunciationTargetCreateNestedManyWithoutUserInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutLearningReviewEventsInput = {
@@ -1757,6 +1883,9 @@ export type UserUncheckedCreateWithoutLearningReviewEventsInput = {
   traceSubjectMapping?: Prisma.TraceSubjectMappingUncheckedCreateNestedOneWithoutUserInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentUncheckedCreateNestedManyWithoutUserInput
   privateLearningSummaries?: Prisma.PrivateLearningSummaryUncheckedCreateNestedManyWithoutUserInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentUncheckedCreateNestedManyWithoutUserInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedCreateNestedManyWithoutUserInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutLearningReviewEventsInput = {
@@ -1806,6 +1935,9 @@ export type UserUpdateWithoutLearningReviewEventsInput = {
   traceSubjectMapping?: Prisma.TraceSubjectMappingUpdateOneWithoutUserNestedInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentUpdateManyWithoutUserNestedInput
   privateLearningSummaries?: Prisma.PrivateLearningSummaryUpdateManyWithoutUserNestedInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentUpdateManyWithoutUserNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUpdateManyWithoutUserNestedInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutLearningReviewEventsInput = {
@@ -1839,6 +1971,9 @@ export type UserUncheckedUpdateWithoutLearningReviewEventsInput = {
   traceSubjectMapping?: Prisma.TraceSubjectMappingUncheckedUpdateOneWithoutUserNestedInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentUncheckedUpdateManyWithoutUserNestedInput
   privateLearningSummaries?: Prisma.PrivateLearningSummaryUncheckedUpdateManyWithoutUserNestedInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentUncheckedUpdateManyWithoutUserNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedUpdateManyWithoutUserNestedInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutCoachConversationsInput = {
@@ -1872,6 +2007,9 @@ export type UserCreateWithoutCoachConversationsInput = {
   traceSubjectMapping?: Prisma.TraceSubjectMappingCreateNestedOneWithoutUserInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentCreateNestedManyWithoutUserInput
   privateLearningSummaries?: Prisma.PrivateLearningSummaryCreateNestedManyWithoutUserInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentCreateNestedManyWithoutUserInput
+  pronunciationTargets?: Prisma.PronunciationTargetCreateNestedManyWithoutUserInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutCoachConversationsInput = {
@@ -1905,6 +2043,9 @@ export type UserUncheckedCreateWithoutCoachConversationsInput = {
   traceSubjectMapping?: Prisma.TraceSubjectMappingUncheckedCreateNestedOneWithoutUserInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentUncheckedCreateNestedManyWithoutUserInput
   privateLearningSummaries?: Prisma.PrivateLearningSummaryUncheckedCreateNestedManyWithoutUserInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentUncheckedCreateNestedManyWithoutUserInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedCreateNestedManyWithoutUserInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutCoachConversationsInput = {
@@ -1954,6 +2095,9 @@ export type UserUpdateWithoutCoachConversationsInput = {
   traceSubjectMapping?: Prisma.TraceSubjectMappingUpdateOneWithoutUserNestedInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentUpdateManyWithoutUserNestedInput
   privateLearningSummaries?: Prisma.PrivateLearningSummaryUpdateManyWithoutUserNestedInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentUpdateManyWithoutUserNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUpdateManyWithoutUserNestedInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCoachConversationsInput = {
@@ -1987,6 +2131,9 @@ export type UserUncheckedUpdateWithoutCoachConversationsInput = {
   traceSubjectMapping?: Prisma.TraceSubjectMappingUncheckedUpdateOneWithoutUserNestedInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentUncheckedUpdateManyWithoutUserNestedInput
   privateLearningSummaries?: Prisma.PrivateLearningSummaryUncheckedUpdateManyWithoutUserNestedInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentUncheckedUpdateManyWithoutUserNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedUpdateManyWithoutUserNestedInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutCoachRequestsInput = {
@@ -2020,6 +2167,9 @@ export type UserCreateWithoutCoachRequestsInput = {
   traceSubjectMapping?: Prisma.TraceSubjectMappingCreateNestedOneWithoutUserInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentCreateNestedManyWithoutUserInput
   privateLearningSummaries?: Prisma.PrivateLearningSummaryCreateNestedManyWithoutUserInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentCreateNestedManyWithoutUserInput
+  pronunciationTargets?: Prisma.PronunciationTargetCreateNestedManyWithoutUserInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutCoachRequestsInput = {
@@ -2053,6 +2203,9 @@ export type UserUncheckedCreateWithoutCoachRequestsInput = {
   traceSubjectMapping?: Prisma.TraceSubjectMappingUncheckedCreateNestedOneWithoutUserInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentUncheckedCreateNestedManyWithoutUserInput
   privateLearningSummaries?: Prisma.PrivateLearningSummaryUncheckedCreateNestedManyWithoutUserInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentUncheckedCreateNestedManyWithoutUserInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedCreateNestedManyWithoutUserInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutCoachRequestsInput = {
@@ -2102,6 +2255,9 @@ export type UserUpdateWithoutCoachRequestsInput = {
   traceSubjectMapping?: Prisma.TraceSubjectMappingUpdateOneWithoutUserNestedInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentUpdateManyWithoutUserNestedInput
   privateLearningSummaries?: Prisma.PrivateLearningSummaryUpdateManyWithoutUserNestedInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentUpdateManyWithoutUserNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUpdateManyWithoutUserNestedInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCoachRequestsInput = {
@@ -2135,6 +2291,9 @@ export type UserUncheckedUpdateWithoutCoachRequestsInput = {
   traceSubjectMapping?: Prisma.TraceSubjectMappingUncheckedUpdateOneWithoutUserNestedInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentUncheckedUpdateManyWithoutUserNestedInput
   privateLearningSummaries?: Prisma.PrivateLearningSummaryUncheckedUpdateManyWithoutUserNestedInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentUncheckedUpdateManyWithoutUserNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedUpdateManyWithoutUserNestedInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutExercisesInput = {
@@ -2168,6 +2327,9 @@ export type UserCreateWithoutExercisesInput = {
   traceSubjectMapping?: Prisma.TraceSubjectMappingCreateNestedOneWithoutUserInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentCreateNestedManyWithoutUserInput
   privateLearningSummaries?: Prisma.PrivateLearningSummaryCreateNestedManyWithoutUserInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentCreateNestedManyWithoutUserInput
+  pronunciationTargets?: Prisma.PronunciationTargetCreateNestedManyWithoutUserInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutExercisesInput = {
@@ -2201,6 +2363,9 @@ export type UserUncheckedCreateWithoutExercisesInput = {
   traceSubjectMapping?: Prisma.TraceSubjectMappingUncheckedCreateNestedOneWithoutUserInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentUncheckedCreateNestedManyWithoutUserInput
   privateLearningSummaries?: Prisma.PrivateLearningSummaryUncheckedCreateNestedManyWithoutUserInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentUncheckedCreateNestedManyWithoutUserInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedCreateNestedManyWithoutUserInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutExercisesInput = {
@@ -2250,6 +2415,9 @@ export type UserUpdateWithoutExercisesInput = {
   traceSubjectMapping?: Prisma.TraceSubjectMappingUpdateOneWithoutUserNestedInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentUpdateManyWithoutUserNestedInput
   privateLearningSummaries?: Prisma.PrivateLearningSummaryUpdateManyWithoutUserNestedInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentUpdateManyWithoutUserNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUpdateManyWithoutUserNestedInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutExercisesInput = {
@@ -2283,6 +2451,9 @@ export type UserUncheckedUpdateWithoutExercisesInput = {
   traceSubjectMapping?: Prisma.TraceSubjectMappingUncheckedUpdateOneWithoutUserNestedInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentUncheckedUpdateManyWithoutUserNestedInput
   privateLearningSummaries?: Prisma.PrivateLearningSummaryUncheckedUpdateManyWithoutUserNestedInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentUncheckedUpdateManyWithoutUserNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedUpdateManyWithoutUserNestedInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutExerciseSubmissionsInput = {
@@ -2316,6 +2487,9 @@ export type UserCreateWithoutExerciseSubmissionsInput = {
   traceSubjectMapping?: Prisma.TraceSubjectMappingCreateNestedOneWithoutUserInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentCreateNestedManyWithoutUserInput
   privateLearningSummaries?: Prisma.PrivateLearningSummaryCreateNestedManyWithoutUserInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentCreateNestedManyWithoutUserInput
+  pronunciationTargets?: Prisma.PronunciationTargetCreateNestedManyWithoutUserInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutExerciseSubmissionsInput = {
@@ -2349,6 +2523,9 @@ export type UserUncheckedCreateWithoutExerciseSubmissionsInput = {
   traceSubjectMapping?: Prisma.TraceSubjectMappingUncheckedCreateNestedOneWithoutUserInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentUncheckedCreateNestedManyWithoutUserInput
   privateLearningSummaries?: Prisma.PrivateLearningSummaryUncheckedCreateNestedManyWithoutUserInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentUncheckedCreateNestedManyWithoutUserInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedCreateNestedManyWithoutUserInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutExerciseSubmissionsInput = {
@@ -2398,6 +2575,9 @@ export type UserUpdateWithoutExerciseSubmissionsInput = {
   traceSubjectMapping?: Prisma.TraceSubjectMappingUpdateOneWithoutUserNestedInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentUpdateManyWithoutUserNestedInput
   privateLearningSummaries?: Prisma.PrivateLearningSummaryUpdateManyWithoutUserNestedInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentUpdateManyWithoutUserNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUpdateManyWithoutUserNestedInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutExerciseSubmissionsInput = {
@@ -2431,6 +2611,9 @@ export type UserUncheckedUpdateWithoutExerciseSubmissionsInput = {
   traceSubjectMapping?: Prisma.TraceSubjectMappingUncheckedUpdateOneWithoutUserNestedInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentUncheckedUpdateManyWithoutUserNestedInput
   privateLearningSummaries?: Prisma.PrivateLearningSummaryUncheckedUpdateManyWithoutUserNestedInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentUncheckedUpdateManyWithoutUserNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedUpdateManyWithoutUserNestedInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutLearningAttemptsInput = {
@@ -2464,6 +2647,9 @@ export type UserCreateWithoutLearningAttemptsInput = {
   traceSubjectMapping?: Prisma.TraceSubjectMappingCreateNestedOneWithoutUserInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentCreateNestedManyWithoutUserInput
   privateLearningSummaries?: Prisma.PrivateLearningSummaryCreateNestedManyWithoutUserInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentCreateNestedManyWithoutUserInput
+  pronunciationTargets?: Prisma.PronunciationTargetCreateNestedManyWithoutUserInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutLearningAttemptsInput = {
@@ -2497,6 +2683,9 @@ export type UserUncheckedCreateWithoutLearningAttemptsInput = {
   traceSubjectMapping?: Prisma.TraceSubjectMappingUncheckedCreateNestedOneWithoutUserInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentUncheckedCreateNestedManyWithoutUserInput
   privateLearningSummaries?: Prisma.PrivateLearningSummaryUncheckedCreateNestedManyWithoutUserInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentUncheckedCreateNestedManyWithoutUserInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedCreateNestedManyWithoutUserInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutLearningAttemptsInput = {
@@ -2546,6 +2735,9 @@ export type UserUpdateWithoutLearningAttemptsInput = {
   traceSubjectMapping?: Prisma.TraceSubjectMappingUpdateOneWithoutUserNestedInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentUpdateManyWithoutUserNestedInput
   privateLearningSummaries?: Prisma.PrivateLearningSummaryUpdateManyWithoutUserNestedInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentUpdateManyWithoutUserNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUpdateManyWithoutUserNestedInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutLearningAttemptsInput = {
@@ -2579,6 +2771,489 @@ export type UserUncheckedUpdateWithoutLearningAttemptsInput = {
   traceSubjectMapping?: Prisma.TraceSubjectMappingUncheckedUpdateOneWithoutUserNestedInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentUncheckedUpdateManyWithoutUserNestedInput
   privateLearningSummaries?: Prisma.PrivateLearningSummaryUncheckedUpdateManyWithoutUserNestedInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentUncheckedUpdateManyWithoutUserNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedUpdateManyWithoutUserNestedInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutPronunciationAssessmentsInput = {
+  id?: string
+  name: string
+  email?: string | null
+  phone: string
+  address?: string | null
+  password: string
+  avatar?: string | null
+  bio?: string | null
+  isTimingTask?: boolean
+  timingTaskTime?: string
+  wordNumber?: number
+  dayNumber?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastLoginAt?: Date | string | null
+  wordBookRecords?: Prisma.WordBookRecordCreateNestedManyWithoutUserInput
+  paymentRecords?: Prisma.PaymentRecordCreateNestedManyWithoutUserInput
+  courseRecords?: Prisma.CourseRecordCreateNestedManyWithoutUserInput
+  visitors?: Prisma.VisitorCreateNestedManyWithoutUserInput
+  learnerProfile?: Prisma.LearnerProfileCreateNestedOneWithoutUserInput
+  learningItemStates?: Prisma.LearningItemStateCreateNestedManyWithoutUserInput
+  learningReviewEvents?: Prisma.LearningReviewEventCreateNestedManyWithoutUserInput
+  coachConversations?: Prisma.CoachConversationCreateNestedManyWithoutUserInput
+  coachRequests?: Prisma.CoachRequestCreateNestedManyWithoutUserInput
+  exercises?: Prisma.ExerciseCreateNestedManyWithoutUserInput
+  exerciseSubmissions?: Prisma.ExerciseSubmissionCreateNestedManyWithoutUserInput
+  learningAttempts?: Prisma.LearningAttemptCreateNestedManyWithoutUserInput
+  coachFeedback?: Prisma.CoachFeedbackCreateNestedManyWithoutUserInput
+  traceSubjectMapping?: Prisma.TraceSubjectMappingCreateNestedOneWithoutUserInput
+  knowledgeDocuments?: Prisma.KnowledgeDocumentCreateNestedManyWithoutUserInput
+  privateLearningSummaries?: Prisma.PrivateLearningSummaryCreateNestedManyWithoutUserInput
+  pronunciationTargets?: Prisma.PronunciationTargetCreateNestedManyWithoutUserInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutPronunciationAssessmentsInput = {
+  id?: string
+  name: string
+  email?: string | null
+  phone: string
+  address?: string | null
+  password: string
+  avatar?: string | null
+  bio?: string | null
+  isTimingTask?: boolean
+  timingTaskTime?: string
+  wordNumber?: number
+  dayNumber?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastLoginAt?: Date | string | null
+  wordBookRecords?: Prisma.WordBookRecordUncheckedCreateNestedManyWithoutUserInput
+  paymentRecords?: Prisma.PaymentRecordUncheckedCreateNestedManyWithoutUserInput
+  courseRecords?: Prisma.CourseRecordUncheckedCreateNestedManyWithoutUserInput
+  visitors?: Prisma.VisitorUncheckedCreateNestedManyWithoutUserInput
+  learnerProfile?: Prisma.LearnerProfileUncheckedCreateNestedOneWithoutUserInput
+  learningItemStates?: Prisma.LearningItemStateUncheckedCreateNestedManyWithoutUserInput
+  learningReviewEvents?: Prisma.LearningReviewEventUncheckedCreateNestedManyWithoutUserInput
+  coachConversations?: Prisma.CoachConversationUncheckedCreateNestedManyWithoutUserInput
+  coachRequests?: Prisma.CoachRequestUncheckedCreateNestedManyWithoutUserInput
+  exercises?: Prisma.ExerciseUncheckedCreateNestedManyWithoutUserInput
+  exerciseSubmissions?: Prisma.ExerciseSubmissionUncheckedCreateNestedManyWithoutUserInput
+  learningAttempts?: Prisma.LearningAttemptUncheckedCreateNestedManyWithoutUserInput
+  coachFeedback?: Prisma.CoachFeedbackUncheckedCreateNestedManyWithoutUserInput
+  traceSubjectMapping?: Prisma.TraceSubjectMappingUncheckedCreateNestedOneWithoutUserInput
+  knowledgeDocuments?: Prisma.KnowledgeDocumentUncheckedCreateNestedManyWithoutUserInput
+  privateLearningSummaries?: Prisma.PrivateLearningSummaryUncheckedCreateNestedManyWithoutUserInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedCreateNestedManyWithoutUserInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutPronunciationAssessmentsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutPronunciationAssessmentsInput, Prisma.UserUncheckedCreateWithoutPronunciationAssessmentsInput>
+}
+
+export type UserUpsertWithoutPronunciationAssessmentsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutPronunciationAssessmentsInput, Prisma.UserUncheckedUpdateWithoutPronunciationAssessmentsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutPronunciationAssessmentsInput, Prisma.UserUncheckedCreateWithoutPronunciationAssessmentsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutPronunciationAssessmentsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutPronunciationAssessmentsInput, Prisma.UserUncheckedUpdateWithoutPronunciationAssessmentsInput>
+}
+
+export type UserUpdateWithoutPronunciationAssessmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.StringFieldUpdateOperationsInput | string
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isTimingTask?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  timingTaskTime?: Prisma.StringFieldUpdateOperationsInput | string
+  wordNumber?: Prisma.IntFieldUpdateOperationsInput | number
+  dayNumber?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  wordBookRecords?: Prisma.WordBookRecordUpdateManyWithoutUserNestedInput
+  paymentRecords?: Prisma.PaymentRecordUpdateManyWithoutUserNestedInput
+  courseRecords?: Prisma.CourseRecordUpdateManyWithoutUserNestedInput
+  visitors?: Prisma.VisitorUpdateManyWithoutUserNestedInput
+  learnerProfile?: Prisma.LearnerProfileUpdateOneWithoutUserNestedInput
+  learningItemStates?: Prisma.LearningItemStateUpdateManyWithoutUserNestedInput
+  learningReviewEvents?: Prisma.LearningReviewEventUpdateManyWithoutUserNestedInput
+  coachConversations?: Prisma.CoachConversationUpdateManyWithoutUserNestedInput
+  coachRequests?: Prisma.CoachRequestUpdateManyWithoutUserNestedInput
+  exercises?: Prisma.ExerciseUpdateManyWithoutUserNestedInput
+  exerciseSubmissions?: Prisma.ExerciseSubmissionUpdateManyWithoutUserNestedInput
+  learningAttempts?: Prisma.LearningAttemptUpdateManyWithoutUserNestedInput
+  coachFeedback?: Prisma.CoachFeedbackUpdateManyWithoutUserNestedInput
+  traceSubjectMapping?: Prisma.TraceSubjectMappingUpdateOneWithoutUserNestedInput
+  knowledgeDocuments?: Prisma.KnowledgeDocumentUpdateManyWithoutUserNestedInput
+  privateLearningSummaries?: Prisma.PrivateLearningSummaryUpdateManyWithoutUserNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUpdateManyWithoutUserNestedInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutPronunciationAssessmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.StringFieldUpdateOperationsInput | string
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isTimingTask?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  timingTaskTime?: Prisma.StringFieldUpdateOperationsInput | string
+  wordNumber?: Prisma.IntFieldUpdateOperationsInput | number
+  dayNumber?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  wordBookRecords?: Prisma.WordBookRecordUncheckedUpdateManyWithoutUserNestedInput
+  paymentRecords?: Prisma.PaymentRecordUncheckedUpdateManyWithoutUserNestedInput
+  courseRecords?: Prisma.CourseRecordUncheckedUpdateManyWithoutUserNestedInput
+  visitors?: Prisma.VisitorUncheckedUpdateManyWithoutUserNestedInput
+  learnerProfile?: Prisma.LearnerProfileUncheckedUpdateOneWithoutUserNestedInput
+  learningItemStates?: Prisma.LearningItemStateUncheckedUpdateManyWithoutUserNestedInput
+  learningReviewEvents?: Prisma.LearningReviewEventUncheckedUpdateManyWithoutUserNestedInput
+  coachConversations?: Prisma.CoachConversationUncheckedUpdateManyWithoutUserNestedInput
+  coachRequests?: Prisma.CoachRequestUncheckedUpdateManyWithoutUserNestedInput
+  exercises?: Prisma.ExerciseUncheckedUpdateManyWithoutUserNestedInput
+  exerciseSubmissions?: Prisma.ExerciseSubmissionUncheckedUpdateManyWithoutUserNestedInput
+  learningAttempts?: Prisma.LearningAttemptUncheckedUpdateManyWithoutUserNestedInput
+  coachFeedback?: Prisma.CoachFeedbackUncheckedUpdateManyWithoutUserNestedInput
+  traceSubjectMapping?: Prisma.TraceSubjectMappingUncheckedUpdateOneWithoutUserNestedInput
+  knowledgeDocuments?: Prisma.KnowledgeDocumentUncheckedUpdateManyWithoutUserNestedInput
+  privateLearningSummaries?: Prisma.PrivateLearningSummaryUncheckedUpdateManyWithoutUserNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedUpdateManyWithoutUserNestedInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutPronunciationTargetsInput = {
+  id?: string
+  name: string
+  email?: string | null
+  phone: string
+  address?: string | null
+  password: string
+  avatar?: string | null
+  bio?: string | null
+  isTimingTask?: boolean
+  timingTaskTime?: string
+  wordNumber?: number
+  dayNumber?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastLoginAt?: Date | string | null
+  wordBookRecords?: Prisma.WordBookRecordCreateNestedManyWithoutUserInput
+  paymentRecords?: Prisma.PaymentRecordCreateNestedManyWithoutUserInput
+  courseRecords?: Prisma.CourseRecordCreateNestedManyWithoutUserInput
+  visitors?: Prisma.VisitorCreateNestedManyWithoutUserInput
+  learnerProfile?: Prisma.LearnerProfileCreateNestedOneWithoutUserInput
+  learningItemStates?: Prisma.LearningItemStateCreateNestedManyWithoutUserInput
+  learningReviewEvents?: Prisma.LearningReviewEventCreateNestedManyWithoutUserInput
+  coachConversations?: Prisma.CoachConversationCreateNestedManyWithoutUserInput
+  coachRequests?: Prisma.CoachRequestCreateNestedManyWithoutUserInput
+  exercises?: Prisma.ExerciseCreateNestedManyWithoutUserInput
+  exerciseSubmissions?: Prisma.ExerciseSubmissionCreateNestedManyWithoutUserInput
+  learningAttempts?: Prisma.LearningAttemptCreateNestedManyWithoutUserInput
+  coachFeedback?: Prisma.CoachFeedbackCreateNestedManyWithoutUserInput
+  traceSubjectMapping?: Prisma.TraceSubjectMappingCreateNestedOneWithoutUserInput
+  knowledgeDocuments?: Prisma.KnowledgeDocumentCreateNestedManyWithoutUserInput
+  privateLearningSummaries?: Prisma.PrivateLearningSummaryCreateNestedManyWithoutUserInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentCreateNestedManyWithoutUserInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutPronunciationTargetsInput = {
+  id?: string
+  name: string
+  email?: string | null
+  phone: string
+  address?: string | null
+  password: string
+  avatar?: string | null
+  bio?: string | null
+  isTimingTask?: boolean
+  timingTaskTime?: string
+  wordNumber?: number
+  dayNumber?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastLoginAt?: Date | string | null
+  wordBookRecords?: Prisma.WordBookRecordUncheckedCreateNestedManyWithoutUserInput
+  paymentRecords?: Prisma.PaymentRecordUncheckedCreateNestedManyWithoutUserInput
+  courseRecords?: Prisma.CourseRecordUncheckedCreateNestedManyWithoutUserInput
+  visitors?: Prisma.VisitorUncheckedCreateNestedManyWithoutUserInput
+  learnerProfile?: Prisma.LearnerProfileUncheckedCreateNestedOneWithoutUserInput
+  learningItemStates?: Prisma.LearningItemStateUncheckedCreateNestedManyWithoutUserInput
+  learningReviewEvents?: Prisma.LearningReviewEventUncheckedCreateNestedManyWithoutUserInput
+  coachConversations?: Prisma.CoachConversationUncheckedCreateNestedManyWithoutUserInput
+  coachRequests?: Prisma.CoachRequestUncheckedCreateNestedManyWithoutUserInput
+  exercises?: Prisma.ExerciseUncheckedCreateNestedManyWithoutUserInput
+  exerciseSubmissions?: Prisma.ExerciseSubmissionUncheckedCreateNestedManyWithoutUserInput
+  learningAttempts?: Prisma.LearningAttemptUncheckedCreateNestedManyWithoutUserInput
+  coachFeedback?: Prisma.CoachFeedbackUncheckedCreateNestedManyWithoutUserInput
+  traceSubjectMapping?: Prisma.TraceSubjectMappingUncheckedCreateNestedOneWithoutUserInput
+  knowledgeDocuments?: Prisma.KnowledgeDocumentUncheckedCreateNestedManyWithoutUserInput
+  privateLearningSummaries?: Prisma.PrivateLearningSummaryUncheckedCreateNestedManyWithoutUserInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentUncheckedCreateNestedManyWithoutUserInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutPronunciationTargetsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutPronunciationTargetsInput, Prisma.UserUncheckedCreateWithoutPronunciationTargetsInput>
+}
+
+export type UserUpsertWithoutPronunciationTargetsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutPronunciationTargetsInput, Prisma.UserUncheckedUpdateWithoutPronunciationTargetsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutPronunciationTargetsInput, Prisma.UserUncheckedCreateWithoutPronunciationTargetsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutPronunciationTargetsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutPronunciationTargetsInput, Prisma.UserUncheckedUpdateWithoutPronunciationTargetsInput>
+}
+
+export type UserUpdateWithoutPronunciationTargetsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.StringFieldUpdateOperationsInput | string
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isTimingTask?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  timingTaskTime?: Prisma.StringFieldUpdateOperationsInput | string
+  wordNumber?: Prisma.IntFieldUpdateOperationsInput | number
+  dayNumber?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  wordBookRecords?: Prisma.WordBookRecordUpdateManyWithoutUserNestedInput
+  paymentRecords?: Prisma.PaymentRecordUpdateManyWithoutUserNestedInput
+  courseRecords?: Prisma.CourseRecordUpdateManyWithoutUserNestedInput
+  visitors?: Prisma.VisitorUpdateManyWithoutUserNestedInput
+  learnerProfile?: Prisma.LearnerProfileUpdateOneWithoutUserNestedInput
+  learningItemStates?: Prisma.LearningItemStateUpdateManyWithoutUserNestedInput
+  learningReviewEvents?: Prisma.LearningReviewEventUpdateManyWithoutUserNestedInput
+  coachConversations?: Prisma.CoachConversationUpdateManyWithoutUserNestedInput
+  coachRequests?: Prisma.CoachRequestUpdateManyWithoutUserNestedInput
+  exercises?: Prisma.ExerciseUpdateManyWithoutUserNestedInput
+  exerciseSubmissions?: Prisma.ExerciseSubmissionUpdateManyWithoutUserNestedInput
+  learningAttempts?: Prisma.LearningAttemptUpdateManyWithoutUserNestedInput
+  coachFeedback?: Prisma.CoachFeedbackUpdateManyWithoutUserNestedInput
+  traceSubjectMapping?: Prisma.TraceSubjectMappingUpdateOneWithoutUserNestedInput
+  knowledgeDocuments?: Prisma.KnowledgeDocumentUpdateManyWithoutUserNestedInput
+  privateLearningSummaries?: Prisma.PrivateLearningSummaryUpdateManyWithoutUserNestedInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentUpdateManyWithoutUserNestedInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutPronunciationTargetsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.StringFieldUpdateOperationsInput | string
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isTimingTask?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  timingTaskTime?: Prisma.StringFieldUpdateOperationsInput | string
+  wordNumber?: Prisma.IntFieldUpdateOperationsInput | number
+  dayNumber?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  wordBookRecords?: Prisma.WordBookRecordUncheckedUpdateManyWithoutUserNestedInput
+  paymentRecords?: Prisma.PaymentRecordUncheckedUpdateManyWithoutUserNestedInput
+  courseRecords?: Prisma.CourseRecordUncheckedUpdateManyWithoutUserNestedInput
+  visitors?: Prisma.VisitorUncheckedUpdateManyWithoutUserNestedInput
+  learnerProfile?: Prisma.LearnerProfileUncheckedUpdateOneWithoutUserNestedInput
+  learningItemStates?: Prisma.LearningItemStateUncheckedUpdateManyWithoutUserNestedInput
+  learningReviewEvents?: Prisma.LearningReviewEventUncheckedUpdateManyWithoutUserNestedInput
+  coachConversations?: Prisma.CoachConversationUncheckedUpdateManyWithoutUserNestedInput
+  coachRequests?: Prisma.CoachRequestUncheckedUpdateManyWithoutUserNestedInput
+  exercises?: Prisma.ExerciseUncheckedUpdateManyWithoutUserNestedInput
+  exerciseSubmissions?: Prisma.ExerciseSubmissionUncheckedUpdateManyWithoutUserNestedInput
+  learningAttempts?: Prisma.LearningAttemptUncheckedUpdateManyWithoutUserNestedInput
+  coachFeedback?: Prisma.CoachFeedbackUncheckedUpdateManyWithoutUserNestedInput
+  traceSubjectMapping?: Prisma.TraceSubjectMappingUncheckedUpdateOneWithoutUserNestedInput
+  knowledgeDocuments?: Prisma.KnowledgeDocumentUncheckedUpdateManyWithoutUserNestedInput
+  privateLearningSummaries?: Prisma.PrivateLearningSummaryUncheckedUpdateManyWithoutUserNestedInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentUncheckedUpdateManyWithoutUserNestedInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutPronunciationAudioAssetsInput = {
+  id?: string
+  name: string
+  email?: string | null
+  phone: string
+  address?: string | null
+  password: string
+  avatar?: string | null
+  bio?: string | null
+  isTimingTask?: boolean
+  timingTaskTime?: string
+  wordNumber?: number
+  dayNumber?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastLoginAt?: Date | string | null
+  wordBookRecords?: Prisma.WordBookRecordCreateNestedManyWithoutUserInput
+  paymentRecords?: Prisma.PaymentRecordCreateNestedManyWithoutUserInput
+  courseRecords?: Prisma.CourseRecordCreateNestedManyWithoutUserInput
+  visitors?: Prisma.VisitorCreateNestedManyWithoutUserInput
+  learnerProfile?: Prisma.LearnerProfileCreateNestedOneWithoutUserInput
+  learningItemStates?: Prisma.LearningItemStateCreateNestedManyWithoutUserInput
+  learningReviewEvents?: Prisma.LearningReviewEventCreateNestedManyWithoutUserInput
+  coachConversations?: Prisma.CoachConversationCreateNestedManyWithoutUserInput
+  coachRequests?: Prisma.CoachRequestCreateNestedManyWithoutUserInput
+  exercises?: Prisma.ExerciseCreateNestedManyWithoutUserInput
+  exerciseSubmissions?: Prisma.ExerciseSubmissionCreateNestedManyWithoutUserInput
+  learningAttempts?: Prisma.LearningAttemptCreateNestedManyWithoutUserInput
+  coachFeedback?: Prisma.CoachFeedbackCreateNestedManyWithoutUserInput
+  traceSubjectMapping?: Prisma.TraceSubjectMappingCreateNestedOneWithoutUserInput
+  knowledgeDocuments?: Prisma.KnowledgeDocumentCreateNestedManyWithoutUserInput
+  privateLearningSummaries?: Prisma.PrivateLearningSummaryCreateNestedManyWithoutUserInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentCreateNestedManyWithoutUserInput
+  pronunciationTargets?: Prisma.PronunciationTargetCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutPronunciationAudioAssetsInput = {
+  id?: string
+  name: string
+  email?: string | null
+  phone: string
+  address?: string | null
+  password: string
+  avatar?: string | null
+  bio?: string | null
+  isTimingTask?: boolean
+  timingTaskTime?: string
+  wordNumber?: number
+  dayNumber?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastLoginAt?: Date | string | null
+  wordBookRecords?: Prisma.WordBookRecordUncheckedCreateNestedManyWithoutUserInput
+  paymentRecords?: Prisma.PaymentRecordUncheckedCreateNestedManyWithoutUserInput
+  courseRecords?: Prisma.CourseRecordUncheckedCreateNestedManyWithoutUserInput
+  visitors?: Prisma.VisitorUncheckedCreateNestedManyWithoutUserInput
+  learnerProfile?: Prisma.LearnerProfileUncheckedCreateNestedOneWithoutUserInput
+  learningItemStates?: Prisma.LearningItemStateUncheckedCreateNestedManyWithoutUserInput
+  learningReviewEvents?: Prisma.LearningReviewEventUncheckedCreateNestedManyWithoutUserInput
+  coachConversations?: Prisma.CoachConversationUncheckedCreateNestedManyWithoutUserInput
+  coachRequests?: Prisma.CoachRequestUncheckedCreateNestedManyWithoutUserInput
+  exercises?: Prisma.ExerciseUncheckedCreateNestedManyWithoutUserInput
+  exerciseSubmissions?: Prisma.ExerciseSubmissionUncheckedCreateNestedManyWithoutUserInput
+  learningAttempts?: Prisma.LearningAttemptUncheckedCreateNestedManyWithoutUserInput
+  coachFeedback?: Prisma.CoachFeedbackUncheckedCreateNestedManyWithoutUserInput
+  traceSubjectMapping?: Prisma.TraceSubjectMappingUncheckedCreateNestedOneWithoutUserInput
+  knowledgeDocuments?: Prisma.KnowledgeDocumentUncheckedCreateNestedManyWithoutUserInput
+  privateLearningSummaries?: Prisma.PrivateLearningSummaryUncheckedCreateNestedManyWithoutUserInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentUncheckedCreateNestedManyWithoutUserInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutPronunciationAudioAssetsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutPronunciationAudioAssetsInput, Prisma.UserUncheckedCreateWithoutPronunciationAudioAssetsInput>
+}
+
+export type UserUpsertWithoutPronunciationAudioAssetsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutPronunciationAudioAssetsInput, Prisma.UserUncheckedUpdateWithoutPronunciationAudioAssetsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutPronunciationAudioAssetsInput, Prisma.UserUncheckedCreateWithoutPronunciationAudioAssetsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutPronunciationAudioAssetsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutPronunciationAudioAssetsInput, Prisma.UserUncheckedUpdateWithoutPronunciationAudioAssetsInput>
+}
+
+export type UserUpdateWithoutPronunciationAudioAssetsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.StringFieldUpdateOperationsInput | string
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isTimingTask?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  timingTaskTime?: Prisma.StringFieldUpdateOperationsInput | string
+  wordNumber?: Prisma.IntFieldUpdateOperationsInput | number
+  dayNumber?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  wordBookRecords?: Prisma.WordBookRecordUpdateManyWithoutUserNestedInput
+  paymentRecords?: Prisma.PaymentRecordUpdateManyWithoutUserNestedInput
+  courseRecords?: Prisma.CourseRecordUpdateManyWithoutUserNestedInput
+  visitors?: Prisma.VisitorUpdateManyWithoutUserNestedInput
+  learnerProfile?: Prisma.LearnerProfileUpdateOneWithoutUserNestedInput
+  learningItemStates?: Prisma.LearningItemStateUpdateManyWithoutUserNestedInput
+  learningReviewEvents?: Prisma.LearningReviewEventUpdateManyWithoutUserNestedInput
+  coachConversations?: Prisma.CoachConversationUpdateManyWithoutUserNestedInput
+  coachRequests?: Prisma.CoachRequestUpdateManyWithoutUserNestedInput
+  exercises?: Prisma.ExerciseUpdateManyWithoutUserNestedInput
+  exerciseSubmissions?: Prisma.ExerciseSubmissionUpdateManyWithoutUserNestedInput
+  learningAttempts?: Prisma.LearningAttemptUpdateManyWithoutUserNestedInput
+  coachFeedback?: Prisma.CoachFeedbackUpdateManyWithoutUserNestedInput
+  traceSubjectMapping?: Prisma.TraceSubjectMappingUpdateOneWithoutUserNestedInput
+  knowledgeDocuments?: Prisma.KnowledgeDocumentUpdateManyWithoutUserNestedInput
+  privateLearningSummaries?: Prisma.PrivateLearningSummaryUpdateManyWithoutUserNestedInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentUpdateManyWithoutUserNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutPronunciationAudioAssetsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.StringFieldUpdateOperationsInput | string
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isTimingTask?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  timingTaskTime?: Prisma.StringFieldUpdateOperationsInput | string
+  wordNumber?: Prisma.IntFieldUpdateOperationsInput | number
+  dayNumber?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  wordBookRecords?: Prisma.WordBookRecordUncheckedUpdateManyWithoutUserNestedInput
+  paymentRecords?: Prisma.PaymentRecordUncheckedUpdateManyWithoutUserNestedInput
+  courseRecords?: Prisma.CourseRecordUncheckedUpdateManyWithoutUserNestedInput
+  visitors?: Prisma.VisitorUncheckedUpdateManyWithoutUserNestedInput
+  learnerProfile?: Prisma.LearnerProfileUncheckedUpdateOneWithoutUserNestedInput
+  learningItemStates?: Prisma.LearningItemStateUncheckedUpdateManyWithoutUserNestedInput
+  learningReviewEvents?: Prisma.LearningReviewEventUncheckedUpdateManyWithoutUserNestedInput
+  coachConversations?: Prisma.CoachConversationUncheckedUpdateManyWithoutUserNestedInput
+  coachRequests?: Prisma.CoachRequestUncheckedUpdateManyWithoutUserNestedInput
+  exercises?: Prisma.ExerciseUncheckedUpdateManyWithoutUserNestedInput
+  exerciseSubmissions?: Prisma.ExerciseSubmissionUncheckedUpdateManyWithoutUserNestedInput
+  learningAttempts?: Prisma.LearningAttemptUncheckedUpdateManyWithoutUserNestedInput
+  coachFeedback?: Prisma.CoachFeedbackUncheckedUpdateManyWithoutUserNestedInput
+  traceSubjectMapping?: Prisma.TraceSubjectMappingUncheckedUpdateOneWithoutUserNestedInput
+  knowledgeDocuments?: Prisma.KnowledgeDocumentUncheckedUpdateManyWithoutUserNestedInput
+  privateLearningSummaries?: Prisma.PrivateLearningSummaryUncheckedUpdateManyWithoutUserNestedInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentUncheckedUpdateManyWithoutUserNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutCoachFeedbackInput = {
@@ -2612,6 +3287,9 @@ export type UserCreateWithoutCoachFeedbackInput = {
   traceSubjectMapping?: Prisma.TraceSubjectMappingCreateNestedOneWithoutUserInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentCreateNestedManyWithoutUserInput
   privateLearningSummaries?: Prisma.PrivateLearningSummaryCreateNestedManyWithoutUserInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentCreateNestedManyWithoutUserInput
+  pronunciationTargets?: Prisma.PronunciationTargetCreateNestedManyWithoutUserInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutCoachFeedbackInput = {
@@ -2645,6 +3323,9 @@ export type UserUncheckedCreateWithoutCoachFeedbackInput = {
   traceSubjectMapping?: Prisma.TraceSubjectMappingUncheckedCreateNestedOneWithoutUserInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentUncheckedCreateNestedManyWithoutUserInput
   privateLearningSummaries?: Prisma.PrivateLearningSummaryUncheckedCreateNestedManyWithoutUserInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentUncheckedCreateNestedManyWithoutUserInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedCreateNestedManyWithoutUserInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutCoachFeedbackInput = {
@@ -2694,6 +3375,9 @@ export type UserUpdateWithoutCoachFeedbackInput = {
   traceSubjectMapping?: Prisma.TraceSubjectMappingUpdateOneWithoutUserNestedInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentUpdateManyWithoutUserNestedInput
   privateLearningSummaries?: Prisma.PrivateLearningSummaryUpdateManyWithoutUserNestedInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentUpdateManyWithoutUserNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUpdateManyWithoutUserNestedInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCoachFeedbackInput = {
@@ -2727,6 +3411,9 @@ export type UserUncheckedUpdateWithoutCoachFeedbackInput = {
   traceSubjectMapping?: Prisma.TraceSubjectMappingUncheckedUpdateOneWithoutUserNestedInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentUncheckedUpdateManyWithoutUserNestedInput
   privateLearningSummaries?: Prisma.PrivateLearningSummaryUncheckedUpdateManyWithoutUserNestedInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentUncheckedUpdateManyWithoutUserNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedUpdateManyWithoutUserNestedInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutTraceSubjectMappingInput = {
@@ -2760,6 +3447,9 @@ export type UserCreateWithoutTraceSubjectMappingInput = {
   coachFeedback?: Prisma.CoachFeedbackCreateNestedManyWithoutUserInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentCreateNestedManyWithoutUserInput
   privateLearningSummaries?: Prisma.PrivateLearningSummaryCreateNestedManyWithoutUserInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentCreateNestedManyWithoutUserInput
+  pronunciationTargets?: Prisma.PronunciationTargetCreateNestedManyWithoutUserInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutTraceSubjectMappingInput = {
@@ -2793,6 +3483,9 @@ export type UserUncheckedCreateWithoutTraceSubjectMappingInput = {
   coachFeedback?: Prisma.CoachFeedbackUncheckedCreateNestedManyWithoutUserInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentUncheckedCreateNestedManyWithoutUserInput
   privateLearningSummaries?: Prisma.PrivateLearningSummaryUncheckedCreateNestedManyWithoutUserInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentUncheckedCreateNestedManyWithoutUserInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedCreateNestedManyWithoutUserInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutTraceSubjectMappingInput = {
@@ -2842,6 +3535,9 @@ export type UserUpdateWithoutTraceSubjectMappingInput = {
   coachFeedback?: Prisma.CoachFeedbackUpdateManyWithoutUserNestedInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentUpdateManyWithoutUserNestedInput
   privateLearningSummaries?: Prisma.PrivateLearningSummaryUpdateManyWithoutUserNestedInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentUpdateManyWithoutUserNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUpdateManyWithoutUserNestedInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutTraceSubjectMappingInput = {
@@ -2875,6 +3571,9 @@ export type UserUncheckedUpdateWithoutTraceSubjectMappingInput = {
   coachFeedback?: Prisma.CoachFeedbackUncheckedUpdateManyWithoutUserNestedInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentUncheckedUpdateManyWithoutUserNestedInput
   privateLearningSummaries?: Prisma.PrivateLearningSummaryUncheckedUpdateManyWithoutUserNestedInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentUncheckedUpdateManyWithoutUserNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedUpdateManyWithoutUserNestedInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutKnowledgeDocumentsInput = {
@@ -2908,6 +3607,9 @@ export type UserCreateWithoutKnowledgeDocumentsInput = {
   coachFeedback?: Prisma.CoachFeedbackCreateNestedManyWithoutUserInput
   traceSubjectMapping?: Prisma.TraceSubjectMappingCreateNestedOneWithoutUserInput
   privateLearningSummaries?: Prisma.PrivateLearningSummaryCreateNestedManyWithoutUserInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentCreateNestedManyWithoutUserInput
+  pronunciationTargets?: Prisma.PronunciationTargetCreateNestedManyWithoutUserInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutKnowledgeDocumentsInput = {
@@ -2941,6 +3643,9 @@ export type UserUncheckedCreateWithoutKnowledgeDocumentsInput = {
   coachFeedback?: Prisma.CoachFeedbackUncheckedCreateNestedManyWithoutUserInput
   traceSubjectMapping?: Prisma.TraceSubjectMappingUncheckedCreateNestedOneWithoutUserInput
   privateLearningSummaries?: Prisma.PrivateLearningSummaryUncheckedCreateNestedManyWithoutUserInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentUncheckedCreateNestedManyWithoutUserInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedCreateNestedManyWithoutUserInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutKnowledgeDocumentsInput = {
@@ -2990,6 +3695,9 @@ export type UserUpdateWithoutKnowledgeDocumentsInput = {
   coachFeedback?: Prisma.CoachFeedbackUpdateManyWithoutUserNestedInput
   traceSubjectMapping?: Prisma.TraceSubjectMappingUpdateOneWithoutUserNestedInput
   privateLearningSummaries?: Prisma.PrivateLearningSummaryUpdateManyWithoutUserNestedInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentUpdateManyWithoutUserNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUpdateManyWithoutUserNestedInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutKnowledgeDocumentsInput = {
@@ -3023,6 +3731,9 @@ export type UserUncheckedUpdateWithoutKnowledgeDocumentsInput = {
   coachFeedback?: Prisma.CoachFeedbackUncheckedUpdateManyWithoutUserNestedInput
   traceSubjectMapping?: Prisma.TraceSubjectMappingUncheckedUpdateOneWithoutUserNestedInput
   privateLearningSummaries?: Prisma.PrivateLearningSummaryUncheckedUpdateManyWithoutUserNestedInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentUncheckedUpdateManyWithoutUserNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedUpdateManyWithoutUserNestedInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutPrivateLearningSummariesInput = {
@@ -3056,6 +3767,9 @@ export type UserCreateWithoutPrivateLearningSummariesInput = {
   coachFeedback?: Prisma.CoachFeedbackCreateNestedManyWithoutUserInput
   traceSubjectMapping?: Prisma.TraceSubjectMappingCreateNestedOneWithoutUserInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentCreateNestedManyWithoutUserInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentCreateNestedManyWithoutUserInput
+  pronunciationTargets?: Prisma.PronunciationTargetCreateNestedManyWithoutUserInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutPrivateLearningSummariesInput = {
@@ -3089,6 +3803,9 @@ export type UserUncheckedCreateWithoutPrivateLearningSummariesInput = {
   coachFeedback?: Prisma.CoachFeedbackUncheckedCreateNestedManyWithoutUserInput
   traceSubjectMapping?: Prisma.TraceSubjectMappingUncheckedCreateNestedOneWithoutUserInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentUncheckedCreateNestedManyWithoutUserInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentUncheckedCreateNestedManyWithoutUserInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedCreateNestedManyWithoutUserInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutPrivateLearningSummariesInput = {
@@ -3138,6 +3855,9 @@ export type UserUpdateWithoutPrivateLearningSummariesInput = {
   coachFeedback?: Prisma.CoachFeedbackUpdateManyWithoutUserNestedInput
   traceSubjectMapping?: Prisma.TraceSubjectMappingUpdateOneWithoutUserNestedInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentUpdateManyWithoutUserNestedInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentUpdateManyWithoutUserNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUpdateManyWithoutUserNestedInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPrivateLearningSummariesInput = {
@@ -3171,6 +3891,9 @@ export type UserUncheckedUpdateWithoutPrivateLearningSummariesInput = {
   coachFeedback?: Prisma.CoachFeedbackUncheckedUpdateManyWithoutUserNestedInput
   traceSubjectMapping?: Prisma.TraceSubjectMappingUncheckedUpdateOneWithoutUserNestedInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentUncheckedUpdateManyWithoutUserNestedInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentUncheckedUpdateManyWithoutUserNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedUpdateManyWithoutUserNestedInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutVisitorsInput = {
@@ -3204,6 +3927,9 @@ export type UserCreateWithoutVisitorsInput = {
   traceSubjectMapping?: Prisma.TraceSubjectMappingCreateNestedOneWithoutUserInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentCreateNestedManyWithoutUserInput
   privateLearningSummaries?: Prisma.PrivateLearningSummaryCreateNestedManyWithoutUserInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentCreateNestedManyWithoutUserInput
+  pronunciationTargets?: Prisma.PronunciationTargetCreateNestedManyWithoutUserInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutVisitorsInput = {
@@ -3237,6 +3963,9 @@ export type UserUncheckedCreateWithoutVisitorsInput = {
   traceSubjectMapping?: Prisma.TraceSubjectMappingUncheckedCreateNestedOneWithoutUserInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentUncheckedCreateNestedManyWithoutUserInput
   privateLearningSummaries?: Prisma.PrivateLearningSummaryUncheckedCreateNestedManyWithoutUserInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentUncheckedCreateNestedManyWithoutUserInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedCreateNestedManyWithoutUserInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutVisitorsInput = {
@@ -3286,6 +4015,9 @@ export type UserUpdateWithoutVisitorsInput = {
   traceSubjectMapping?: Prisma.TraceSubjectMappingUpdateOneWithoutUserNestedInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentUpdateManyWithoutUserNestedInput
   privateLearningSummaries?: Prisma.PrivateLearningSummaryUpdateManyWithoutUserNestedInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentUpdateManyWithoutUserNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUpdateManyWithoutUserNestedInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutVisitorsInput = {
@@ -3319,6 +4051,9 @@ export type UserUncheckedUpdateWithoutVisitorsInput = {
   traceSubjectMapping?: Prisma.TraceSubjectMappingUncheckedUpdateOneWithoutUserNestedInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentUncheckedUpdateManyWithoutUserNestedInput
   privateLearningSummaries?: Prisma.PrivateLearningSummaryUncheckedUpdateManyWithoutUserNestedInput
+  pronunciationAssessments?: Prisma.PronunciationAssessmentUncheckedUpdateManyWithoutUserNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedUpdateManyWithoutUserNestedInput
+  pronunciationAudioAssets?: Prisma.PronunciationAudioAssetUncheckedUpdateManyWithoutUserNestedInput
 }
 
 
@@ -3341,6 +4076,9 @@ export type UserCountOutputType = {
   coachFeedback: number
   knowledgeDocuments: number
   privateLearningSummaries: number
+  pronunciationAssessments: number
+  pronunciationTargets: number
+  pronunciationAudioAssets: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -3358,6 +4096,9 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   coachFeedback?: boolean | UserCountOutputTypeCountCoachFeedbackArgs
   knowledgeDocuments?: boolean | UserCountOutputTypeCountKnowledgeDocumentsArgs
   privateLearningSummaries?: boolean | UserCountOutputTypeCountPrivateLearningSummariesArgs
+  pronunciationAssessments?: boolean | UserCountOutputTypeCountPronunciationAssessmentsArgs
+  pronunciationTargets?: boolean | UserCountOutputTypeCountPronunciationTargetsArgs
+  pronunciationAudioAssets?: boolean | UserCountOutputTypeCountPronunciationAudioAssetsArgs
 }
 
 /**
@@ -3468,6 +4209,27 @@ export type UserCountOutputTypeCountPrivateLearningSummariesArgs<ExtArgs extends
   where?: Prisma.PrivateLearningSummaryWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountPronunciationAssessmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PronunciationAssessmentWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountPronunciationTargetsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PronunciationTargetWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountPronunciationAudioAssetsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PronunciationAudioAssetWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -3501,6 +4263,9 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   traceSubjectMapping?: boolean | Prisma.User$traceSubjectMappingArgs<ExtArgs>
   knowledgeDocuments?: boolean | Prisma.User$knowledgeDocumentsArgs<ExtArgs>
   privateLearningSummaries?: boolean | Prisma.User$privateLearningSummariesArgs<ExtArgs>
+  pronunciationAssessments?: boolean | Prisma.User$pronunciationAssessmentsArgs<ExtArgs>
+  pronunciationTargets?: boolean | Prisma.User$pronunciationTargetsArgs<ExtArgs>
+  pronunciationAudioAssets?: boolean | Prisma.User$pronunciationAudioAssetsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -3576,6 +4341,9 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   traceSubjectMapping?: boolean | Prisma.User$traceSubjectMappingArgs<ExtArgs>
   knowledgeDocuments?: boolean | Prisma.User$knowledgeDocumentsArgs<ExtArgs>
   privateLearningSummaries?: boolean | Prisma.User$privateLearningSummariesArgs<ExtArgs>
+  pronunciationAssessments?: boolean | Prisma.User$pronunciationAssessmentsArgs<ExtArgs>
+  pronunciationTargets?: boolean | Prisma.User$pronunciationTargetsArgs<ExtArgs>
+  pronunciationAudioAssets?: boolean | Prisma.User$pronunciationAudioAssetsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -3600,6 +4368,9 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     traceSubjectMapping: Prisma.$TraceSubjectMappingPayload<ExtArgs> | null
     knowledgeDocuments: Prisma.$KnowledgeDocumentPayload<ExtArgs>[]
     privateLearningSummaries: Prisma.$PrivateLearningSummaryPayload<ExtArgs>[]
+    pronunciationAssessments: Prisma.$PronunciationAssessmentPayload<ExtArgs>[]
+    pronunciationTargets: Prisma.$PronunciationTargetPayload<ExtArgs>[]
+    pronunciationAudioAssets: Prisma.$PronunciationAudioAssetPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -4027,6 +4798,9 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   traceSubjectMapping<T extends Prisma.User$traceSubjectMappingArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$traceSubjectMappingArgs<ExtArgs>>): Prisma.Prisma__TraceSubjectMappingClient<runtime.Types.Result.GetResult<Prisma.$TraceSubjectMappingPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   knowledgeDocuments<T extends Prisma.User$knowledgeDocumentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$knowledgeDocumentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$KnowledgeDocumentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   privateLearningSummaries<T extends Prisma.User$privateLearningSummariesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$privateLearningSummariesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PrivateLearningSummaryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  pronunciationAssessments<T extends Prisma.User$pronunciationAssessmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$pronunciationAssessmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PronunciationAssessmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  pronunciationTargets<T extends Prisma.User$pronunciationTargetsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$pronunciationTargetsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PronunciationTargetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  pronunciationAudioAssets<T extends Prisma.User$pronunciationAudioAssetsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$pronunciationAudioAssetsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PronunciationAudioAssetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -4835,6 +5609,78 @@ export type User$privateLearningSummariesArgs<ExtArgs extends runtime.Types.Exte
   take?: number
   skip?: number
   distinct?: Prisma.PrivateLearningSummaryScalarFieldEnum | Prisma.PrivateLearningSummaryScalarFieldEnum[]
+}
+
+/**
+ * User.pronunciationAssessments
+ */
+export type User$pronunciationAssessmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PronunciationAssessment
+   */
+  select?: Prisma.PronunciationAssessmentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PronunciationAssessment
+   */
+  omit?: Prisma.PronunciationAssessmentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PronunciationAssessmentInclude<ExtArgs> | null
+  where?: Prisma.PronunciationAssessmentWhereInput
+  orderBy?: Prisma.PronunciationAssessmentOrderByWithRelationInput | Prisma.PronunciationAssessmentOrderByWithRelationInput[]
+  cursor?: Prisma.PronunciationAssessmentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PronunciationAssessmentScalarFieldEnum | Prisma.PronunciationAssessmentScalarFieldEnum[]
+}
+
+/**
+ * User.pronunciationTargets
+ */
+export type User$pronunciationTargetsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PronunciationTarget
+   */
+  select?: Prisma.PronunciationTargetSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PronunciationTarget
+   */
+  omit?: Prisma.PronunciationTargetOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PronunciationTargetInclude<ExtArgs> | null
+  where?: Prisma.PronunciationTargetWhereInput
+  orderBy?: Prisma.PronunciationTargetOrderByWithRelationInput | Prisma.PronunciationTargetOrderByWithRelationInput[]
+  cursor?: Prisma.PronunciationTargetWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PronunciationTargetScalarFieldEnum | Prisma.PronunciationTargetScalarFieldEnum[]
+}
+
+/**
+ * User.pronunciationAudioAssets
+ */
+export type User$pronunciationAudioAssetsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PronunciationAudioAsset
+   */
+  select?: Prisma.PronunciationAudioAssetSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PronunciationAudioAsset
+   */
+  omit?: Prisma.PronunciationAudioAssetOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PronunciationAudioAssetInclude<ExtArgs> | null
+  where?: Prisma.PronunciationAudioAssetWhereInput
+  orderBy?: Prisma.PronunciationAudioAssetOrderByWithRelationInput | Prisma.PronunciationAudioAssetOrderByWithRelationInput[]
+  cursor?: Prisma.PronunciationAudioAssetWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PronunciationAudioAssetScalarFieldEnum | Prisma.PronunciationAudioAssetScalarFieldEnum[]
 }
 
 /**

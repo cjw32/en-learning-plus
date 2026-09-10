@@ -312,6 +312,7 @@ export type LearningItemStateWhereInput = {
   word?: Prisma.XOR<Prisma.WordBookNullableScalarRelationFilter, Prisma.WordBookWhereInput> | null
   lastAttempt?: Prisma.XOR<Prisma.LearningAttemptNullableScalarRelationFilter, Prisma.LearningAttemptWhereInput> | null
   reviewEvents?: Prisma.LearningReviewEventListRelationFilter
+  recalculationEvents?: Prisma.LearningStateRecalculationEventListRelationFilter
 }
 
 export type LearningItemStateOrderByWithRelationInput = {
@@ -334,6 +335,7 @@ export type LearningItemStateOrderByWithRelationInput = {
   word?: Prisma.WordBookOrderByWithRelationInput
   lastAttempt?: Prisma.LearningAttemptOrderByWithRelationInput
   reviewEvents?: Prisma.LearningReviewEventOrderByRelationAggregateInput
+  recalculationEvents?: Prisma.LearningStateRecalculationEventOrderByRelationAggregateInput
 }
 
 export type LearningItemStateWhereUniqueInput = Prisma.AtLeast<{
@@ -360,6 +362,7 @@ export type LearningItemStateWhereUniqueInput = Prisma.AtLeast<{
   word?: Prisma.XOR<Prisma.WordBookNullableScalarRelationFilter, Prisma.WordBookWhereInput> | null
   lastAttempt?: Prisma.XOR<Prisma.LearningAttemptNullableScalarRelationFilter, Prisma.LearningAttemptWhereInput> | null
   reviewEvents?: Prisma.LearningReviewEventListRelationFilter
+  recalculationEvents?: Prisma.LearningStateRecalculationEventListRelationFilter
 }, "id" | "userId_targetType_targetKey">
 
 export type LearningItemStateOrderByWithAggregationInput = {
@@ -423,6 +426,7 @@ export type LearningItemStateCreateInput = {
   word?: Prisma.WordBookCreateNestedOneWithoutLearningItemStatesInput
   lastAttempt?: Prisma.LearningAttemptCreateNestedOneWithoutLatestItemStatesInput
   reviewEvents?: Prisma.LearningReviewEventCreateNestedManyWithoutItemStateInput
+  recalculationEvents?: Prisma.LearningStateRecalculationEventCreateNestedManyWithoutItemStateInput
 }
 
 export type LearningItemStateUncheckedCreateInput = {
@@ -442,6 +446,7 @@ export type LearningItemStateUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   reviewEvents?: Prisma.LearningReviewEventUncheckedCreateNestedManyWithoutItemStateInput
+  recalculationEvents?: Prisma.LearningStateRecalculationEventUncheckedCreateNestedManyWithoutItemStateInput
 }
 
 export type LearningItemStateUpdateInput = {
@@ -461,6 +466,7 @@ export type LearningItemStateUpdateInput = {
   word?: Prisma.WordBookUpdateOneWithoutLearningItemStatesNestedInput
   lastAttempt?: Prisma.LearningAttemptUpdateOneWithoutLatestItemStatesNestedInput
   reviewEvents?: Prisma.LearningReviewEventUpdateManyWithoutItemStateNestedInput
+  recalculationEvents?: Prisma.LearningStateRecalculationEventUpdateManyWithoutItemStateNestedInput
 }
 
 export type LearningItemStateUncheckedUpdateInput = {
@@ -480,6 +486,7 @@ export type LearningItemStateUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   reviewEvents?: Prisma.LearningReviewEventUncheckedUpdateManyWithoutItemStateNestedInput
+  recalculationEvents?: Prisma.LearningStateRecalculationEventUncheckedUpdateManyWithoutItemStateNestedInput
 }
 
 export type LearningItemStateCreateManyInput = {
@@ -778,6 +785,20 @@ export type LearningItemStateUncheckedUpdateManyWithoutLastAttemptNestedInput = 
   deleteMany?: Prisma.LearningItemStateScalarWhereInput | Prisma.LearningItemStateScalarWhereInput[]
 }
 
+export type LearningItemStateCreateNestedOneWithoutRecalculationEventsInput = {
+  create?: Prisma.XOR<Prisma.LearningItemStateCreateWithoutRecalculationEventsInput, Prisma.LearningItemStateUncheckedCreateWithoutRecalculationEventsInput>
+  connectOrCreate?: Prisma.LearningItemStateCreateOrConnectWithoutRecalculationEventsInput
+  connect?: Prisma.LearningItemStateWhereUniqueInput
+}
+
+export type LearningItemStateUpdateOneRequiredWithoutRecalculationEventsNestedInput = {
+  create?: Prisma.XOR<Prisma.LearningItemStateCreateWithoutRecalculationEventsInput, Prisma.LearningItemStateUncheckedCreateWithoutRecalculationEventsInput>
+  connectOrCreate?: Prisma.LearningItemStateCreateOrConnectWithoutRecalculationEventsInput
+  upsert?: Prisma.LearningItemStateUpsertWithoutRecalculationEventsInput
+  connect?: Prisma.LearningItemStateWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.LearningItemStateUpdateToOneWithWhereWithoutRecalculationEventsInput, Prisma.LearningItemStateUpdateWithoutRecalculationEventsInput>, Prisma.LearningItemStateUncheckedUpdateWithoutRecalculationEventsInput>
+}
+
 export type LearningItemStateCreateWithoutUserInput = {
   id?: string
   targetType: $Enums.LearningTargetType
@@ -794,6 +815,7 @@ export type LearningItemStateCreateWithoutUserInput = {
   word?: Prisma.WordBookCreateNestedOneWithoutLearningItemStatesInput
   lastAttempt?: Prisma.LearningAttemptCreateNestedOneWithoutLatestItemStatesInput
   reviewEvents?: Prisma.LearningReviewEventCreateNestedManyWithoutItemStateInput
+  recalculationEvents?: Prisma.LearningStateRecalculationEventCreateNestedManyWithoutItemStateInput
 }
 
 export type LearningItemStateUncheckedCreateWithoutUserInput = {
@@ -812,6 +834,7 @@ export type LearningItemStateUncheckedCreateWithoutUserInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   reviewEvents?: Prisma.LearningReviewEventUncheckedCreateNestedManyWithoutItemStateInput
+  recalculationEvents?: Prisma.LearningStateRecalculationEventUncheckedCreateNestedManyWithoutItemStateInput
 }
 
 export type LearningItemStateCreateOrConnectWithoutUserInput = {
@@ -877,6 +900,7 @@ export type LearningItemStateCreateWithoutWordInput = {
   user: Prisma.UserCreateNestedOneWithoutLearningItemStatesInput
   lastAttempt?: Prisma.LearningAttemptCreateNestedOneWithoutLatestItemStatesInput
   reviewEvents?: Prisma.LearningReviewEventCreateNestedManyWithoutItemStateInput
+  recalculationEvents?: Prisma.LearningStateRecalculationEventCreateNestedManyWithoutItemStateInput
 }
 
 export type LearningItemStateUncheckedCreateWithoutWordInput = {
@@ -895,6 +919,7 @@ export type LearningItemStateUncheckedCreateWithoutWordInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   reviewEvents?: Prisma.LearningReviewEventUncheckedCreateNestedManyWithoutItemStateInput
+  recalculationEvents?: Prisma.LearningStateRecalculationEventUncheckedCreateNestedManyWithoutItemStateInput
 }
 
 export type LearningItemStateCreateOrConnectWithoutWordInput = {
@@ -939,6 +964,7 @@ export type LearningItemStateCreateWithoutReviewEventsInput = {
   user: Prisma.UserCreateNestedOneWithoutLearningItemStatesInput
   word?: Prisma.WordBookCreateNestedOneWithoutLearningItemStatesInput
   lastAttempt?: Prisma.LearningAttemptCreateNestedOneWithoutLatestItemStatesInput
+  recalculationEvents?: Prisma.LearningStateRecalculationEventCreateNestedManyWithoutItemStateInput
 }
 
 export type LearningItemStateUncheckedCreateWithoutReviewEventsInput = {
@@ -957,6 +983,7 @@ export type LearningItemStateUncheckedCreateWithoutReviewEventsInput = {
   lastAttemptId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  recalculationEvents?: Prisma.LearningStateRecalculationEventUncheckedCreateNestedManyWithoutItemStateInput
 }
 
 export type LearningItemStateCreateOrConnectWithoutReviewEventsInput = {
@@ -991,6 +1018,7 @@ export type LearningItemStateUpdateWithoutReviewEventsInput = {
   user?: Prisma.UserUpdateOneRequiredWithoutLearningItemStatesNestedInput
   word?: Prisma.WordBookUpdateOneWithoutLearningItemStatesNestedInput
   lastAttempt?: Prisma.LearningAttemptUpdateOneWithoutLatestItemStatesNestedInput
+  recalculationEvents?: Prisma.LearningStateRecalculationEventUpdateManyWithoutItemStateNestedInput
 }
 
 export type LearningItemStateUncheckedUpdateWithoutReviewEventsInput = {
@@ -1009,6 +1037,7 @@ export type LearningItemStateUncheckedUpdateWithoutReviewEventsInput = {
   lastAttemptId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  recalculationEvents?: Prisma.LearningStateRecalculationEventUncheckedUpdateManyWithoutItemStateNestedInput
 }
 
 export type LearningItemStateCreateWithoutLastAttemptInput = {
@@ -1027,6 +1056,7 @@ export type LearningItemStateCreateWithoutLastAttemptInput = {
   user: Prisma.UserCreateNestedOneWithoutLearningItemStatesInput
   word?: Prisma.WordBookCreateNestedOneWithoutLearningItemStatesInput
   reviewEvents?: Prisma.LearningReviewEventCreateNestedManyWithoutItemStateInput
+  recalculationEvents?: Prisma.LearningStateRecalculationEventCreateNestedManyWithoutItemStateInput
 }
 
 export type LearningItemStateUncheckedCreateWithoutLastAttemptInput = {
@@ -1045,6 +1075,7 @@ export type LearningItemStateUncheckedCreateWithoutLastAttemptInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   reviewEvents?: Prisma.LearningReviewEventUncheckedCreateNestedManyWithoutItemStateInput
+  recalculationEvents?: Prisma.LearningStateRecalculationEventUncheckedCreateNestedManyWithoutItemStateInput
 }
 
 export type LearningItemStateCreateOrConnectWithoutLastAttemptInput = {
@@ -1071,6 +1102,98 @@ export type LearningItemStateUpdateWithWhereUniqueWithoutLastAttemptInput = {
 export type LearningItemStateUpdateManyWithWhereWithoutLastAttemptInput = {
   where: Prisma.LearningItemStateScalarWhereInput
   data: Prisma.XOR<Prisma.LearningItemStateUpdateManyMutationInput, Prisma.LearningItemStateUncheckedUpdateManyWithoutLastAttemptInput>
+}
+
+export type LearningItemStateCreateWithoutRecalculationEventsInput = {
+  id?: string
+  targetType: $Enums.LearningTargetType
+  targetKey: string
+  reviewState?: $Enums.LearningReviewState
+  repetitionCount?: number
+  easeFactor?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  intervalDays?: number
+  dueAt?: Date | string | null
+  lastReviewedAt?: Date | string | null
+  lastQuality?: number | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutLearningItemStatesInput
+  word?: Prisma.WordBookCreateNestedOneWithoutLearningItemStatesInput
+  lastAttempt?: Prisma.LearningAttemptCreateNestedOneWithoutLatestItemStatesInput
+  reviewEvents?: Prisma.LearningReviewEventCreateNestedManyWithoutItemStateInput
+}
+
+export type LearningItemStateUncheckedCreateWithoutRecalculationEventsInput = {
+  id?: string
+  userId: string
+  targetType: $Enums.LearningTargetType
+  targetKey: string
+  wordId?: string | null
+  reviewState?: $Enums.LearningReviewState
+  repetitionCount?: number
+  easeFactor?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  intervalDays?: number
+  dueAt?: Date | string | null
+  lastReviewedAt?: Date | string | null
+  lastQuality?: number | null
+  lastAttemptId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  reviewEvents?: Prisma.LearningReviewEventUncheckedCreateNestedManyWithoutItemStateInput
+}
+
+export type LearningItemStateCreateOrConnectWithoutRecalculationEventsInput = {
+  where: Prisma.LearningItemStateWhereUniqueInput
+  create: Prisma.XOR<Prisma.LearningItemStateCreateWithoutRecalculationEventsInput, Prisma.LearningItemStateUncheckedCreateWithoutRecalculationEventsInput>
+}
+
+export type LearningItemStateUpsertWithoutRecalculationEventsInput = {
+  update: Prisma.XOR<Prisma.LearningItemStateUpdateWithoutRecalculationEventsInput, Prisma.LearningItemStateUncheckedUpdateWithoutRecalculationEventsInput>
+  create: Prisma.XOR<Prisma.LearningItemStateCreateWithoutRecalculationEventsInput, Prisma.LearningItemStateUncheckedCreateWithoutRecalculationEventsInput>
+  where?: Prisma.LearningItemStateWhereInput
+}
+
+export type LearningItemStateUpdateToOneWithWhereWithoutRecalculationEventsInput = {
+  where?: Prisma.LearningItemStateWhereInput
+  data: Prisma.XOR<Prisma.LearningItemStateUpdateWithoutRecalculationEventsInput, Prisma.LearningItemStateUncheckedUpdateWithoutRecalculationEventsInput>
+}
+
+export type LearningItemStateUpdateWithoutRecalculationEventsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  targetType?: Prisma.EnumLearningTargetTypeFieldUpdateOperationsInput | $Enums.LearningTargetType
+  targetKey?: Prisma.StringFieldUpdateOperationsInput | string
+  reviewState?: Prisma.EnumLearningReviewStateFieldUpdateOperationsInput | $Enums.LearningReviewState
+  repetitionCount?: Prisma.IntFieldUpdateOperationsInput | number
+  easeFactor?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  intervalDays?: Prisma.IntFieldUpdateOperationsInput | number
+  dueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastReviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastQuality?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutLearningItemStatesNestedInput
+  word?: Prisma.WordBookUpdateOneWithoutLearningItemStatesNestedInput
+  lastAttempt?: Prisma.LearningAttemptUpdateOneWithoutLatestItemStatesNestedInput
+  reviewEvents?: Prisma.LearningReviewEventUpdateManyWithoutItemStateNestedInput
+}
+
+export type LearningItemStateUncheckedUpdateWithoutRecalculationEventsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  targetType?: Prisma.EnumLearningTargetTypeFieldUpdateOperationsInput | $Enums.LearningTargetType
+  targetKey?: Prisma.StringFieldUpdateOperationsInput | string
+  wordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reviewState?: Prisma.EnumLearningReviewStateFieldUpdateOperationsInput | $Enums.LearningReviewState
+  repetitionCount?: Prisma.IntFieldUpdateOperationsInput | number
+  easeFactor?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  intervalDays?: Prisma.IntFieldUpdateOperationsInput | number
+  dueAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastReviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastQuality?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lastAttemptId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  reviewEvents?: Prisma.LearningReviewEventUncheckedUpdateManyWithoutItemStateNestedInput
 }
 
 export type LearningItemStateCreateManyUserInput = {
@@ -1106,6 +1229,7 @@ export type LearningItemStateUpdateWithoutUserInput = {
   word?: Prisma.WordBookUpdateOneWithoutLearningItemStatesNestedInput
   lastAttempt?: Prisma.LearningAttemptUpdateOneWithoutLatestItemStatesNestedInput
   reviewEvents?: Prisma.LearningReviewEventUpdateManyWithoutItemStateNestedInput
+  recalculationEvents?: Prisma.LearningStateRecalculationEventUpdateManyWithoutItemStateNestedInput
 }
 
 export type LearningItemStateUncheckedUpdateWithoutUserInput = {
@@ -1124,6 +1248,7 @@ export type LearningItemStateUncheckedUpdateWithoutUserInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   reviewEvents?: Prisma.LearningReviewEventUncheckedUpdateManyWithoutItemStateNestedInput
+  recalculationEvents?: Prisma.LearningStateRecalculationEventUncheckedUpdateManyWithoutItemStateNestedInput
 }
 
 export type LearningItemStateUncheckedUpdateManyWithoutUserInput = {
@@ -1176,6 +1301,7 @@ export type LearningItemStateUpdateWithoutWordInput = {
   user?: Prisma.UserUpdateOneRequiredWithoutLearningItemStatesNestedInput
   lastAttempt?: Prisma.LearningAttemptUpdateOneWithoutLatestItemStatesNestedInput
   reviewEvents?: Prisma.LearningReviewEventUpdateManyWithoutItemStateNestedInput
+  recalculationEvents?: Prisma.LearningStateRecalculationEventUpdateManyWithoutItemStateNestedInput
 }
 
 export type LearningItemStateUncheckedUpdateWithoutWordInput = {
@@ -1194,6 +1320,7 @@ export type LearningItemStateUncheckedUpdateWithoutWordInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   reviewEvents?: Prisma.LearningReviewEventUncheckedUpdateManyWithoutItemStateNestedInput
+  recalculationEvents?: Prisma.LearningStateRecalculationEventUncheckedUpdateManyWithoutItemStateNestedInput
 }
 
 export type LearningItemStateUncheckedUpdateManyWithoutWordInput = {
@@ -1246,6 +1373,7 @@ export type LearningItemStateUpdateWithoutLastAttemptInput = {
   user?: Prisma.UserUpdateOneRequiredWithoutLearningItemStatesNestedInput
   word?: Prisma.WordBookUpdateOneWithoutLearningItemStatesNestedInput
   reviewEvents?: Prisma.LearningReviewEventUpdateManyWithoutItemStateNestedInput
+  recalculationEvents?: Prisma.LearningStateRecalculationEventUpdateManyWithoutItemStateNestedInput
 }
 
 export type LearningItemStateUncheckedUpdateWithoutLastAttemptInput = {
@@ -1264,6 +1392,7 @@ export type LearningItemStateUncheckedUpdateWithoutLastAttemptInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   reviewEvents?: Prisma.LearningReviewEventUncheckedUpdateManyWithoutItemStateNestedInput
+  recalculationEvents?: Prisma.LearningStateRecalculationEventUncheckedUpdateManyWithoutItemStateNestedInput
 }
 
 export type LearningItemStateUncheckedUpdateManyWithoutLastAttemptInput = {
@@ -1290,10 +1419,12 @@ export type LearningItemStateUncheckedUpdateManyWithoutLastAttemptInput = {
 
 export type LearningItemStateCountOutputType = {
   reviewEvents: number
+  recalculationEvents: number
 }
 
 export type LearningItemStateCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   reviewEvents?: boolean | LearningItemStateCountOutputTypeCountReviewEventsArgs
+  recalculationEvents?: boolean | LearningItemStateCountOutputTypeCountRecalculationEventsArgs
 }
 
 /**
@@ -1311,6 +1442,13 @@ export type LearningItemStateCountOutputTypeDefaultArgs<ExtArgs extends runtime.
  */
 export type LearningItemStateCountOutputTypeCountReviewEventsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.LearningReviewEventWhereInput
+}
+
+/**
+ * LearningItemStateCountOutputType without action
+ */
+export type LearningItemStateCountOutputTypeCountRecalculationEventsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.LearningStateRecalculationEventWhereInput
 }
 
 
@@ -1334,6 +1472,7 @@ export type LearningItemStateSelect<ExtArgs extends runtime.Types.Extensions.Int
   word?: boolean | Prisma.LearningItemState$wordArgs<ExtArgs>
   lastAttempt?: boolean | Prisma.LearningItemState$lastAttemptArgs<ExtArgs>
   reviewEvents?: boolean | Prisma.LearningItemState$reviewEventsArgs<ExtArgs>
+  recalculationEvents?: boolean | Prisma.LearningItemState$recalculationEventsArgs<ExtArgs>
   _count?: boolean | Prisma.LearningItemStateCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["learningItemState"]>
 
@@ -1403,6 +1542,7 @@ export type LearningItemStateInclude<ExtArgs extends runtime.Types.Extensions.In
   word?: boolean | Prisma.LearningItemState$wordArgs<ExtArgs>
   lastAttempt?: boolean | Prisma.LearningItemState$lastAttemptArgs<ExtArgs>
   reviewEvents?: boolean | Prisma.LearningItemState$reviewEventsArgs<ExtArgs>
+  recalculationEvents?: boolean | Prisma.LearningItemState$recalculationEventsArgs<ExtArgs>
   _count?: boolean | Prisma.LearningItemStateCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type LearningItemStateIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1423,6 +1563,7 @@ export type $LearningItemStatePayload<ExtArgs extends runtime.Types.Extensions.I
     word: Prisma.$WordBookPayload<ExtArgs> | null
     lastAttempt: Prisma.$LearningAttemptPayload<ExtArgs> | null
     reviewEvents: Prisma.$LearningReviewEventPayload<ExtArgs>[]
+    recalculationEvents: Prisma.$LearningStateRecalculationEventPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1838,6 +1979,7 @@ export interface Prisma__LearningItemStateClient<T, Null = never, ExtArgs extend
   word<T extends Prisma.LearningItemState$wordArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.LearningItemState$wordArgs<ExtArgs>>): Prisma.Prisma__WordBookClient<runtime.Types.Result.GetResult<Prisma.$WordBookPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   lastAttempt<T extends Prisma.LearningItemState$lastAttemptArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.LearningItemState$lastAttemptArgs<ExtArgs>>): Prisma.Prisma__LearningAttemptClient<runtime.Types.Result.GetResult<Prisma.$LearningAttemptPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   reviewEvents<T extends Prisma.LearningItemState$reviewEventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.LearningItemState$reviewEventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LearningReviewEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  recalculationEvents<T extends Prisma.LearningItemState$recalculationEventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.LearningItemState$recalculationEventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LearningStateRecalculationEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2342,6 +2484,30 @@ export type LearningItemState$reviewEventsArgs<ExtArgs extends runtime.Types.Ext
   take?: number
   skip?: number
   distinct?: Prisma.LearningReviewEventScalarFieldEnum | Prisma.LearningReviewEventScalarFieldEnum[]
+}
+
+/**
+ * LearningItemState.recalculationEvents
+ */
+export type LearningItemState$recalculationEventsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the LearningStateRecalculationEvent
+   */
+  select?: Prisma.LearningStateRecalculationEventSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the LearningStateRecalculationEvent
+   */
+  omit?: Prisma.LearningStateRecalculationEventOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.LearningStateRecalculationEventInclude<ExtArgs> | null
+  where?: Prisma.LearningStateRecalculationEventWhereInput
+  orderBy?: Prisma.LearningStateRecalculationEventOrderByWithRelationInput | Prisma.LearningStateRecalculationEventOrderByWithRelationInput[]
+  cursor?: Prisma.LearningStateRecalculationEventWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.LearningStateRecalculationEventScalarFieldEnum | Prisma.LearningStateRecalculationEventScalarFieldEnum[]
 }
 
 /**

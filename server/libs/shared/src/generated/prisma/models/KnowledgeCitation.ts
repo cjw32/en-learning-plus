@@ -311,6 +311,7 @@ export type KnowledgeCitationWhereInput = {
   request?: Prisma.XOR<Prisma.CoachRequestScalarRelationFilter, Prisma.CoachRequestWhereInput>
   chunk?: Prisma.XOR<Prisma.KnowledgeChunkNullableScalarRelationFilter, Prisma.KnowledgeChunkWhereInput> | null
   document?: Prisma.XOR<Prisma.KnowledgeDocumentNullableScalarRelationFilter, Prisma.KnowledgeDocumentWhereInput> | null
+  pronunciationTargets?: Prisma.PronunciationTargetListRelationFilter
 }
 
 export type KnowledgeCitationOrderByWithRelationInput = {
@@ -333,6 +334,7 @@ export type KnowledgeCitationOrderByWithRelationInput = {
   request?: Prisma.CoachRequestOrderByWithRelationInput
   chunk?: Prisma.KnowledgeChunkOrderByWithRelationInput
   document?: Prisma.KnowledgeDocumentOrderByWithRelationInput
+  pronunciationTargets?: Prisma.PronunciationTargetOrderByRelationAggregateInput
 }
 
 export type KnowledgeCitationWhereUniqueInput = Prisma.AtLeast<{
@@ -359,6 +361,7 @@ export type KnowledgeCitationWhereUniqueInput = Prisma.AtLeast<{
   request?: Prisma.XOR<Prisma.CoachRequestScalarRelationFilter, Prisma.CoachRequestWhereInput>
   chunk?: Prisma.XOR<Prisma.KnowledgeChunkNullableScalarRelationFilter, Prisma.KnowledgeChunkWhereInput> | null
   document?: Prisma.XOR<Prisma.KnowledgeDocumentNullableScalarRelationFilter, Prisma.KnowledgeDocumentWhereInput> | null
+  pronunciationTargets?: Prisma.PronunciationTargetListRelationFilter
 }, "id" | "requestId_chunkId_contentVersion">
 
 export type KnowledgeCitationOrderByWithAggregationInput = {
@@ -424,6 +427,7 @@ export type KnowledgeCitationCreateInput = {
   request: Prisma.CoachRequestCreateNestedOneWithoutKnowledgeCitationsInput
   chunk?: Prisma.KnowledgeChunkCreateNestedOneWithoutCitationsInput
   document?: Prisma.KnowledgeDocumentCreateNestedOneWithoutCitationsInput
+  pronunciationTargets?: Prisma.PronunciationTargetCreateNestedManyWithoutKnowledgeCitationInput
 }
 
 export type KnowledgeCitationUncheckedCreateInput = {
@@ -443,6 +447,7 @@ export type KnowledgeCitationUncheckedCreateInput = {
   invalidatedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedCreateNestedManyWithoutKnowledgeCitationInput
 }
 
 export type KnowledgeCitationUpdateInput = {
@@ -462,6 +467,7 @@ export type KnowledgeCitationUpdateInput = {
   request?: Prisma.CoachRequestUpdateOneRequiredWithoutKnowledgeCitationsNestedInput
   chunk?: Prisma.KnowledgeChunkUpdateOneWithoutCitationsNestedInput
   document?: Prisma.KnowledgeDocumentUpdateOneWithoutCitationsNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUpdateManyWithoutKnowledgeCitationNestedInput
 }
 
 export type KnowledgeCitationUncheckedUpdateInput = {
@@ -481,6 +487,7 @@ export type KnowledgeCitationUncheckedUpdateInput = {
   invalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedUpdateManyWithoutKnowledgeCitationNestedInput
 }
 
 export type KnowledgeCitationCreateManyInput = {
@@ -545,6 +552,11 @@ export type KnowledgeCitationListRelationFilter = {
 
 export type KnowledgeCitationOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
+}
+
+export type KnowledgeCitationNullableScalarRelationFilter = {
+  is?: Prisma.KnowledgeCitationWhereInput | null
+  isNot?: Prisma.KnowledgeCitationWhereInput | null
 }
 
 export type KnowledgeCitationRequestIdChunkIdContentVersionCompoundUniqueInput = {
@@ -662,6 +674,22 @@ export type KnowledgeCitationUncheckedUpdateManyWithoutRequestNestedInput = {
   deleteMany?: Prisma.KnowledgeCitationScalarWhereInput | Prisma.KnowledgeCitationScalarWhereInput[]
 }
 
+export type KnowledgeCitationCreateNestedOneWithoutPronunciationTargetsInput = {
+  create?: Prisma.XOR<Prisma.KnowledgeCitationCreateWithoutPronunciationTargetsInput, Prisma.KnowledgeCitationUncheckedCreateWithoutPronunciationTargetsInput>
+  connectOrCreate?: Prisma.KnowledgeCitationCreateOrConnectWithoutPronunciationTargetsInput
+  connect?: Prisma.KnowledgeCitationWhereUniqueInput
+}
+
+export type KnowledgeCitationUpdateOneWithoutPronunciationTargetsNestedInput = {
+  create?: Prisma.XOR<Prisma.KnowledgeCitationCreateWithoutPronunciationTargetsInput, Prisma.KnowledgeCitationUncheckedCreateWithoutPronunciationTargetsInput>
+  connectOrCreate?: Prisma.KnowledgeCitationCreateOrConnectWithoutPronunciationTargetsInput
+  upsert?: Prisma.KnowledgeCitationUpsertWithoutPronunciationTargetsInput
+  disconnect?: Prisma.KnowledgeCitationWhereInput | boolean
+  delete?: Prisma.KnowledgeCitationWhereInput | boolean
+  connect?: Prisma.KnowledgeCitationWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.KnowledgeCitationUpdateToOneWithWhereWithoutPronunciationTargetsInput, Prisma.KnowledgeCitationUpdateWithoutPronunciationTargetsInput>, Prisma.KnowledgeCitationUncheckedUpdateWithoutPronunciationTargetsInput>
+}
+
 export type KnowledgeCitationCreateNestedManyWithoutDocumentInput = {
   create?: Prisma.XOR<Prisma.KnowledgeCitationCreateWithoutDocumentInput, Prisma.KnowledgeCitationUncheckedCreateWithoutDocumentInput> | Prisma.KnowledgeCitationCreateWithoutDocumentInput[] | Prisma.KnowledgeCitationUncheckedCreateWithoutDocumentInput[]
   connectOrCreate?: Prisma.KnowledgeCitationCreateOrConnectWithoutDocumentInput | Prisma.KnowledgeCitationCreateOrConnectWithoutDocumentInput[]
@@ -766,6 +794,7 @@ export type KnowledgeCitationCreateWithoutRequestInput = {
   updatedAt?: Date | string
   chunk?: Prisma.KnowledgeChunkCreateNestedOneWithoutCitationsInput
   document?: Prisma.KnowledgeDocumentCreateNestedOneWithoutCitationsInput
+  pronunciationTargets?: Prisma.PronunciationTargetCreateNestedManyWithoutKnowledgeCitationInput
 }
 
 export type KnowledgeCitationUncheckedCreateWithoutRequestInput = {
@@ -784,6 +813,7 @@ export type KnowledgeCitationUncheckedCreateWithoutRequestInput = {
   invalidatedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedCreateNestedManyWithoutKnowledgeCitationInput
 }
 
 export type KnowledgeCitationCreateOrConnectWithoutRequestInput = {
@@ -834,6 +864,98 @@ export type KnowledgeCitationScalarWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"KnowledgeCitation"> | Date | string
 }
 
+export type KnowledgeCitationCreateWithoutPronunciationTargetsInput = {
+  id: string
+  sourceId?: string | null
+  sourceIdHash: string
+  contentVersion: string
+  embeddingVersion: string
+  excerpt?: string | null
+  excerptHash: string
+  rank: number
+  relevanceScore: runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: $Enums.KnowledgeCitationStatus
+  invalidatedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  request: Prisma.CoachRequestCreateNestedOneWithoutKnowledgeCitationsInput
+  chunk?: Prisma.KnowledgeChunkCreateNestedOneWithoutCitationsInput
+  document?: Prisma.KnowledgeDocumentCreateNestedOneWithoutCitationsInput
+}
+
+export type KnowledgeCitationUncheckedCreateWithoutPronunciationTargetsInput = {
+  id: string
+  requestId: string
+  chunkId?: string | null
+  documentId?: string | null
+  sourceId?: string | null
+  sourceIdHash: string
+  contentVersion: string
+  embeddingVersion: string
+  excerpt?: string | null
+  excerptHash: string
+  rank: number
+  relevanceScore: runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: $Enums.KnowledgeCitationStatus
+  invalidatedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type KnowledgeCitationCreateOrConnectWithoutPronunciationTargetsInput = {
+  where: Prisma.KnowledgeCitationWhereUniqueInput
+  create: Prisma.XOR<Prisma.KnowledgeCitationCreateWithoutPronunciationTargetsInput, Prisma.KnowledgeCitationUncheckedCreateWithoutPronunciationTargetsInput>
+}
+
+export type KnowledgeCitationUpsertWithoutPronunciationTargetsInput = {
+  update: Prisma.XOR<Prisma.KnowledgeCitationUpdateWithoutPronunciationTargetsInput, Prisma.KnowledgeCitationUncheckedUpdateWithoutPronunciationTargetsInput>
+  create: Prisma.XOR<Prisma.KnowledgeCitationCreateWithoutPronunciationTargetsInput, Prisma.KnowledgeCitationUncheckedCreateWithoutPronunciationTargetsInput>
+  where?: Prisma.KnowledgeCitationWhereInput
+}
+
+export type KnowledgeCitationUpdateToOneWithWhereWithoutPronunciationTargetsInput = {
+  where?: Prisma.KnowledgeCitationWhereInput
+  data: Prisma.XOR<Prisma.KnowledgeCitationUpdateWithoutPronunciationTargetsInput, Prisma.KnowledgeCitationUncheckedUpdateWithoutPronunciationTargetsInput>
+}
+
+export type KnowledgeCitationUpdateWithoutPronunciationTargetsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sourceIdHash?: Prisma.StringFieldUpdateOperationsInput | string
+  contentVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  embeddingVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  excerpt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  excerptHash?: Prisma.StringFieldUpdateOperationsInput | string
+  rank?: Prisma.IntFieldUpdateOperationsInput | number
+  relevanceScore?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.EnumKnowledgeCitationStatusFieldUpdateOperationsInput | $Enums.KnowledgeCitationStatus
+  invalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  request?: Prisma.CoachRequestUpdateOneRequiredWithoutKnowledgeCitationsNestedInput
+  chunk?: Prisma.KnowledgeChunkUpdateOneWithoutCitationsNestedInput
+  document?: Prisma.KnowledgeDocumentUpdateOneWithoutCitationsNestedInput
+}
+
+export type KnowledgeCitationUncheckedUpdateWithoutPronunciationTargetsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  requestId?: Prisma.StringFieldUpdateOperationsInput | string
+  chunkId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  documentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sourceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sourceIdHash?: Prisma.StringFieldUpdateOperationsInput | string
+  contentVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  embeddingVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  excerpt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  excerptHash?: Prisma.StringFieldUpdateOperationsInput | string
+  rank?: Prisma.IntFieldUpdateOperationsInput | number
+  relevanceScore?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.EnumKnowledgeCitationStatusFieldUpdateOperationsInput | $Enums.KnowledgeCitationStatus
+  invalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
 export type KnowledgeCitationCreateWithoutDocumentInput = {
   id: string
   sourceId?: string | null
@@ -850,6 +972,7 @@ export type KnowledgeCitationCreateWithoutDocumentInput = {
   updatedAt?: Date | string
   request: Prisma.CoachRequestCreateNestedOneWithoutKnowledgeCitationsInput
   chunk?: Prisma.KnowledgeChunkCreateNestedOneWithoutCitationsInput
+  pronunciationTargets?: Prisma.PronunciationTargetCreateNestedManyWithoutKnowledgeCitationInput
 }
 
 export type KnowledgeCitationUncheckedCreateWithoutDocumentInput = {
@@ -868,6 +991,7 @@ export type KnowledgeCitationUncheckedCreateWithoutDocumentInput = {
   invalidatedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedCreateNestedManyWithoutKnowledgeCitationInput
 }
 
 export type KnowledgeCitationCreateOrConnectWithoutDocumentInput = {
@@ -912,6 +1036,7 @@ export type KnowledgeCitationCreateWithoutChunkInput = {
   updatedAt?: Date | string
   request: Prisma.CoachRequestCreateNestedOneWithoutKnowledgeCitationsInput
   document?: Prisma.KnowledgeDocumentCreateNestedOneWithoutCitationsInput
+  pronunciationTargets?: Prisma.PronunciationTargetCreateNestedManyWithoutKnowledgeCitationInput
 }
 
 export type KnowledgeCitationUncheckedCreateWithoutChunkInput = {
@@ -930,6 +1055,7 @@ export type KnowledgeCitationUncheckedCreateWithoutChunkInput = {
   invalidatedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedCreateNestedManyWithoutKnowledgeCitationInput
 }
 
 export type KnowledgeCitationCreateOrConnectWithoutChunkInput = {
@@ -992,6 +1118,7 @@ export type KnowledgeCitationUpdateWithoutRequestInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   chunk?: Prisma.KnowledgeChunkUpdateOneWithoutCitationsNestedInput
   document?: Prisma.KnowledgeDocumentUpdateOneWithoutCitationsNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUpdateManyWithoutKnowledgeCitationNestedInput
 }
 
 export type KnowledgeCitationUncheckedUpdateWithoutRequestInput = {
@@ -1010,6 +1137,7 @@ export type KnowledgeCitationUncheckedUpdateWithoutRequestInput = {
   invalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedUpdateManyWithoutKnowledgeCitationNestedInput
 }
 
 export type KnowledgeCitationUncheckedUpdateManyWithoutRequestInput = {
@@ -1064,6 +1192,7 @@ export type KnowledgeCitationUpdateWithoutDocumentInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   request?: Prisma.CoachRequestUpdateOneRequiredWithoutKnowledgeCitationsNestedInput
   chunk?: Prisma.KnowledgeChunkUpdateOneWithoutCitationsNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUpdateManyWithoutKnowledgeCitationNestedInput
 }
 
 export type KnowledgeCitationUncheckedUpdateWithoutDocumentInput = {
@@ -1082,6 +1211,7 @@ export type KnowledgeCitationUncheckedUpdateWithoutDocumentInput = {
   invalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedUpdateManyWithoutKnowledgeCitationNestedInput
 }
 
 export type KnowledgeCitationUncheckedUpdateManyWithoutDocumentInput = {
@@ -1136,6 +1266,7 @@ export type KnowledgeCitationUpdateWithoutChunkInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   request?: Prisma.CoachRequestUpdateOneRequiredWithoutKnowledgeCitationsNestedInput
   document?: Prisma.KnowledgeDocumentUpdateOneWithoutCitationsNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUpdateManyWithoutKnowledgeCitationNestedInput
 }
 
 export type KnowledgeCitationUncheckedUpdateWithoutChunkInput = {
@@ -1154,6 +1285,7 @@ export type KnowledgeCitationUncheckedUpdateWithoutChunkInput = {
   invalidatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedUpdateManyWithoutKnowledgeCitationNestedInput
 }
 
 export type KnowledgeCitationUncheckedUpdateManyWithoutChunkInput = {
@@ -1174,6 +1306,35 @@ export type KnowledgeCitationUncheckedUpdateManyWithoutChunkInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
+
+/**
+ * Count Type KnowledgeCitationCountOutputType
+ */
+
+export type KnowledgeCitationCountOutputType = {
+  pronunciationTargets: number
+}
+
+export type KnowledgeCitationCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  pronunciationTargets?: boolean | KnowledgeCitationCountOutputTypeCountPronunciationTargetsArgs
+}
+
+/**
+ * KnowledgeCitationCountOutputType without action
+ */
+export type KnowledgeCitationCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the KnowledgeCitationCountOutputType
+   */
+  select?: Prisma.KnowledgeCitationCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * KnowledgeCitationCountOutputType without action
+ */
+export type KnowledgeCitationCountOutputTypeCountPronunciationTargetsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PronunciationTargetWhereInput
+}
 
 
 export type KnowledgeCitationSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1196,6 +1357,8 @@ export type KnowledgeCitationSelect<ExtArgs extends runtime.Types.Extensions.Int
   request?: boolean | Prisma.CoachRequestDefaultArgs<ExtArgs>
   chunk?: boolean | Prisma.KnowledgeCitation$chunkArgs<ExtArgs>
   document?: boolean | Prisma.KnowledgeCitation$documentArgs<ExtArgs>
+  pronunciationTargets?: boolean | Prisma.KnowledgeCitation$pronunciationTargetsArgs<ExtArgs>
+  _count?: boolean | Prisma.KnowledgeCitationCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["knowledgeCitation"]>
 
 export type KnowledgeCitationSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1266,6 +1429,8 @@ export type KnowledgeCitationInclude<ExtArgs extends runtime.Types.Extensions.In
   request?: boolean | Prisma.CoachRequestDefaultArgs<ExtArgs>
   chunk?: boolean | Prisma.KnowledgeCitation$chunkArgs<ExtArgs>
   document?: boolean | Prisma.KnowledgeCitation$documentArgs<ExtArgs>
+  pronunciationTargets?: boolean | Prisma.KnowledgeCitation$pronunciationTargetsArgs<ExtArgs>
+  _count?: boolean | Prisma.KnowledgeCitationCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type KnowledgeCitationIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   request?: boolean | Prisma.CoachRequestDefaultArgs<ExtArgs>
@@ -1284,6 +1449,7 @@ export type $KnowledgeCitationPayload<ExtArgs extends runtime.Types.Extensions.I
     request: Prisma.$CoachRequestPayload<ExtArgs>
     chunk: Prisma.$KnowledgeChunkPayload<ExtArgs> | null
     document: Prisma.$KnowledgeDocumentPayload<ExtArgs> | null
+    pronunciationTargets: Prisma.$PronunciationTargetPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1699,6 +1865,7 @@ export interface Prisma__KnowledgeCitationClient<T, Null = never, ExtArgs extend
   request<T extends Prisma.CoachRequestDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CoachRequestDefaultArgs<ExtArgs>>): Prisma.Prisma__CoachRequestClient<runtime.Types.Result.GetResult<Prisma.$CoachRequestPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   chunk<T extends Prisma.KnowledgeCitation$chunkArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.KnowledgeCitation$chunkArgs<ExtArgs>>): Prisma.Prisma__KnowledgeChunkClient<runtime.Types.Result.GetResult<Prisma.$KnowledgeChunkPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   document<T extends Prisma.KnowledgeCitation$documentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.KnowledgeCitation$documentArgs<ExtArgs>>): Prisma.Prisma__KnowledgeDocumentClient<runtime.Types.Result.GetResult<Prisma.$KnowledgeDocumentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  pronunciationTargets<T extends Prisma.KnowledgeCitation$pronunciationTargetsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.KnowledgeCitation$pronunciationTargetsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PronunciationTargetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2180,6 +2347,30 @@ export type KnowledgeCitation$documentArgs<ExtArgs extends runtime.Types.Extensi
    */
   include?: Prisma.KnowledgeDocumentInclude<ExtArgs> | null
   where?: Prisma.KnowledgeDocumentWhereInput
+}
+
+/**
+ * KnowledgeCitation.pronunciationTargets
+ */
+export type KnowledgeCitation$pronunciationTargetsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PronunciationTarget
+   */
+  select?: Prisma.PronunciationTargetSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PronunciationTarget
+   */
+  omit?: Prisma.PronunciationTargetOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PronunciationTargetInclude<ExtArgs> | null
+  where?: Prisma.PronunciationTargetWhereInput
+  orderBy?: Prisma.PronunciationTargetOrderByWithRelationInput | Prisma.PronunciationTargetOrderByWithRelationInput[]
+  cursor?: Prisma.PronunciationTargetWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PronunciationTargetScalarFieldEnum | Prisma.PronunciationTargetScalarFieldEnum[]
 }
 
 /**

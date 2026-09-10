@@ -13,6 +13,7 @@ import {
   LearningModule,
   CitationProjectionService,
   RAG_LEARNING_MATERIAL_SEARCH,
+  PronunciationContextService,
   type RagLearningMaterialSearchPort,
 } from '@libs/learning';
 import { AuthGuard, SharedModule } from '@libs/shared';
@@ -74,6 +75,7 @@ import { SearchLearningMaterialsTool } from './tools/search-learning-materials.t
 import { CreateExerciseTool } from './tools/create-exercise.tool';
 import { GradeAnswerTool } from './tools/grade-answer.tool';
 import { SaveAttemptTool } from './tools/save-attempt.tool';
+import { GetPronunciationSummaryTool } from './tools/get-pronunciation-summary.tool';
 import { CoachModelGateway } from './workflow/coach-model.gateway';
 import { ConfiguredCoachStructuredModel } from './workflow/coach-structured-model.provider';
 import {
@@ -92,6 +94,7 @@ import {
 } from './governance/coach-admission.service';
 import { CoachEnabledGuard } from './governance/coach-enabled.guard';
 import { resolveRagRuntimeConfig } from './governance/coach-config.schema';
+import { resolvePronunciationRuntimeConfig } from '../pronunciation/governance/pronunciation-config.schema';
 import { KnowledgeModule } from '../knowledge/knowledge.module';
 
 @Module({
@@ -238,6 +241,15 @@ import { KnowledgeModule } from '../knowledge/knowledge.module';
     },
     GetLearnerProfileTool,
     {
+      provide: GetPronunciationSummaryTool,
+      inject: [PronunciationContextService],
+      useFactory: (contexts: PronunciationContextService) =>
+        new GetPronunciationSummaryTool(
+          contexts,
+          resolvePronunciationRuntimeConfig(process.env).coachSummaryEnabled,
+        ),
+    },
+    {
       provide: GetDueWordsTool,
       inject: [ReviewScheduleService],
       useFactory: (schedules: ReviewScheduleService) =>
@@ -310,6 +322,7 @@ import { KnowledgeModule } from '../knowledge/knowledge.module';
         CreateExerciseTool,
         GradeAnswerTool,
         SaveAttemptTool,
+        GetPronunciationSummaryTool,
       ],
       useFactory: (
         stream: CoachEventStreamService,
@@ -323,6 +336,7 @@ import { KnowledgeModule } from '../knowledge/knowledge.module';
         exercises: CreateExerciseTool,
         grading: GradeAnswerTool,
         attempts: SaveAttemptTool,
+        pronunciationSummary: GetPronunciationSummaryTool,
       ) =>
         new CoachRuntimeWorkflowService(
           stream,
@@ -336,6 +350,8 @@ import { KnowledgeModule } from '../knowledge/knowledge.module';
           exercises,
           grading,
           attempts,
+          undefined,
+          pronunciationSummary,
         ),
     },
     {

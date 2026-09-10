@@ -1,0 +1,590 @@
+openapi: 3.1.0
+info:
+  title: en-learning-plus Pronunciation Assessment API
+  version: 1.0.0-plan
+  description: >-
+    Planned authenticated lifecycle for short browser pronunciation assessments.
+    This contract is not implemented or deployed by the planning phase.
+servers:
+  - url: /ai/v1
+security:
+  - bearerAuth: []
+tags:
+  - name: Pronunciation
+paths:
+  /pronunciation/assessments:
+    post:
+      tags: [Pronunciation]
+      operationId: createPronunciationAssessment
+      summary: Create an owned assessment and resolve an authoritative target snapshot
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateAssessmentRequest"
+      responses:
+        "201":
+          description: Created or idempotently replayed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AssessmentResponse"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+    get:
+      tags: [Pronunciation]
+      operationId: listPronunciationAssessments
+      summary: List owned, non-hidden assessments
+      parameters:
+        - name: cursor
+          in: query
+          schema: { type: string, maxLength: 512 }
+        - name: limit
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 50, default: 20 }
+      responses:
+        "200":
+          description: Owned assessment page
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AssessmentPageResponse"
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /pronunciation/assessments/{assessmentId}:
+    parameters:
+      - $ref: "#/components/parameters/AssessmentId"
+    get:
+      tags: [Pronunciation]
+      operationId: getPronunciationAssessment
+      summary: Read current durable state and result
+      responses:
+        "200":
+          description: Owned assessment
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AssessmentResponse"
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+    delete:
+      tags: [Pronunciation]
+      operationId: deletePronunciationAssessment
+      summary: Hide and delete the full assessment, including compensated learning impact
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      responses:
+        "202":
+          description: Deletion accepted; details are already hidden and audio access revoked
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeletionResponse"
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+
+  /pronunciation/assessments/{assessmentId}/audio:
+    parameters:
+      - $ref: "#/components/parameters/AssessmentId"
+    put:
+      tags: [Pronunciation]
+      operationId: uploadPronunciationAudio
+      summary: Upload one browser recording to private quarantine storage
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [audio]
+              properties:
+                audio:
+                  type: string
+                  format: binary
+                  description: WebM/Opus or MP4/AAC, at most 8 MiB; declared type is not trusted
+      responses:
+        "200":
+          description: Audio accepted for validation or idempotently replayed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AssessmentResponse"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "413":
+          description: Audio exceeds the 8 MiB hard limit
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+    get:
+      tags: [Pronunciation]
+      operationId: streamPronunciationAudio
+      summary: Stream currently available owned audio after fresh authorization
+      responses:
+        "200":
+          description: Private, no-store audio stream
+          headers:
+            Cache-Control:
+              schema: { type: string, const: "private, no-store" }
+          content:
+            audio/webm:
+              schema: { type: string, format: binary }
+            audio/mp4:
+              schema: { type: string, format: binary }
+            audio/wav:
+              schema: { type: string, format: binary }
+        "206":
+          description: Authorized partial audio response
+          content:
+            application/octet-stream:
+              schema: { type: string, format: binary }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "410":
+          description: Audio was revoked or expired
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+    delete:
+      tags: [Pronunciation]
+      operationId: deletePronunciationAudio
+      summary: Revoke and purge audio while retaining structured result and learning history
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      responses:
+        "202":
+          description: Audio access revoked and deletion accepted
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DeletionResponse" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  /pronunciation/assessments/{assessmentId}/submit:
+    parameters:
+      - $ref: "#/components/parameters/AssessmentId"
+    post:
+      tags: [Pronunciation]
+      operationId: submitPronunciationAssessment
+      summary: Revalidate source, reserve budget and enqueue assessment
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      responses:
+        "202":
+          description: Assessment queued or idempotently replayed
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AssessmentResponse" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "503":
+          description: Feature, provider, storage, model identity, price or budget gate is closed
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+  /pronunciation/assessments/{assessmentId}/cancel:
+    parameters:
+      - $ref: "#/components/parameters/AssessmentId"
+    post:
+      tags: [Pronunciation]
+      operationId: cancelPronunciationAssessment
+      summary: Durably cancel and prevent any subsequent learning write
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      responses:
+        "200":
+          description: Cancellation recorded or idempotently replayed
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AssessmentResponse" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+
+  /pronunciation/assessments/{assessmentId}/retry:
+    parameters:
+      - $ref: "#/components/parameters/AssessmentId"
+    post:
+      tags: [Pronunciation]
+      operationId: retryPronunciationAssessment
+      summary: Create a new assessment in the retry lineage
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      responses:
+        "201":
+          description: New assessment created or mutation idempotently replayed
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AssessmentResponse" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+
+  /pronunciation/deletions/{deletionId}:
+    get:
+      tags: [Pronunciation]
+      operationId: getPronunciationDeletion
+      summary: Read the verifiable status of an owned deletion request
+      parameters:
+        - name: deletionId
+          in: path
+          required: true
+          schema: { type: string, minLength: 1, maxLength: 128 }
+      responses:
+        "200":
+          description: Deletion status
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DeletionResponse" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    AssessmentId:
+      name: assessmentId
+      in: path
+      required: true
+      schema: { type: string, minLength: 1, maxLength: 128 }
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      schema: { type: string, minLength: 16, maxLength: 128 }
+
+  responses:
+    BadRequest:
+      description: Invalid target, state, audio metadata or request body
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+    Unauthorized:
+      description: Missing or invalid access token
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+    NotFound:
+      description: Resource does not exist or is not accessible to the authenticated subject
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+    Conflict:
+      description: Idempotency or state conflict
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+    RateLimited:
+      description: Per-subject concurrency, minute or daily limit reached
+      headers:
+        Retry-After:
+          schema: { type: integer, minimum: 1 }
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+  schemas:
+    CreateAssessmentRequest:
+      type: object
+      additionalProperties: false
+      required: [locale, target]
+      properties:
+        locale:
+          enum: [en-US, en-GB]
+        target:
+          oneOf:
+            - $ref: "#/components/schemas/ManualTarget"
+            - $ref: "#/components/schemas/WordBookTarget"
+            - $ref: "#/components/schemas/CourseWordTarget"
+            - $ref: "#/components/schemas/RagCitationTarget"
+            - $ref: "#/components/schemas/CoachExerciseTarget"
+          discriminator:
+            propertyName: sourceType
+
+    ManualTarget:
+      type: object
+      additionalProperties: false
+      required: [sourceType, text]
+      properties:
+        sourceType: { const: MANUAL }
+        text: { type: string, minLength: 1, maxLength: 200 }
+    WordBookTarget:
+      type: object
+      additionalProperties: false
+      required: [sourceType, wordId]
+      properties:
+        sourceType: { const: WORD_BOOK }
+        wordId: { type: string, minLength: 1, maxLength: 128 }
+    CourseWordTarget:
+      type: object
+      additionalProperties: false
+      required: [sourceType, courseId, wordId]
+      properties:
+        sourceType: { const: COURSE_WORD }
+        courseId: { type: string, minLength: 1, maxLength: 128 }
+        wordId: { type: string, minLength: 1, maxLength: 128 }
+    RagCitationTarget:
+      type: object
+      additionalProperties: false
+      required: [sourceType, citationId, selection]
+      properties:
+        sourceType: { const: RAG_CITATION }
+        citationId: { type: string, minLength: 1, maxLength: 128 }
+        selection:
+          type: object
+          additionalProperties: false
+          required: [start, end]
+          properties:
+            start: { type: integer, minimum: 0, maximum: 2000 }
+            end: { type: integer, minimum: 1, maximum: 2000 }
+    CoachExerciseTarget:
+      type: object
+      additionalProperties: false
+      required: [sourceType, coachRequestId, exerciseId, itemId]
+      properties:
+        sourceType: { const: COACH_EXERCISE }
+        coachRequestId: { type: string, minLength: 1, maxLength: 128 }
+        exerciseId: { type: string, minLength: 1, maxLength: 128 }
+        itemId: { type: string, minLength: 1, maxLength: 128 }
+
+    AssessmentResource:
+      type: object
+      additionalProperties: false
+      required:
+        - assessmentId
+        - status
+        - exerciseType
+        - locale
+        - referenceText
+        - retryOfAssessmentId
+        - result
+        - diagnostic
+        - learningWriteStatus
+        - audio
+        - createdAt
+        - updatedAt
+        - traceId
+      properties:
+        assessmentId: { type: string, minLength: 1, maxLength: 128 }
+        status:
+          enum:
+            - CREATED
+            - AUDIO_VALIDATING
+            - AUDIO_READY
+            - QUEUED
+            - PROCESSING
+            - COMPLETED
+            - REFERENCE_ONLY
+            - UNRECOGNIZABLE
+            - REJECTED
+            - CANCELLED
+            - TIMED_OUT
+            - FAILED
+            - DELETING
+            - DELETED
+        exerciseType: { enum: [WORD, PHRASE, SENTENCE] }
+        locale: { enum: [en-US, en-GB] }
+        referenceText: { type: string, minLength: 1, maxLength: 200 }
+        retryOfAssessmentId:
+          oneOf:
+            - { type: string, minLength: 1, maxLength: 128 }
+            - { type: "null" }
+        result:
+          oneOf:
+            - $ref: "./pronunciation-result.schema.json"
+            - { type: "null" }
+        diagnostic:
+          oneOf:
+            - $ref: "#/components/schemas/SafeDiagnostic"
+            - { type: "null" }
+        learningWriteStatus:
+          enum:
+            [NOT_ELIGIBLE, PENDING, SAVED, FAILED, COMPENSATING, COMPENSATED]
+        audio:
+          type: object
+          additionalProperties: false
+          required: [status, available, expiresAt]
+          properties:
+            status:
+              {
+                enum:
+                  [
+                    MISSING,
+                    VALIDATING,
+                    READY,
+                    INVALID,
+                    REVOKED,
+                    PURGING,
+                    PURGED,
+                  ],
+              }
+            available: { type: boolean }
+            expiresAt:
+              oneOf:
+                - { type: string, format: date-time }
+                - { type: "null" }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+        traceId: { type: string, minLength: 1, maxLength: 128 }
+
+    SafeDiagnostic:
+      type: object
+      additionalProperties: false
+      required: [code, message, retryable]
+      properties:
+        code:
+          enum:
+            - AUDIO_TOO_SHORT
+            - AUDIO_TOO_LONG
+            - AUDIO_TOO_LARGE
+            - AUDIO_UNSUPPORTED
+            - AUDIO_INVALID
+            - AUDIO_SILENT
+            - AUDIO_LOW_VOLUME
+            - SPEECH_UNRECOGNIZABLE
+            - SOURCE_UNAVAILABLE
+            - PROVIDER_TIMEOUT
+            - PROVIDER_UNAVAILABLE
+            - LEARNING_WRITE_FAILED
+        message: { type: string, minLength: 1, maxLength: 500 }
+        retryable: { type: boolean }
+        recognizedText:
+          type: string
+          maxLength: 500
+          description: Optional safe diagnostic only; never treated as a complete result
+
+    AssessmentResponse:
+      type: object
+      additionalProperties: false
+      required: [code, data]
+      properties:
+        code: { type: integer, minimum: 200, maximum: 299 }
+        data: { $ref: "#/components/schemas/AssessmentResource" }
+
+    AssessmentPageResponse:
+      type: object
+      additionalProperties: false
+      required: [code, data]
+      properties:
+        code: { const: 200 }
+        data:
+          type: object
+          additionalProperties: false
+          required: [items, nextCursor]
+          properties:
+            items:
+              type: array
+              items: { $ref: "#/components/schemas/AssessmentResource" }
+            nextCursor:
+              oneOf:
+                - { type: string, maxLength: 512 }
+                - { type: "null" }
+
+    DeletionResponse:
+      type: object
+      additionalProperties: false
+      required: [code, data]
+      properties:
+        code: { type: integer, minimum: 200, maximum: 299 }
+        data:
+          type: object
+          additionalProperties: false
+          required:
+            [
+              deletionId,
+              scope,
+              status,
+              accessRevokedAt,
+              purgeDeadline,
+              completedAt,
+            ]
+          properties:
+            deletionId: { type: string, minLength: 1, maxLength: 128 }
+            scope: { enum: [PRONUNCIATION_AUDIO, PRONUNCIATION_ASSESSMENT] }
+            status:
+              { enum: [ACCEPTED, COMPENSATING, PURGING, COMPLETED, FAILED] }
+            accessRevokedAt: { type: string, format: date-time }
+            purgeDeadline: { type: string, format: date-time }
+            completedAt:
+              oneOf:
+                - { type: string, format: date-time }
+                - { type: "null" }
+
+    ErrorResponse:
+      type: object
+      additionalProperties: false
+      required: [code, error]
+      properties:
+        code: { type: integer, minimum: 400, maximum: 599 }
+        error:
+          type: object
+          additionalProperties: false
+          required:
+            [
+              code,
+              category,
+              message,
+              retryable,
+              retryAfterSeconds,
+              assessmentId,
+              traceId,
+            ]
+          properties:
+            code:
+              enum:
+                - AUTH_REQUIRED
+                - TOKEN_INVALID
+                - RESOURCE_NOT_FOUND
+                - VALIDATION_FAILED
+                - IDEMPOTENCY_CONFLICT
+                - STATE_CONFLICT
+                - RATE_LIMITED
+                - CONCURRENCY_LIMITED
+                - AUDIO_TOO_LARGE
+                - FEATURE_DISABLED
+                - PROVIDER_NOT_APPROVED
+                - STORAGE_NOT_APPROVED
+                - PRICE_UNKNOWN
+                - BUDGET_NOT_APPROVED
+                - BUDGET_EXCEEDED
+            category:
+              {
+                enum:
+                  [AUTH, TARGET, UPLOAD, AUDIO, GOVERNANCE, PROVIDER, LEARNING],
+              }
+            message: { type: string, minLength: 1, maxLength: 500 }
+            retryable: { type: boolean }
+            retryAfterSeconds:
+              oneOf:
+                - { type: integer, minimum: 1, maximum: 86400 }
+                - { type: "null" }
+            assessmentId:
+              oneOf:
+                - { type: string, minLength: 1, maxLength: 128 }
+                - { type: "null" }
+            traceId:
+              oneOf:
+                - { type: string, minLength: 1, maxLength: 128 }
+                - { type: "null" }

@@ -45,6 +45,10 @@ export type LearningReviewEventMinAggregateOutputType = {
   targetKey: string | null
   itemScore: number | null
   quality: number | null
+  evidenceKind: $Enums.LearningEvidenceKind | null
+  schedulerVersion: string | null
+  policyVersion: string | null
+  voidedAt: Date | null
   createdAt: Date | null
 }
 
@@ -57,6 +61,10 @@ export type LearningReviewEventMaxAggregateOutputType = {
   targetKey: string | null
   itemScore: number | null
   quality: number | null
+  evidenceKind: $Enums.LearningEvidenceKind | null
+  schedulerVersion: string | null
+  policyVersion: string | null
+  voidedAt: Date | null
   createdAt: Date | null
 }
 
@@ -71,6 +79,10 @@ export type LearningReviewEventCountAggregateOutputType = {
   quality: number
   previousState: number
   nextState: number
+  evidenceKind: number
+  schedulerVersion: number
+  policyVersion: number
+  voidedAt: number
   createdAt: number
   _all: number
 }
@@ -95,6 +107,10 @@ export type LearningReviewEventMinAggregateInputType = {
   targetKey?: true
   itemScore?: true
   quality?: true
+  evidenceKind?: true
+  schedulerVersion?: true
+  policyVersion?: true
+  voidedAt?: true
   createdAt?: true
 }
 
@@ -107,6 +123,10 @@ export type LearningReviewEventMaxAggregateInputType = {
   targetKey?: true
   itemScore?: true
   quality?: true
+  evidenceKind?: true
+  schedulerVersion?: true
+  policyVersion?: true
+  voidedAt?: true
   createdAt?: true
 }
 
@@ -121,6 +141,10 @@ export type LearningReviewEventCountAggregateInputType = {
   quality?: true
   previousState?: true
   nextState?: true
+  evidenceKind?: true
+  schedulerVersion?: true
+  policyVersion?: true
+  voidedAt?: true
   createdAt?: true
   _all?: true
 }
@@ -222,6 +246,10 @@ export type LearningReviewEventGroupByOutputType = {
   quality: number
   previousState: runtime.JsonValue
   nextState: runtime.JsonValue
+  evidenceKind: $Enums.LearningEvidenceKind
+  schedulerVersion: string
+  policyVersion: string
+  voidedAt: Date | null
   createdAt: Date
   _count: LearningReviewEventCountAggregateOutputType | null
   _avg: LearningReviewEventAvgAggregateOutputType | null
@@ -259,6 +287,10 @@ export type LearningReviewEventWhereInput = {
   quality?: Prisma.IntFilter<"LearningReviewEvent"> | number
   previousState?: Prisma.JsonFilter<"LearningReviewEvent">
   nextState?: Prisma.JsonFilter<"LearningReviewEvent">
+  evidenceKind?: Prisma.EnumLearningEvidenceKindFilter<"LearningReviewEvent"> | $Enums.LearningEvidenceKind
+  schedulerVersion?: Prisma.StringFilter<"LearningReviewEvent"> | string
+  policyVersion?: Prisma.StringFilter<"LearningReviewEvent"> | string
+  voidedAt?: Prisma.DateTimeNullableFilter<"LearningReviewEvent"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"LearningReviewEvent"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   itemState?: Prisma.XOR<Prisma.LearningItemStateScalarRelationFilter, Prisma.LearningItemStateWhereInput>
@@ -276,6 +308,10 @@ export type LearningReviewEventOrderByWithRelationInput = {
   quality?: Prisma.SortOrder
   previousState?: Prisma.SortOrder
   nextState?: Prisma.SortOrder
+  evidenceKind?: Prisma.SortOrder
+  schedulerVersion?: Prisma.SortOrder
+  policyVersion?: Prisma.SortOrder
+  voidedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
   itemState?: Prisma.LearningItemStateOrderByWithRelationInput
@@ -297,6 +333,10 @@ export type LearningReviewEventWhereUniqueInput = Prisma.AtLeast<{
   quality?: Prisma.IntFilter<"LearningReviewEvent"> | number
   previousState?: Prisma.JsonFilter<"LearningReviewEvent">
   nextState?: Prisma.JsonFilter<"LearningReviewEvent">
+  evidenceKind?: Prisma.EnumLearningEvidenceKindFilter<"LearningReviewEvent"> | $Enums.LearningEvidenceKind
+  schedulerVersion?: Prisma.StringFilter<"LearningReviewEvent"> | string
+  policyVersion?: Prisma.StringFilter<"LearningReviewEvent"> | string
+  voidedAt?: Prisma.DateTimeNullableFilter<"LearningReviewEvent"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"LearningReviewEvent"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   itemState?: Prisma.XOR<Prisma.LearningItemStateScalarRelationFilter, Prisma.LearningItemStateWhereInput>
@@ -314,6 +354,10 @@ export type LearningReviewEventOrderByWithAggregationInput = {
   quality?: Prisma.SortOrder
   previousState?: Prisma.SortOrder
   nextState?: Prisma.SortOrder
+  evidenceKind?: Prisma.SortOrder
+  schedulerVersion?: Prisma.SortOrder
+  policyVersion?: Prisma.SortOrder
+  voidedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.LearningReviewEventCountOrderByAggregateInput
   _avg?: Prisma.LearningReviewEventAvgOrderByAggregateInput
@@ -336,6 +380,10 @@ export type LearningReviewEventScalarWhereWithAggregatesInput = {
   quality?: Prisma.IntWithAggregatesFilter<"LearningReviewEvent"> | number
   previousState?: Prisma.JsonWithAggregatesFilter<"LearningReviewEvent">
   nextState?: Prisma.JsonWithAggregatesFilter<"LearningReviewEvent">
+  evidenceKind?: Prisma.EnumLearningEvidenceKindWithAggregatesFilter<"LearningReviewEvent"> | $Enums.LearningEvidenceKind
+  schedulerVersion?: Prisma.StringWithAggregatesFilter<"LearningReviewEvent"> | string
+  policyVersion?: Prisma.StringWithAggregatesFilter<"LearningReviewEvent"> | string
+  voidedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"LearningReviewEvent"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"LearningReviewEvent"> | Date | string
 }
 
@@ -347,6 +395,10 @@ export type LearningReviewEventCreateInput = {
   quality: number
   previousState: Prisma.JsonNullValueInput | runtime.InputJsonValue
   nextState: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  evidenceKind?: $Enums.LearningEvidenceKind
+  schedulerVersion?: string
+  policyVersion?: string
+  voidedAt?: Date | string | null
   createdAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutLearningReviewEventsInput
   itemState: Prisma.LearningItemStateCreateNestedOneWithoutReviewEventsInput
@@ -364,6 +416,10 @@ export type LearningReviewEventUncheckedCreateInput = {
   quality: number
   previousState: Prisma.JsonNullValueInput | runtime.InputJsonValue
   nextState: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  evidenceKind?: $Enums.LearningEvidenceKind
+  schedulerVersion?: string
+  policyVersion?: string
+  voidedAt?: Date | string | null
   createdAt?: Date | string
 }
 
@@ -375,6 +431,10 @@ export type LearningReviewEventUpdateInput = {
   quality?: Prisma.IntFieldUpdateOperationsInput | number
   previousState?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   nextState?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  evidenceKind?: Prisma.EnumLearningEvidenceKindFieldUpdateOperationsInput | $Enums.LearningEvidenceKind
+  schedulerVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  policyVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  voidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutLearningReviewEventsNestedInput
   itemState?: Prisma.LearningItemStateUpdateOneRequiredWithoutReviewEventsNestedInput
@@ -392,6 +452,10 @@ export type LearningReviewEventUncheckedUpdateInput = {
   quality?: Prisma.IntFieldUpdateOperationsInput | number
   previousState?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   nextState?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  evidenceKind?: Prisma.EnumLearningEvidenceKindFieldUpdateOperationsInput | $Enums.LearningEvidenceKind
+  schedulerVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  policyVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  voidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -406,6 +470,10 @@ export type LearningReviewEventCreateManyInput = {
   quality: number
   previousState: Prisma.JsonNullValueInput | runtime.InputJsonValue
   nextState: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  evidenceKind?: $Enums.LearningEvidenceKind
+  schedulerVersion?: string
+  policyVersion?: string
+  voidedAt?: Date | string | null
   createdAt?: Date | string
 }
 
@@ -417,6 +485,10 @@ export type LearningReviewEventUpdateManyMutationInput = {
   quality?: Prisma.IntFieldUpdateOperationsInput | number
   previousState?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   nextState?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  evidenceKind?: Prisma.EnumLearningEvidenceKindFieldUpdateOperationsInput | $Enums.LearningEvidenceKind
+  schedulerVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  policyVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  voidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -431,6 +503,10 @@ export type LearningReviewEventUncheckedUpdateManyInput = {
   quality?: Prisma.IntFieldUpdateOperationsInput | number
   previousState?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   nextState?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  evidenceKind?: Prisma.EnumLearningEvidenceKindFieldUpdateOperationsInput | $Enums.LearningEvidenceKind
+  schedulerVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  policyVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  voidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -461,6 +537,10 @@ export type LearningReviewEventCountOrderByAggregateInput = {
   quality?: Prisma.SortOrder
   previousState?: Prisma.SortOrder
   nextState?: Prisma.SortOrder
+  evidenceKind?: Prisma.SortOrder
+  schedulerVersion?: Prisma.SortOrder
+  policyVersion?: Prisma.SortOrder
+  voidedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -478,6 +558,10 @@ export type LearningReviewEventMaxOrderByAggregateInput = {
   targetKey?: Prisma.SortOrder
   itemScore?: Prisma.SortOrder
   quality?: Prisma.SortOrder
+  evidenceKind?: Prisma.SortOrder
+  schedulerVersion?: Prisma.SortOrder
+  policyVersion?: Prisma.SortOrder
+  voidedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -490,6 +574,10 @@ export type LearningReviewEventMinOrderByAggregateInput = {
   targetKey?: Prisma.SortOrder
   itemScore?: Prisma.SortOrder
   quality?: Prisma.SortOrder
+  evidenceKind?: Prisma.SortOrder
+  schedulerVersion?: Prisma.SortOrder
+  policyVersion?: Prisma.SortOrder
+  voidedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -582,6 +670,10 @@ export type LearningReviewEventUncheckedUpdateManyWithoutItemStateNestedInput = 
   deleteMany?: Prisma.LearningReviewEventScalarWhereInput | Prisma.LearningReviewEventScalarWhereInput[]
 }
 
+export type EnumLearningEvidenceKindFieldUpdateOperationsInput = {
+  set?: $Enums.LearningEvidenceKind
+}
+
 export type LearningReviewEventCreateNestedManyWithoutAttemptInput = {
   create?: Prisma.XOR<Prisma.LearningReviewEventCreateWithoutAttemptInput, Prisma.LearningReviewEventUncheckedCreateWithoutAttemptInput> | Prisma.LearningReviewEventCreateWithoutAttemptInput[] | Prisma.LearningReviewEventUncheckedCreateWithoutAttemptInput[]
   connectOrCreate?: Prisma.LearningReviewEventCreateOrConnectWithoutAttemptInput | Prisma.LearningReviewEventCreateOrConnectWithoutAttemptInput[]
@@ -632,6 +724,10 @@ export type LearningReviewEventCreateWithoutUserInput = {
   quality: number
   previousState: Prisma.JsonNullValueInput | runtime.InputJsonValue
   nextState: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  evidenceKind?: $Enums.LearningEvidenceKind
+  schedulerVersion?: string
+  policyVersion?: string
+  voidedAt?: Date | string | null
   createdAt?: Date | string
   itemState: Prisma.LearningItemStateCreateNestedOneWithoutReviewEventsInput
   attempt: Prisma.LearningAttemptCreateNestedOneWithoutReviewEventsInput
@@ -647,6 +743,10 @@ export type LearningReviewEventUncheckedCreateWithoutUserInput = {
   quality: number
   previousState: Prisma.JsonNullValueInput | runtime.InputJsonValue
   nextState: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  evidenceKind?: $Enums.LearningEvidenceKind
+  schedulerVersion?: string
+  policyVersion?: string
+  voidedAt?: Date | string | null
   createdAt?: Date | string
 }
 
@@ -690,6 +790,10 @@ export type LearningReviewEventScalarWhereInput = {
   quality?: Prisma.IntFilter<"LearningReviewEvent"> | number
   previousState?: Prisma.JsonFilter<"LearningReviewEvent">
   nextState?: Prisma.JsonFilter<"LearningReviewEvent">
+  evidenceKind?: Prisma.EnumLearningEvidenceKindFilter<"LearningReviewEvent"> | $Enums.LearningEvidenceKind
+  schedulerVersion?: Prisma.StringFilter<"LearningReviewEvent"> | string
+  policyVersion?: Prisma.StringFilter<"LearningReviewEvent"> | string
+  voidedAt?: Prisma.DateTimeNullableFilter<"LearningReviewEvent"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"LearningReviewEvent"> | Date | string
 }
 
@@ -701,6 +805,10 @@ export type LearningReviewEventCreateWithoutItemStateInput = {
   quality: number
   previousState: Prisma.JsonNullValueInput | runtime.InputJsonValue
   nextState: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  evidenceKind?: $Enums.LearningEvidenceKind
+  schedulerVersion?: string
+  policyVersion?: string
+  voidedAt?: Date | string | null
   createdAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutLearningReviewEventsInput
   attempt: Prisma.LearningAttemptCreateNestedOneWithoutReviewEventsInput
@@ -716,6 +824,10 @@ export type LearningReviewEventUncheckedCreateWithoutItemStateInput = {
   quality: number
   previousState: Prisma.JsonNullValueInput | runtime.InputJsonValue
   nextState: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  evidenceKind?: $Enums.LearningEvidenceKind
+  schedulerVersion?: string
+  policyVersion?: string
+  voidedAt?: Date | string | null
   createdAt?: Date | string
 }
 
@@ -753,6 +865,10 @@ export type LearningReviewEventCreateWithoutAttemptInput = {
   quality: number
   previousState: Prisma.JsonNullValueInput | runtime.InputJsonValue
   nextState: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  evidenceKind?: $Enums.LearningEvidenceKind
+  schedulerVersion?: string
+  policyVersion?: string
+  voidedAt?: Date | string | null
   createdAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutLearningReviewEventsInput
   itemState: Prisma.LearningItemStateCreateNestedOneWithoutReviewEventsInput
@@ -768,6 +884,10 @@ export type LearningReviewEventUncheckedCreateWithoutAttemptInput = {
   quality: number
   previousState: Prisma.JsonNullValueInput | runtime.InputJsonValue
   nextState: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  evidenceKind?: $Enums.LearningEvidenceKind
+  schedulerVersion?: string
+  policyVersion?: string
+  voidedAt?: Date | string | null
   createdAt?: Date | string
 }
 
@@ -807,6 +927,10 @@ export type LearningReviewEventCreateManyUserInput = {
   quality: number
   previousState: Prisma.JsonNullValueInput | runtime.InputJsonValue
   nextState: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  evidenceKind?: $Enums.LearningEvidenceKind
+  schedulerVersion?: string
+  policyVersion?: string
+  voidedAt?: Date | string | null
   createdAt?: Date | string
 }
 
@@ -818,6 +942,10 @@ export type LearningReviewEventUpdateWithoutUserInput = {
   quality?: Prisma.IntFieldUpdateOperationsInput | number
   previousState?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   nextState?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  evidenceKind?: Prisma.EnumLearningEvidenceKindFieldUpdateOperationsInput | $Enums.LearningEvidenceKind
+  schedulerVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  policyVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  voidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   itemState?: Prisma.LearningItemStateUpdateOneRequiredWithoutReviewEventsNestedInput
   attempt?: Prisma.LearningAttemptUpdateOneRequiredWithoutReviewEventsNestedInput
@@ -833,6 +961,10 @@ export type LearningReviewEventUncheckedUpdateWithoutUserInput = {
   quality?: Prisma.IntFieldUpdateOperationsInput | number
   previousState?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   nextState?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  evidenceKind?: Prisma.EnumLearningEvidenceKindFieldUpdateOperationsInput | $Enums.LearningEvidenceKind
+  schedulerVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  policyVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  voidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -846,6 +978,10 @@ export type LearningReviewEventUncheckedUpdateManyWithoutUserInput = {
   quality?: Prisma.IntFieldUpdateOperationsInput | number
   previousState?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   nextState?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  evidenceKind?: Prisma.EnumLearningEvidenceKindFieldUpdateOperationsInput | $Enums.LearningEvidenceKind
+  schedulerVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  policyVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  voidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -859,6 +995,10 @@ export type LearningReviewEventCreateManyItemStateInput = {
   quality: number
   previousState: Prisma.JsonNullValueInput | runtime.InputJsonValue
   nextState: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  evidenceKind?: $Enums.LearningEvidenceKind
+  schedulerVersion?: string
+  policyVersion?: string
+  voidedAt?: Date | string | null
   createdAt?: Date | string
 }
 
@@ -870,6 +1010,10 @@ export type LearningReviewEventUpdateWithoutItemStateInput = {
   quality?: Prisma.IntFieldUpdateOperationsInput | number
   previousState?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   nextState?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  evidenceKind?: Prisma.EnumLearningEvidenceKindFieldUpdateOperationsInput | $Enums.LearningEvidenceKind
+  schedulerVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  policyVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  voidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutLearningReviewEventsNestedInput
   attempt?: Prisma.LearningAttemptUpdateOneRequiredWithoutReviewEventsNestedInput
@@ -885,6 +1029,10 @@ export type LearningReviewEventUncheckedUpdateWithoutItemStateInput = {
   quality?: Prisma.IntFieldUpdateOperationsInput | number
   previousState?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   nextState?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  evidenceKind?: Prisma.EnumLearningEvidenceKindFieldUpdateOperationsInput | $Enums.LearningEvidenceKind
+  schedulerVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  policyVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  voidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -898,6 +1046,10 @@ export type LearningReviewEventUncheckedUpdateManyWithoutItemStateInput = {
   quality?: Prisma.IntFieldUpdateOperationsInput | number
   previousState?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   nextState?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  evidenceKind?: Prisma.EnumLearningEvidenceKindFieldUpdateOperationsInput | $Enums.LearningEvidenceKind
+  schedulerVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  policyVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  voidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -911,6 +1063,10 @@ export type LearningReviewEventCreateManyAttemptInput = {
   quality: number
   previousState: Prisma.JsonNullValueInput | runtime.InputJsonValue
   nextState: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  evidenceKind?: $Enums.LearningEvidenceKind
+  schedulerVersion?: string
+  policyVersion?: string
+  voidedAt?: Date | string | null
   createdAt?: Date | string
 }
 
@@ -922,6 +1078,10 @@ export type LearningReviewEventUpdateWithoutAttemptInput = {
   quality?: Prisma.IntFieldUpdateOperationsInput | number
   previousState?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   nextState?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  evidenceKind?: Prisma.EnumLearningEvidenceKindFieldUpdateOperationsInput | $Enums.LearningEvidenceKind
+  schedulerVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  policyVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  voidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutLearningReviewEventsNestedInput
   itemState?: Prisma.LearningItemStateUpdateOneRequiredWithoutReviewEventsNestedInput
@@ -937,6 +1097,10 @@ export type LearningReviewEventUncheckedUpdateWithoutAttemptInput = {
   quality?: Prisma.IntFieldUpdateOperationsInput | number
   previousState?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   nextState?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  evidenceKind?: Prisma.EnumLearningEvidenceKindFieldUpdateOperationsInput | $Enums.LearningEvidenceKind
+  schedulerVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  policyVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  voidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -950,6 +1114,10 @@ export type LearningReviewEventUncheckedUpdateManyWithoutAttemptInput = {
   quality?: Prisma.IntFieldUpdateOperationsInput | number
   previousState?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   nextState?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  evidenceKind?: Prisma.EnumLearningEvidenceKindFieldUpdateOperationsInput | $Enums.LearningEvidenceKind
+  schedulerVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  policyVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  voidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -966,6 +1134,10 @@ export type LearningReviewEventSelect<ExtArgs extends runtime.Types.Extensions.I
   quality?: boolean
   previousState?: boolean
   nextState?: boolean
+  evidenceKind?: boolean
+  schedulerVersion?: boolean
+  policyVersion?: boolean
+  voidedAt?: boolean
   createdAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   itemState?: boolean | Prisma.LearningItemStateDefaultArgs<ExtArgs>
@@ -983,6 +1155,10 @@ export type LearningReviewEventSelectCreateManyAndReturn<ExtArgs extends runtime
   quality?: boolean
   previousState?: boolean
   nextState?: boolean
+  evidenceKind?: boolean
+  schedulerVersion?: boolean
+  policyVersion?: boolean
+  voidedAt?: boolean
   createdAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   itemState?: boolean | Prisma.LearningItemStateDefaultArgs<ExtArgs>
@@ -1000,6 +1176,10 @@ export type LearningReviewEventSelectUpdateManyAndReturn<ExtArgs extends runtime
   quality?: boolean
   previousState?: boolean
   nextState?: boolean
+  evidenceKind?: boolean
+  schedulerVersion?: boolean
+  policyVersion?: boolean
+  voidedAt?: boolean
   createdAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   itemState?: boolean | Prisma.LearningItemStateDefaultArgs<ExtArgs>
@@ -1017,10 +1197,14 @@ export type LearningReviewEventSelectScalar = {
   quality?: boolean
   previousState?: boolean
   nextState?: boolean
+  evidenceKind?: boolean
+  schedulerVersion?: boolean
+  policyVersion?: boolean
+  voidedAt?: boolean
   createdAt?: boolean
 }
 
-export type LearningReviewEventOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "itemStateId" | "attemptId" | "targetType" | "targetKey" | "itemScore" | "quality" | "previousState" | "nextState" | "createdAt", ExtArgs["result"]["learningReviewEvent"]>
+export type LearningReviewEventOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "itemStateId" | "attemptId" | "targetType" | "targetKey" | "itemScore" | "quality" | "previousState" | "nextState" | "evidenceKind" | "schedulerVersion" | "policyVersion" | "voidedAt" | "createdAt", ExtArgs["result"]["learningReviewEvent"]>
 export type LearningReviewEventInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   itemState?: boolean | Prisma.LearningItemStateDefaultArgs<ExtArgs>
@@ -1055,6 +1239,10 @@ export type $LearningReviewEventPayload<ExtArgs extends runtime.Types.Extensions
     quality: number
     previousState: runtime.JsonValue
     nextState: runtime.JsonValue
+    evidenceKind: $Enums.LearningEvidenceKind
+    schedulerVersion: string
+    policyVersion: string
+    voidedAt: Date | null
     createdAt: Date
   }, ExtArgs["result"]["learningReviewEvent"]>
   composites: {}
@@ -1492,6 +1680,10 @@ export interface LearningReviewEventFieldRefs {
   readonly quality: Prisma.FieldRef<"LearningReviewEvent", 'Int'>
   readonly previousState: Prisma.FieldRef<"LearningReviewEvent", 'Json'>
   readonly nextState: Prisma.FieldRef<"LearningReviewEvent", 'Json'>
+  readonly evidenceKind: Prisma.FieldRef<"LearningReviewEvent", 'LearningEvidenceKind'>
+  readonly schedulerVersion: Prisma.FieldRef<"LearningReviewEvent", 'String'>
+  readonly policyVersion: Prisma.FieldRef<"LearningReviewEvent", 'String'>
+  readonly voidedAt: Prisma.FieldRef<"LearningReviewEvent", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"LearningReviewEvent", 'DateTime'>
 }
     

@@ -37,34 +37,46 @@ export type LearningAttemptSumAggregateOutputType = {
 export type LearningAttemptMinAggregateOutputType = {
   id: string | null
   userId: string | null
+  attemptType: $Enums.LearningAttemptType | null
   exerciseId: string | null
   submissionId: string | null
   saveRequestId: string | null
+  pronunciationAssessmentId: string | null
   score: number | null
   gradingHash: string | null
+  evidenceHash: string | null
+  policyVersion: string | null
   savedAt: Date | null
 }
 
 export type LearningAttemptMaxAggregateOutputType = {
   id: string | null
   userId: string | null
+  attemptType: $Enums.LearningAttemptType | null
   exerciseId: string | null
   submissionId: string | null
   saveRequestId: string | null
+  pronunciationAssessmentId: string | null
   score: number | null
   gradingHash: string | null
+  evidenceHash: string | null
+  policyVersion: string | null
   savedAt: Date | null
 }
 
 export type LearningAttemptCountAggregateOutputType = {
   id: number
   userId: number
+  attemptType: number
   exerciseId: number
   submissionId: number
   saveRequestId: number
+  pronunciationAssessmentId: number
   score: number
   errorTypes: number
   gradingHash: number
+  evidenceHash: number
+  policyVersion: number
   savedAt: number
   _all: number
 }
@@ -81,34 +93,46 @@ export type LearningAttemptSumAggregateInputType = {
 export type LearningAttemptMinAggregateInputType = {
   id?: true
   userId?: true
+  attemptType?: true
   exerciseId?: true
   submissionId?: true
   saveRequestId?: true
+  pronunciationAssessmentId?: true
   score?: true
   gradingHash?: true
+  evidenceHash?: true
+  policyVersion?: true
   savedAt?: true
 }
 
 export type LearningAttemptMaxAggregateInputType = {
   id?: true
   userId?: true
+  attemptType?: true
   exerciseId?: true
   submissionId?: true
   saveRequestId?: true
+  pronunciationAssessmentId?: true
   score?: true
   gradingHash?: true
+  evidenceHash?: true
+  policyVersion?: true
   savedAt?: true
 }
 
 export type LearningAttemptCountAggregateInputType = {
   id?: true
   userId?: true
+  attemptType?: true
   exerciseId?: true
   submissionId?: true
   saveRequestId?: true
+  pronunciationAssessmentId?: true
   score?: true
   errorTypes?: true
   gradingHash?: true
+  evidenceHash?: true
+  policyVersion?: true
   savedAt?: true
   _all?: true
 }
@@ -202,12 +226,16 @@ export type LearningAttemptGroupByArgs<ExtArgs extends runtime.Types.Extensions.
 export type LearningAttemptGroupByOutputType = {
   id: string
   userId: string
-  exerciseId: string
-  submissionId: string
-  saveRequestId: string
+  attemptType: $Enums.LearningAttemptType
+  exerciseId: string | null
+  submissionId: string | null
+  saveRequestId: string | null
+  pronunciationAssessmentId: string | null
   score: number
   errorTypes: runtime.JsonValue
-  gradingHash: string
+  gradingHash: string | null
+  evidenceHash: string | null
+  policyVersion: string | null
   savedAt: Date
   _count: LearningAttemptCountAggregateOutputType | null
   _avg: LearningAttemptAvgAggregateOutputType | null
@@ -237,17 +265,22 @@ export type LearningAttemptWhereInput = {
   NOT?: Prisma.LearningAttemptWhereInput | Prisma.LearningAttemptWhereInput[]
   id?: Prisma.StringFilter<"LearningAttempt"> | string
   userId?: Prisma.StringFilter<"LearningAttempt"> | string
-  exerciseId?: Prisma.StringFilter<"LearningAttempt"> | string
-  submissionId?: Prisma.StringFilter<"LearningAttempt"> | string
-  saveRequestId?: Prisma.StringFilter<"LearningAttempt"> | string
+  attemptType?: Prisma.EnumLearningAttemptTypeFilter<"LearningAttempt"> | $Enums.LearningAttemptType
+  exerciseId?: Prisma.StringNullableFilter<"LearningAttempt"> | string | null
+  submissionId?: Prisma.StringNullableFilter<"LearningAttempt"> | string | null
+  saveRequestId?: Prisma.StringNullableFilter<"LearningAttempt"> | string | null
+  pronunciationAssessmentId?: Prisma.StringNullableFilter<"LearningAttempt"> | string | null
   score?: Prisma.IntFilter<"LearningAttempt"> | number
   errorTypes?: Prisma.JsonFilter<"LearningAttempt">
-  gradingHash?: Prisma.StringFilter<"LearningAttempt"> | string
+  gradingHash?: Prisma.StringNullableFilter<"LearningAttempt"> | string | null
+  evidenceHash?: Prisma.StringNullableFilter<"LearningAttempt"> | string | null
+  policyVersion?: Prisma.StringNullableFilter<"LearningAttempt"> | string | null
   savedAt?: Prisma.DateTimeFilter<"LearningAttempt"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
-  exercise?: Prisma.XOR<Prisma.ExerciseScalarRelationFilter, Prisma.ExerciseWhereInput>
-  submission?: Prisma.XOR<Prisma.ExerciseSubmissionScalarRelationFilter, Prisma.ExerciseSubmissionWhereInput>
-  saveRequest?: Prisma.XOR<Prisma.CoachRequestScalarRelationFilter, Prisma.CoachRequestWhereInput>
+  exercise?: Prisma.XOR<Prisma.ExerciseNullableScalarRelationFilter, Prisma.ExerciseWhereInput> | null
+  submission?: Prisma.XOR<Prisma.ExerciseSubmissionNullableScalarRelationFilter, Prisma.ExerciseSubmissionWhereInput> | null
+  saveRequest?: Prisma.XOR<Prisma.CoachRequestNullableScalarRelationFilter, Prisma.CoachRequestWhereInput> | null
+  pronunciationAssessment?: Prisma.XOR<Prisma.PronunciationAssessmentNullableScalarRelationFilter, Prisma.PronunciationAssessmentWhereInput> | null
   reviewEvents?: Prisma.LearningReviewEventListRelationFilter
   latestItemStates?: Prisma.LearningItemStateListRelationFilter
 }
@@ -255,17 +288,22 @@ export type LearningAttemptWhereInput = {
 export type LearningAttemptOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
-  exerciseId?: Prisma.SortOrder
-  submissionId?: Prisma.SortOrder
-  saveRequestId?: Prisma.SortOrder
+  attemptType?: Prisma.SortOrder
+  exerciseId?: Prisma.SortOrderInput | Prisma.SortOrder
+  submissionId?: Prisma.SortOrderInput | Prisma.SortOrder
+  saveRequestId?: Prisma.SortOrderInput | Prisma.SortOrder
+  pronunciationAssessmentId?: Prisma.SortOrderInput | Prisma.SortOrder
   score?: Prisma.SortOrder
   errorTypes?: Prisma.SortOrder
-  gradingHash?: Prisma.SortOrder
+  gradingHash?: Prisma.SortOrderInput | Prisma.SortOrder
+  evidenceHash?: Prisma.SortOrderInput | Prisma.SortOrder
+  policyVersion?: Prisma.SortOrderInput | Prisma.SortOrder
   savedAt?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
   exercise?: Prisma.ExerciseOrderByWithRelationInput
   submission?: Prisma.ExerciseSubmissionOrderByWithRelationInput
   saveRequest?: Prisma.CoachRequestOrderByWithRelationInput
+  pronunciationAssessment?: Prisma.PronunciationAssessmentOrderByWithRelationInput
   reviewEvents?: Prisma.LearningReviewEventOrderByRelationAggregateInput
   latestItemStates?: Prisma.LearningItemStateOrderByRelationAggregateInput
 }
@@ -274,33 +312,42 @@ export type LearningAttemptWhereUniqueInput = Prisma.AtLeast<{
   id?: string
   submissionId?: string
   saveRequestId?: string
+  pronunciationAssessmentId?: string
   userId_exerciseId_submissionId?: Prisma.LearningAttemptUserIdExerciseIdSubmissionIdCompoundUniqueInput
   AND?: Prisma.LearningAttemptWhereInput | Prisma.LearningAttemptWhereInput[]
   OR?: Prisma.LearningAttemptWhereInput[]
   NOT?: Prisma.LearningAttemptWhereInput | Prisma.LearningAttemptWhereInput[]
   userId?: Prisma.StringFilter<"LearningAttempt"> | string
-  exerciseId?: Prisma.StringFilter<"LearningAttempt"> | string
+  attemptType?: Prisma.EnumLearningAttemptTypeFilter<"LearningAttempt"> | $Enums.LearningAttemptType
+  exerciseId?: Prisma.StringNullableFilter<"LearningAttempt"> | string | null
   score?: Prisma.IntFilter<"LearningAttempt"> | number
   errorTypes?: Prisma.JsonFilter<"LearningAttempt">
-  gradingHash?: Prisma.StringFilter<"LearningAttempt"> | string
+  gradingHash?: Prisma.StringNullableFilter<"LearningAttempt"> | string | null
+  evidenceHash?: Prisma.StringNullableFilter<"LearningAttempt"> | string | null
+  policyVersion?: Prisma.StringNullableFilter<"LearningAttempt"> | string | null
   savedAt?: Prisma.DateTimeFilter<"LearningAttempt"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
-  exercise?: Prisma.XOR<Prisma.ExerciseScalarRelationFilter, Prisma.ExerciseWhereInput>
-  submission?: Prisma.XOR<Prisma.ExerciseSubmissionScalarRelationFilter, Prisma.ExerciseSubmissionWhereInput>
-  saveRequest?: Prisma.XOR<Prisma.CoachRequestScalarRelationFilter, Prisma.CoachRequestWhereInput>
+  exercise?: Prisma.XOR<Prisma.ExerciseNullableScalarRelationFilter, Prisma.ExerciseWhereInput> | null
+  submission?: Prisma.XOR<Prisma.ExerciseSubmissionNullableScalarRelationFilter, Prisma.ExerciseSubmissionWhereInput> | null
+  saveRequest?: Prisma.XOR<Prisma.CoachRequestNullableScalarRelationFilter, Prisma.CoachRequestWhereInput> | null
+  pronunciationAssessment?: Prisma.XOR<Prisma.PronunciationAssessmentNullableScalarRelationFilter, Prisma.PronunciationAssessmentWhereInput> | null
   reviewEvents?: Prisma.LearningReviewEventListRelationFilter
   latestItemStates?: Prisma.LearningItemStateListRelationFilter
-}, "id" | "submissionId" | "saveRequestId" | "userId_exerciseId_submissionId">
+}, "id" | "submissionId" | "saveRequestId" | "pronunciationAssessmentId" | "userId_exerciseId_submissionId">
 
 export type LearningAttemptOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
-  exerciseId?: Prisma.SortOrder
-  submissionId?: Prisma.SortOrder
-  saveRequestId?: Prisma.SortOrder
+  attemptType?: Prisma.SortOrder
+  exerciseId?: Prisma.SortOrderInput | Prisma.SortOrder
+  submissionId?: Prisma.SortOrderInput | Prisma.SortOrder
+  saveRequestId?: Prisma.SortOrderInput | Prisma.SortOrder
+  pronunciationAssessmentId?: Prisma.SortOrderInput | Prisma.SortOrder
   score?: Prisma.SortOrder
   errorTypes?: Prisma.SortOrder
-  gradingHash?: Prisma.SortOrder
+  gradingHash?: Prisma.SortOrderInput | Prisma.SortOrder
+  evidenceHash?: Prisma.SortOrderInput | Prisma.SortOrder
+  policyVersion?: Prisma.SortOrderInput | Prisma.SortOrder
   savedAt?: Prisma.SortOrder
   _count?: Prisma.LearningAttemptCountOrderByAggregateInput
   _avg?: Prisma.LearningAttemptAvgOrderByAggregateInput
@@ -315,25 +362,33 @@ export type LearningAttemptScalarWhereWithAggregatesInput = {
   NOT?: Prisma.LearningAttemptScalarWhereWithAggregatesInput | Prisma.LearningAttemptScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"LearningAttempt"> | string
   userId?: Prisma.StringWithAggregatesFilter<"LearningAttempt"> | string
-  exerciseId?: Prisma.StringWithAggregatesFilter<"LearningAttempt"> | string
-  submissionId?: Prisma.StringWithAggregatesFilter<"LearningAttempt"> | string
-  saveRequestId?: Prisma.StringWithAggregatesFilter<"LearningAttempt"> | string
+  attemptType?: Prisma.EnumLearningAttemptTypeWithAggregatesFilter<"LearningAttempt"> | $Enums.LearningAttemptType
+  exerciseId?: Prisma.StringNullableWithAggregatesFilter<"LearningAttempt"> | string | null
+  submissionId?: Prisma.StringNullableWithAggregatesFilter<"LearningAttempt"> | string | null
+  saveRequestId?: Prisma.StringNullableWithAggregatesFilter<"LearningAttempt"> | string | null
+  pronunciationAssessmentId?: Prisma.StringNullableWithAggregatesFilter<"LearningAttempt"> | string | null
   score?: Prisma.IntWithAggregatesFilter<"LearningAttempt"> | number
   errorTypes?: Prisma.JsonWithAggregatesFilter<"LearningAttempt">
-  gradingHash?: Prisma.StringWithAggregatesFilter<"LearningAttempt"> | string
+  gradingHash?: Prisma.StringNullableWithAggregatesFilter<"LearningAttempt"> | string | null
+  evidenceHash?: Prisma.StringNullableWithAggregatesFilter<"LearningAttempt"> | string | null
+  policyVersion?: Prisma.StringNullableWithAggregatesFilter<"LearningAttempt"> | string | null
   savedAt?: Prisma.DateTimeWithAggregatesFilter<"LearningAttempt"> | Date | string
 }
 
 export type LearningAttemptCreateInput = {
   id?: string
+  attemptType?: $Enums.LearningAttemptType
   score: number
   errorTypes: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  gradingHash: string
+  gradingHash?: string | null
+  evidenceHash?: string | null
+  policyVersion?: string | null
   savedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutLearningAttemptsInput
-  exercise: Prisma.ExerciseCreateNestedOneWithoutAttemptsInput
-  submission: Prisma.ExerciseSubmissionCreateNestedOneWithoutAttemptInput
-  saveRequest: Prisma.CoachRequestCreateNestedOneWithoutSavedAttemptInput
+  exercise?: Prisma.ExerciseCreateNestedOneWithoutAttemptsInput
+  submission?: Prisma.ExerciseSubmissionCreateNestedOneWithoutAttemptInput
+  saveRequest?: Prisma.CoachRequestCreateNestedOneWithoutSavedAttemptInput
+  pronunciationAssessment?: Prisma.PronunciationAssessmentCreateNestedOneWithoutLearningAttemptInput
   reviewEvents?: Prisma.LearningReviewEventCreateNestedManyWithoutAttemptInput
   latestItemStates?: Prisma.LearningItemStateCreateNestedManyWithoutLastAttemptInput
 }
@@ -341,12 +396,16 @@ export type LearningAttemptCreateInput = {
 export type LearningAttemptUncheckedCreateInput = {
   id?: string
   userId: string
-  exerciseId: string
-  submissionId: string
-  saveRequestId: string
+  attemptType?: $Enums.LearningAttemptType
+  exerciseId?: string | null
+  submissionId?: string | null
+  saveRequestId?: string | null
+  pronunciationAssessmentId?: string | null
   score: number
   errorTypes: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  gradingHash: string
+  gradingHash?: string | null
+  evidenceHash?: string | null
+  policyVersion?: string | null
   savedAt?: Date | string
   reviewEvents?: Prisma.LearningReviewEventUncheckedCreateNestedManyWithoutAttemptInput
   latestItemStates?: Prisma.LearningItemStateUncheckedCreateNestedManyWithoutLastAttemptInput
@@ -354,14 +413,18 @@ export type LearningAttemptUncheckedCreateInput = {
 
 export type LearningAttemptUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  attemptType?: Prisma.EnumLearningAttemptTypeFieldUpdateOperationsInput | $Enums.LearningAttemptType
   score?: Prisma.IntFieldUpdateOperationsInput | number
   errorTypes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  gradingHash?: Prisma.StringFieldUpdateOperationsInput | string
+  gradingHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  evidenceHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  policyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   savedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutLearningAttemptsNestedInput
-  exercise?: Prisma.ExerciseUpdateOneRequiredWithoutAttemptsNestedInput
-  submission?: Prisma.ExerciseSubmissionUpdateOneRequiredWithoutAttemptNestedInput
-  saveRequest?: Prisma.CoachRequestUpdateOneRequiredWithoutSavedAttemptNestedInput
+  exercise?: Prisma.ExerciseUpdateOneWithoutAttemptsNestedInput
+  submission?: Prisma.ExerciseSubmissionUpdateOneWithoutAttemptNestedInput
+  saveRequest?: Prisma.CoachRequestUpdateOneWithoutSavedAttemptNestedInput
+  pronunciationAssessment?: Prisma.PronunciationAssessmentUpdateOneWithoutLearningAttemptNestedInput
   reviewEvents?: Prisma.LearningReviewEventUpdateManyWithoutAttemptNestedInput
   latestItemStates?: Prisma.LearningItemStateUpdateManyWithoutLastAttemptNestedInput
 }
@@ -369,12 +432,16 @@ export type LearningAttemptUpdateInput = {
 export type LearningAttemptUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  exerciseId?: Prisma.StringFieldUpdateOperationsInput | string
-  submissionId?: Prisma.StringFieldUpdateOperationsInput | string
-  saveRequestId?: Prisma.StringFieldUpdateOperationsInput | string
+  attemptType?: Prisma.EnumLearningAttemptTypeFieldUpdateOperationsInput | $Enums.LearningAttemptType
+  exerciseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  submissionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  saveRequestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pronunciationAssessmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   score?: Prisma.IntFieldUpdateOperationsInput | number
   errorTypes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  gradingHash?: Prisma.StringFieldUpdateOperationsInput | string
+  gradingHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  evidenceHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  policyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   savedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   reviewEvents?: Prisma.LearningReviewEventUncheckedUpdateManyWithoutAttemptNestedInput
   latestItemStates?: Prisma.LearningItemStateUncheckedUpdateManyWithoutLastAttemptNestedInput
@@ -383,32 +450,43 @@ export type LearningAttemptUncheckedUpdateInput = {
 export type LearningAttemptCreateManyInput = {
   id?: string
   userId: string
-  exerciseId: string
-  submissionId: string
-  saveRequestId: string
+  attemptType?: $Enums.LearningAttemptType
+  exerciseId?: string | null
+  submissionId?: string | null
+  saveRequestId?: string | null
+  pronunciationAssessmentId?: string | null
   score: number
   errorTypes: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  gradingHash: string
+  gradingHash?: string | null
+  evidenceHash?: string | null
+  policyVersion?: string | null
   savedAt?: Date | string
 }
 
 export type LearningAttemptUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  attemptType?: Prisma.EnumLearningAttemptTypeFieldUpdateOperationsInput | $Enums.LearningAttemptType
   score?: Prisma.IntFieldUpdateOperationsInput | number
   errorTypes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  gradingHash?: Prisma.StringFieldUpdateOperationsInput | string
+  gradingHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  evidenceHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  policyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   savedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type LearningAttemptUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  exerciseId?: Prisma.StringFieldUpdateOperationsInput | string
-  submissionId?: Prisma.StringFieldUpdateOperationsInput | string
-  saveRequestId?: Prisma.StringFieldUpdateOperationsInput | string
+  attemptType?: Prisma.EnumLearningAttemptTypeFieldUpdateOperationsInput | $Enums.LearningAttemptType
+  exerciseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  submissionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  saveRequestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pronunciationAssessmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   score?: Prisma.IntFieldUpdateOperationsInput | number
   errorTypes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  gradingHash?: Prisma.StringFieldUpdateOperationsInput | string
+  gradingHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  evidenceHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  policyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   savedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -441,12 +519,16 @@ export type LearningAttemptUserIdExerciseIdSubmissionIdCompoundUniqueInput = {
 export type LearningAttemptCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
+  attemptType?: Prisma.SortOrder
   exerciseId?: Prisma.SortOrder
   submissionId?: Prisma.SortOrder
   saveRequestId?: Prisma.SortOrder
+  pronunciationAssessmentId?: Prisma.SortOrder
   score?: Prisma.SortOrder
   errorTypes?: Prisma.SortOrder
   gradingHash?: Prisma.SortOrder
+  evidenceHash?: Prisma.SortOrder
+  policyVersion?: Prisma.SortOrder
   savedAt?: Prisma.SortOrder
 }
 
@@ -457,22 +539,30 @@ export type LearningAttemptAvgOrderByAggregateInput = {
 export type LearningAttemptMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
+  attemptType?: Prisma.SortOrder
   exerciseId?: Prisma.SortOrder
   submissionId?: Prisma.SortOrder
   saveRequestId?: Prisma.SortOrder
+  pronunciationAssessmentId?: Prisma.SortOrder
   score?: Prisma.SortOrder
   gradingHash?: Prisma.SortOrder
+  evidenceHash?: Prisma.SortOrder
+  policyVersion?: Prisma.SortOrder
   savedAt?: Prisma.SortOrder
 }
 
 export type LearningAttemptMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
+  attemptType?: Prisma.SortOrder
   exerciseId?: Prisma.SortOrder
   submissionId?: Prisma.SortOrder
   saveRequestId?: Prisma.SortOrder
+  pronunciationAssessmentId?: Prisma.SortOrder
   score?: Prisma.SortOrder
   gradingHash?: Prisma.SortOrder
+  evidenceHash?: Prisma.SortOrder
+  policyVersion?: Prisma.SortOrder
   savedAt?: Prisma.SortOrder
 }
 
@@ -658,27 +748,71 @@ export type LearningAttemptUncheckedUpdateOneWithoutSubmissionNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.LearningAttemptUpdateToOneWithWhereWithoutSubmissionInput, Prisma.LearningAttemptUpdateWithoutSubmissionInput>, Prisma.LearningAttemptUncheckedUpdateWithoutSubmissionInput>
 }
 
+export type EnumLearningAttemptTypeFieldUpdateOperationsInput = {
+  set?: $Enums.LearningAttemptType
+}
+
+export type LearningAttemptCreateNestedOneWithoutPronunciationAssessmentInput = {
+  create?: Prisma.XOR<Prisma.LearningAttemptCreateWithoutPronunciationAssessmentInput, Prisma.LearningAttemptUncheckedCreateWithoutPronunciationAssessmentInput>
+  connectOrCreate?: Prisma.LearningAttemptCreateOrConnectWithoutPronunciationAssessmentInput
+  connect?: Prisma.LearningAttemptWhereUniqueInput
+}
+
+export type LearningAttemptUncheckedCreateNestedOneWithoutPronunciationAssessmentInput = {
+  create?: Prisma.XOR<Prisma.LearningAttemptCreateWithoutPronunciationAssessmentInput, Prisma.LearningAttemptUncheckedCreateWithoutPronunciationAssessmentInput>
+  connectOrCreate?: Prisma.LearningAttemptCreateOrConnectWithoutPronunciationAssessmentInput
+  connect?: Prisma.LearningAttemptWhereUniqueInput
+}
+
+export type LearningAttemptUpdateOneWithoutPronunciationAssessmentNestedInput = {
+  create?: Prisma.XOR<Prisma.LearningAttemptCreateWithoutPronunciationAssessmentInput, Prisma.LearningAttemptUncheckedCreateWithoutPronunciationAssessmentInput>
+  connectOrCreate?: Prisma.LearningAttemptCreateOrConnectWithoutPronunciationAssessmentInput
+  upsert?: Prisma.LearningAttemptUpsertWithoutPronunciationAssessmentInput
+  disconnect?: Prisma.LearningAttemptWhereInput | boolean
+  delete?: Prisma.LearningAttemptWhereInput | boolean
+  connect?: Prisma.LearningAttemptWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.LearningAttemptUpdateToOneWithWhereWithoutPronunciationAssessmentInput, Prisma.LearningAttemptUpdateWithoutPronunciationAssessmentInput>, Prisma.LearningAttemptUncheckedUpdateWithoutPronunciationAssessmentInput>
+}
+
+export type LearningAttemptUncheckedUpdateOneWithoutPronunciationAssessmentNestedInput = {
+  create?: Prisma.XOR<Prisma.LearningAttemptCreateWithoutPronunciationAssessmentInput, Prisma.LearningAttemptUncheckedCreateWithoutPronunciationAssessmentInput>
+  connectOrCreate?: Prisma.LearningAttemptCreateOrConnectWithoutPronunciationAssessmentInput
+  upsert?: Prisma.LearningAttemptUpsertWithoutPronunciationAssessmentInput
+  disconnect?: Prisma.LearningAttemptWhereInput | boolean
+  delete?: Prisma.LearningAttemptWhereInput | boolean
+  connect?: Prisma.LearningAttemptWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.LearningAttemptUpdateToOneWithWhereWithoutPronunciationAssessmentInput, Prisma.LearningAttemptUpdateWithoutPronunciationAssessmentInput>, Prisma.LearningAttemptUncheckedUpdateWithoutPronunciationAssessmentInput>
+}
+
 export type LearningAttemptCreateWithoutUserInput = {
   id?: string
+  attemptType?: $Enums.LearningAttemptType
   score: number
   errorTypes: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  gradingHash: string
+  gradingHash?: string | null
+  evidenceHash?: string | null
+  policyVersion?: string | null
   savedAt?: Date | string
-  exercise: Prisma.ExerciseCreateNestedOneWithoutAttemptsInput
-  submission: Prisma.ExerciseSubmissionCreateNestedOneWithoutAttemptInput
-  saveRequest: Prisma.CoachRequestCreateNestedOneWithoutSavedAttemptInput
+  exercise?: Prisma.ExerciseCreateNestedOneWithoutAttemptsInput
+  submission?: Prisma.ExerciseSubmissionCreateNestedOneWithoutAttemptInput
+  saveRequest?: Prisma.CoachRequestCreateNestedOneWithoutSavedAttemptInput
+  pronunciationAssessment?: Prisma.PronunciationAssessmentCreateNestedOneWithoutLearningAttemptInput
   reviewEvents?: Prisma.LearningReviewEventCreateNestedManyWithoutAttemptInput
   latestItemStates?: Prisma.LearningItemStateCreateNestedManyWithoutLastAttemptInput
 }
 
 export type LearningAttemptUncheckedCreateWithoutUserInput = {
   id?: string
-  exerciseId: string
-  submissionId: string
-  saveRequestId: string
+  attemptType?: $Enums.LearningAttemptType
+  exerciseId?: string | null
+  submissionId?: string | null
+  saveRequestId?: string | null
+  pronunciationAssessmentId?: string | null
   score: number
   errorTypes: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  gradingHash: string
+  gradingHash?: string | null
+  evidenceHash?: string | null
+  policyVersion?: string | null
   savedAt?: Date | string
   reviewEvents?: Prisma.LearningReviewEventUncheckedCreateNestedManyWithoutAttemptInput
   latestItemStates?: Prisma.LearningItemStateUncheckedCreateNestedManyWithoutLastAttemptInput
@@ -716,37 +850,49 @@ export type LearningAttemptScalarWhereInput = {
   NOT?: Prisma.LearningAttemptScalarWhereInput | Prisma.LearningAttemptScalarWhereInput[]
   id?: Prisma.StringFilter<"LearningAttempt"> | string
   userId?: Prisma.StringFilter<"LearningAttempt"> | string
-  exerciseId?: Prisma.StringFilter<"LearningAttempt"> | string
-  submissionId?: Prisma.StringFilter<"LearningAttempt"> | string
-  saveRequestId?: Prisma.StringFilter<"LearningAttempt"> | string
+  attemptType?: Prisma.EnumLearningAttemptTypeFilter<"LearningAttempt"> | $Enums.LearningAttemptType
+  exerciseId?: Prisma.StringNullableFilter<"LearningAttempt"> | string | null
+  submissionId?: Prisma.StringNullableFilter<"LearningAttempt"> | string | null
+  saveRequestId?: Prisma.StringNullableFilter<"LearningAttempt"> | string | null
+  pronunciationAssessmentId?: Prisma.StringNullableFilter<"LearningAttempt"> | string | null
   score?: Prisma.IntFilter<"LearningAttempt"> | number
   errorTypes?: Prisma.JsonFilter<"LearningAttempt">
-  gradingHash?: Prisma.StringFilter<"LearningAttempt"> | string
+  gradingHash?: Prisma.StringNullableFilter<"LearningAttempt"> | string | null
+  evidenceHash?: Prisma.StringNullableFilter<"LearningAttempt"> | string | null
+  policyVersion?: Prisma.StringNullableFilter<"LearningAttempt"> | string | null
   savedAt?: Prisma.DateTimeFilter<"LearningAttempt"> | Date | string
 }
 
 export type LearningAttemptCreateWithoutLatestItemStatesInput = {
   id?: string
+  attemptType?: $Enums.LearningAttemptType
   score: number
   errorTypes: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  gradingHash: string
+  gradingHash?: string | null
+  evidenceHash?: string | null
+  policyVersion?: string | null
   savedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutLearningAttemptsInput
-  exercise: Prisma.ExerciseCreateNestedOneWithoutAttemptsInput
-  submission: Prisma.ExerciseSubmissionCreateNestedOneWithoutAttemptInput
-  saveRequest: Prisma.CoachRequestCreateNestedOneWithoutSavedAttemptInput
+  exercise?: Prisma.ExerciseCreateNestedOneWithoutAttemptsInput
+  submission?: Prisma.ExerciseSubmissionCreateNestedOneWithoutAttemptInput
+  saveRequest?: Prisma.CoachRequestCreateNestedOneWithoutSavedAttemptInput
+  pronunciationAssessment?: Prisma.PronunciationAssessmentCreateNestedOneWithoutLearningAttemptInput
   reviewEvents?: Prisma.LearningReviewEventCreateNestedManyWithoutAttemptInput
 }
 
 export type LearningAttemptUncheckedCreateWithoutLatestItemStatesInput = {
   id?: string
   userId: string
-  exerciseId: string
-  submissionId: string
-  saveRequestId: string
+  attemptType?: $Enums.LearningAttemptType
+  exerciseId?: string | null
+  submissionId?: string | null
+  saveRequestId?: string | null
+  pronunciationAssessmentId?: string | null
   score: number
   errorTypes: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  gradingHash: string
+  gradingHash?: string | null
+  evidenceHash?: string | null
+  policyVersion?: string | null
   savedAt?: Date | string
   reviewEvents?: Prisma.LearningReviewEventUncheckedCreateNestedManyWithoutAttemptInput
 }
@@ -769,52 +915,68 @@ export type LearningAttemptUpdateToOneWithWhereWithoutLatestItemStatesInput = {
 
 export type LearningAttemptUpdateWithoutLatestItemStatesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  attemptType?: Prisma.EnumLearningAttemptTypeFieldUpdateOperationsInput | $Enums.LearningAttemptType
   score?: Prisma.IntFieldUpdateOperationsInput | number
   errorTypes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  gradingHash?: Prisma.StringFieldUpdateOperationsInput | string
+  gradingHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  evidenceHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  policyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   savedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutLearningAttemptsNestedInput
-  exercise?: Prisma.ExerciseUpdateOneRequiredWithoutAttemptsNestedInput
-  submission?: Prisma.ExerciseSubmissionUpdateOneRequiredWithoutAttemptNestedInput
-  saveRequest?: Prisma.CoachRequestUpdateOneRequiredWithoutSavedAttemptNestedInput
+  exercise?: Prisma.ExerciseUpdateOneWithoutAttemptsNestedInput
+  submission?: Prisma.ExerciseSubmissionUpdateOneWithoutAttemptNestedInput
+  saveRequest?: Prisma.CoachRequestUpdateOneWithoutSavedAttemptNestedInput
+  pronunciationAssessment?: Prisma.PronunciationAssessmentUpdateOneWithoutLearningAttemptNestedInput
   reviewEvents?: Prisma.LearningReviewEventUpdateManyWithoutAttemptNestedInput
 }
 
 export type LearningAttemptUncheckedUpdateWithoutLatestItemStatesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  exerciseId?: Prisma.StringFieldUpdateOperationsInput | string
-  submissionId?: Prisma.StringFieldUpdateOperationsInput | string
-  saveRequestId?: Prisma.StringFieldUpdateOperationsInput | string
+  attemptType?: Prisma.EnumLearningAttemptTypeFieldUpdateOperationsInput | $Enums.LearningAttemptType
+  exerciseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  submissionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  saveRequestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pronunciationAssessmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   score?: Prisma.IntFieldUpdateOperationsInput | number
   errorTypes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  gradingHash?: Prisma.StringFieldUpdateOperationsInput | string
+  gradingHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  evidenceHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  policyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   savedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   reviewEvents?: Prisma.LearningReviewEventUncheckedUpdateManyWithoutAttemptNestedInput
 }
 
 export type LearningAttemptCreateWithoutReviewEventsInput = {
   id?: string
+  attemptType?: $Enums.LearningAttemptType
   score: number
   errorTypes: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  gradingHash: string
+  gradingHash?: string | null
+  evidenceHash?: string | null
+  policyVersion?: string | null
   savedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutLearningAttemptsInput
-  exercise: Prisma.ExerciseCreateNestedOneWithoutAttemptsInput
-  submission: Prisma.ExerciseSubmissionCreateNestedOneWithoutAttemptInput
-  saveRequest: Prisma.CoachRequestCreateNestedOneWithoutSavedAttemptInput
+  exercise?: Prisma.ExerciseCreateNestedOneWithoutAttemptsInput
+  submission?: Prisma.ExerciseSubmissionCreateNestedOneWithoutAttemptInput
+  saveRequest?: Prisma.CoachRequestCreateNestedOneWithoutSavedAttemptInput
+  pronunciationAssessment?: Prisma.PronunciationAssessmentCreateNestedOneWithoutLearningAttemptInput
   latestItemStates?: Prisma.LearningItemStateCreateNestedManyWithoutLastAttemptInput
 }
 
 export type LearningAttemptUncheckedCreateWithoutReviewEventsInput = {
   id?: string
   userId: string
-  exerciseId: string
-  submissionId: string
-  saveRequestId: string
+  attemptType?: $Enums.LearningAttemptType
+  exerciseId?: string | null
+  submissionId?: string | null
+  saveRequestId?: string | null
+  pronunciationAssessmentId?: string | null
   score: number
   errorTypes: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  gradingHash: string
+  gradingHash?: string | null
+  evidenceHash?: string | null
+  policyVersion?: string | null
   savedAt?: Date | string
   latestItemStates?: Prisma.LearningItemStateUncheckedCreateNestedManyWithoutLastAttemptInput
 }
@@ -837,39 +999,51 @@ export type LearningAttemptUpdateToOneWithWhereWithoutReviewEventsInput = {
 
 export type LearningAttemptUpdateWithoutReviewEventsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  attemptType?: Prisma.EnumLearningAttemptTypeFieldUpdateOperationsInput | $Enums.LearningAttemptType
   score?: Prisma.IntFieldUpdateOperationsInput | number
   errorTypes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  gradingHash?: Prisma.StringFieldUpdateOperationsInput | string
+  gradingHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  evidenceHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  policyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   savedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutLearningAttemptsNestedInput
-  exercise?: Prisma.ExerciseUpdateOneRequiredWithoutAttemptsNestedInput
-  submission?: Prisma.ExerciseSubmissionUpdateOneRequiredWithoutAttemptNestedInput
-  saveRequest?: Prisma.CoachRequestUpdateOneRequiredWithoutSavedAttemptNestedInput
+  exercise?: Prisma.ExerciseUpdateOneWithoutAttemptsNestedInput
+  submission?: Prisma.ExerciseSubmissionUpdateOneWithoutAttemptNestedInput
+  saveRequest?: Prisma.CoachRequestUpdateOneWithoutSavedAttemptNestedInput
+  pronunciationAssessment?: Prisma.PronunciationAssessmentUpdateOneWithoutLearningAttemptNestedInput
   latestItemStates?: Prisma.LearningItemStateUpdateManyWithoutLastAttemptNestedInput
 }
 
 export type LearningAttemptUncheckedUpdateWithoutReviewEventsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  exerciseId?: Prisma.StringFieldUpdateOperationsInput | string
-  submissionId?: Prisma.StringFieldUpdateOperationsInput | string
-  saveRequestId?: Prisma.StringFieldUpdateOperationsInput | string
+  attemptType?: Prisma.EnumLearningAttemptTypeFieldUpdateOperationsInput | $Enums.LearningAttemptType
+  exerciseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  submissionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  saveRequestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pronunciationAssessmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   score?: Prisma.IntFieldUpdateOperationsInput | number
   errorTypes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  gradingHash?: Prisma.StringFieldUpdateOperationsInput | string
+  gradingHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  evidenceHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  policyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   savedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   latestItemStates?: Prisma.LearningItemStateUncheckedUpdateManyWithoutLastAttemptNestedInput
 }
 
 export type LearningAttemptCreateWithoutSaveRequestInput = {
   id?: string
+  attemptType?: $Enums.LearningAttemptType
   score: number
   errorTypes: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  gradingHash: string
+  gradingHash?: string | null
+  evidenceHash?: string | null
+  policyVersion?: string | null
   savedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutLearningAttemptsInput
-  exercise: Prisma.ExerciseCreateNestedOneWithoutAttemptsInput
-  submission: Prisma.ExerciseSubmissionCreateNestedOneWithoutAttemptInput
+  exercise?: Prisma.ExerciseCreateNestedOneWithoutAttemptsInput
+  submission?: Prisma.ExerciseSubmissionCreateNestedOneWithoutAttemptInput
+  pronunciationAssessment?: Prisma.PronunciationAssessmentCreateNestedOneWithoutLearningAttemptInput
   reviewEvents?: Prisma.LearningReviewEventCreateNestedManyWithoutAttemptInput
   latestItemStates?: Prisma.LearningItemStateCreateNestedManyWithoutLastAttemptInput
 }
@@ -877,11 +1051,15 @@ export type LearningAttemptCreateWithoutSaveRequestInput = {
 export type LearningAttemptUncheckedCreateWithoutSaveRequestInput = {
   id?: string
   userId: string
-  exerciseId: string
-  submissionId: string
+  attemptType?: $Enums.LearningAttemptType
+  exerciseId?: string | null
+  submissionId?: string | null
+  pronunciationAssessmentId?: string | null
   score: number
   errorTypes: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  gradingHash: string
+  gradingHash?: string | null
+  evidenceHash?: string | null
+  policyVersion?: string | null
   savedAt?: Date | string
   reviewEvents?: Prisma.LearningReviewEventUncheckedCreateNestedManyWithoutAttemptInput
   latestItemStates?: Prisma.LearningItemStateUncheckedCreateNestedManyWithoutLastAttemptInput
@@ -905,13 +1083,17 @@ export type LearningAttemptUpdateToOneWithWhereWithoutSaveRequestInput = {
 
 export type LearningAttemptUpdateWithoutSaveRequestInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  attemptType?: Prisma.EnumLearningAttemptTypeFieldUpdateOperationsInput | $Enums.LearningAttemptType
   score?: Prisma.IntFieldUpdateOperationsInput | number
   errorTypes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  gradingHash?: Prisma.StringFieldUpdateOperationsInput | string
+  gradingHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  evidenceHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  policyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   savedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutLearningAttemptsNestedInput
-  exercise?: Prisma.ExerciseUpdateOneRequiredWithoutAttemptsNestedInput
-  submission?: Prisma.ExerciseSubmissionUpdateOneRequiredWithoutAttemptNestedInput
+  exercise?: Prisma.ExerciseUpdateOneWithoutAttemptsNestedInput
+  submission?: Prisma.ExerciseSubmissionUpdateOneWithoutAttemptNestedInput
+  pronunciationAssessment?: Prisma.PronunciationAssessmentUpdateOneWithoutLearningAttemptNestedInput
   reviewEvents?: Prisma.LearningReviewEventUpdateManyWithoutAttemptNestedInput
   latestItemStates?: Prisma.LearningItemStateUpdateManyWithoutLastAttemptNestedInput
 }
@@ -919,11 +1101,15 @@ export type LearningAttemptUpdateWithoutSaveRequestInput = {
 export type LearningAttemptUncheckedUpdateWithoutSaveRequestInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  exerciseId?: Prisma.StringFieldUpdateOperationsInput | string
-  submissionId?: Prisma.StringFieldUpdateOperationsInput | string
+  attemptType?: Prisma.EnumLearningAttemptTypeFieldUpdateOperationsInput | $Enums.LearningAttemptType
+  exerciseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  submissionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pronunciationAssessmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   score?: Prisma.IntFieldUpdateOperationsInput | number
   errorTypes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  gradingHash?: Prisma.StringFieldUpdateOperationsInput | string
+  gradingHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  evidenceHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  policyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   savedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   reviewEvents?: Prisma.LearningReviewEventUncheckedUpdateManyWithoutAttemptNestedInput
   latestItemStates?: Prisma.LearningItemStateUncheckedUpdateManyWithoutLastAttemptNestedInput
@@ -931,13 +1117,17 @@ export type LearningAttemptUncheckedUpdateWithoutSaveRequestInput = {
 
 export type LearningAttemptCreateWithoutExerciseInput = {
   id?: string
+  attemptType?: $Enums.LearningAttemptType
   score: number
   errorTypes: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  gradingHash: string
+  gradingHash?: string | null
+  evidenceHash?: string | null
+  policyVersion?: string | null
   savedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutLearningAttemptsInput
-  submission: Prisma.ExerciseSubmissionCreateNestedOneWithoutAttemptInput
-  saveRequest: Prisma.CoachRequestCreateNestedOneWithoutSavedAttemptInput
+  submission?: Prisma.ExerciseSubmissionCreateNestedOneWithoutAttemptInput
+  saveRequest?: Prisma.CoachRequestCreateNestedOneWithoutSavedAttemptInput
+  pronunciationAssessment?: Prisma.PronunciationAssessmentCreateNestedOneWithoutLearningAttemptInput
   reviewEvents?: Prisma.LearningReviewEventCreateNestedManyWithoutAttemptInput
   latestItemStates?: Prisma.LearningItemStateCreateNestedManyWithoutLastAttemptInput
 }
@@ -945,11 +1135,15 @@ export type LearningAttemptCreateWithoutExerciseInput = {
 export type LearningAttemptUncheckedCreateWithoutExerciseInput = {
   id?: string
   userId: string
-  submissionId: string
-  saveRequestId: string
+  attemptType?: $Enums.LearningAttemptType
+  submissionId?: string | null
+  saveRequestId?: string | null
+  pronunciationAssessmentId?: string | null
   score: number
   errorTypes: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  gradingHash: string
+  gradingHash?: string | null
+  evidenceHash?: string | null
+  policyVersion?: string | null
   savedAt?: Date | string
   reviewEvents?: Prisma.LearningReviewEventUncheckedCreateNestedManyWithoutAttemptInput
   latestItemStates?: Prisma.LearningItemStateUncheckedCreateNestedManyWithoutLastAttemptInput
@@ -983,13 +1177,17 @@ export type LearningAttemptUpdateManyWithWhereWithoutExerciseInput = {
 
 export type LearningAttemptCreateWithoutSubmissionInput = {
   id?: string
+  attemptType?: $Enums.LearningAttemptType
   score: number
   errorTypes: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  gradingHash: string
+  gradingHash?: string | null
+  evidenceHash?: string | null
+  policyVersion?: string | null
   savedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutLearningAttemptsInput
-  exercise: Prisma.ExerciseCreateNestedOneWithoutAttemptsInput
-  saveRequest: Prisma.CoachRequestCreateNestedOneWithoutSavedAttemptInput
+  exercise?: Prisma.ExerciseCreateNestedOneWithoutAttemptsInput
+  saveRequest?: Prisma.CoachRequestCreateNestedOneWithoutSavedAttemptInput
+  pronunciationAssessment?: Prisma.PronunciationAssessmentCreateNestedOneWithoutLearningAttemptInput
   reviewEvents?: Prisma.LearningReviewEventCreateNestedManyWithoutAttemptInput
   latestItemStates?: Prisma.LearningItemStateCreateNestedManyWithoutLastAttemptInput
 }
@@ -997,11 +1195,15 @@ export type LearningAttemptCreateWithoutSubmissionInput = {
 export type LearningAttemptUncheckedCreateWithoutSubmissionInput = {
   id?: string
   userId: string
-  exerciseId: string
-  saveRequestId: string
+  attemptType?: $Enums.LearningAttemptType
+  exerciseId?: string | null
+  saveRequestId?: string | null
+  pronunciationAssessmentId?: string | null
   score: number
   errorTypes: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  gradingHash: string
+  gradingHash?: string | null
+  evidenceHash?: string | null
+  policyVersion?: string | null
   savedAt?: Date | string
   reviewEvents?: Prisma.LearningReviewEventUncheckedCreateNestedManyWithoutAttemptInput
   latestItemStates?: Prisma.LearningItemStateUncheckedCreateNestedManyWithoutLastAttemptInput
@@ -1025,13 +1227,17 @@ export type LearningAttemptUpdateToOneWithWhereWithoutSubmissionInput = {
 
 export type LearningAttemptUpdateWithoutSubmissionInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  attemptType?: Prisma.EnumLearningAttemptTypeFieldUpdateOperationsInput | $Enums.LearningAttemptType
   score?: Prisma.IntFieldUpdateOperationsInput | number
   errorTypes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  gradingHash?: Prisma.StringFieldUpdateOperationsInput | string
+  gradingHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  evidenceHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  policyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   savedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutLearningAttemptsNestedInput
-  exercise?: Prisma.ExerciseUpdateOneRequiredWithoutAttemptsNestedInput
-  saveRequest?: Prisma.CoachRequestUpdateOneRequiredWithoutSavedAttemptNestedInput
+  exercise?: Prisma.ExerciseUpdateOneWithoutAttemptsNestedInput
+  saveRequest?: Prisma.CoachRequestUpdateOneWithoutSavedAttemptNestedInput
+  pronunciationAssessment?: Prisma.PronunciationAssessmentUpdateOneWithoutLearningAttemptNestedInput
   reviewEvents?: Prisma.LearningReviewEventUpdateManyWithoutAttemptNestedInput
   latestItemStates?: Prisma.LearningItemStateUpdateManyWithoutLastAttemptNestedInput
 }
@@ -1039,11 +1245,99 @@ export type LearningAttemptUpdateWithoutSubmissionInput = {
 export type LearningAttemptUncheckedUpdateWithoutSubmissionInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  exerciseId?: Prisma.StringFieldUpdateOperationsInput | string
-  saveRequestId?: Prisma.StringFieldUpdateOperationsInput | string
+  attemptType?: Prisma.EnumLearningAttemptTypeFieldUpdateOperationsInput | $Enums.LearningAttemptType
+  exerciseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  saveRequestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pronunciationAssessmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   score?: Prisma.IntFieldUpdateOperationsInput | number
   errorTypes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  gradingHash?: Prisma.StringFieldUpdateOperationsInput | string
+  gradingHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  evidenceHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  policyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  savedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  reviewEvents?: Prisma.LearningReviewEventUncheckedUpdateManyWithoutAttemptNestedInput
+  latestItemStates?: Prisma.LearningItemStateUncheckedUpdateManyWithoutLastAttemptNestedInput
+}
+
+export type LearningAttemptCreateWithoutPronunciationAssessmentInput = {
+  id?: string
+  attemptType?: $Enums.LearningAttemptType
+  score: number
+  errorTypes: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  gradingHash?: string | null
+  evidenceHash?: string | null
+  policyVersion?: string | null
+  savedAt?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutLearningAttemptsInput
+  exercise?: Prisma.ExerciseCreateNestedOneWithoutAttemptsInput
+  submission?: Prisma.ExerciseSubmissionCreateNestedOneWithoutAttemptInput
+  saveRequest?: Prisma.CoachRequestCreateNestedOneWithoutSavedAttemptInput
+  reviewEvents?: Prisma.LearningReviewEventCreateNestedManyWithoutAttemptInput
+  latestItemStates?: Prisma.LearningItemStateCreateNestedManyWithoutLastAttemptInput
+}
+
+export type LearningAttemptUncheckedCreateWithoutPronunciationAssessmentInput = {
+  id?: string
+  userId: string
+  attemptType?: $Enums.LearningAttemptType
+  exerciseId?: string | null
+  submissionId?: string | null
+  saveRequestId?: string | null
+  score: number
+  errorTypes: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  gradingHash?: string | null
+  evidenceHash?: string | null
+  policyVersion?: string | null
+  savedAt?: Date | string
+  reviewEvents?: Prisma.LearningReviewEventUncheckedCreateNestedManyWithoutAttemptInput
+  latestItemStates?: Prisma.LearningItemStateUncheckedCreateNestedManyWithoutLastAttemptInput
+}
+
+export type LearningAttemptCreateOrConnectWithoutPronunciationAssessmentInput = {
+  where: Prisma.LearningAttemptWhereUniqueInput
+  create: Prisma.XOR<Prisma.LearningAttemptCreateWithoutPronunciationAssessmentInput, Prisma.LearningAttemptUncheckedCreateWithoutPronunciationAssessmentInput>
+}
+
+export type LearningAttemptUpsertWithoutPronunciationAssessmentInput = {
+  update: Prisma.XOR<Prisma.LearningAttemptUpdateWithoutPronunciationAssessmentInput, Prisma.LearningAttemptUncheckedUpdateWithoutPronunciationAssessmentInput>
+  create: Prisma.XOR<Prisma.LearningAttemptCreateWithoutPronunciationAssessmentInput, Prisma.LearningAttemptUncheckedCreateWithoutPronunciationAssessmentInput>
+  where?: Prisma.LearningAttemptWhereInput
+}
+
+export type LearningAttemptUpdateToOneWithWhereWithoutPronunciationAssessmentInput = {
+  where?: Prisma.LearningAttemptWhereInput
+  data: Prisma.XOR<Prisma.LearningAttemptUpdateWithoutPronunciationAssessmentInput, Prisma.LearningAttemptUncheckedUpdateWithoutPronunciationAssessmentInput>
+}
+
+export type LearningAttemptUpdateWithoutPronunciationAssessmentInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  attemptType?: Prisma.EnumLearningAttemptTypeFieldUpdateOperationsInput | $Enums.LearningAttemptType
+  score?: Prisma.IntFieldUpdateOperationsInput | number
+  errorTypes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  gradingHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  evidenceHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  policyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  savedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutLearningAttemptsNestedInput
+  exercise?: Prisma.ExerciseUpdateOneWithoutAttemptsNestedInput
+  submission?: Prisma.ExerciseSubmissionUpdateOneWithoutAttemptNestedInput
+  saveRequest?: Prisma.CoachRequestUpdateOneWithoutSavedAttemptNestedInput
+  reviewEvents?: Prisma.LearningReviewEventUpdateManyWithoutAttemptNestedInput
+  latestItemStates?: Prisma.LearningItemStateUpdateManyWithoutLastAttemptNestedInput
+}
+
+export type LearningAttemptUncheckedUpdateWithoutPronunciationAssessmentInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  attemptType?: Prisma.EnumLearningAttemptTypeFieldUpdateOperationsInput | $Enums.LearningAttemptType
+  exerciseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  submissionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  saveRequestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  score?: Prisma.IntFieldUpdateOperationsInput | number
+  errorTypes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  gradingHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  evidenceHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  policyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   savedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   reviewEvents?: Prisma.LearningReviewEventUncheckedUpdateManyWithoutAttemptNestedInput
   latestItemStates?: Prisma.LearningItemStateUncheckedUpdateManyWithoutLastAttemptNestedInput
@@ -1051,36 +1345,48 @@ export type LearningAttemptUncheckedUpdateWithoutSubmissionInput = {
 
 export type LearningAttemptCreateManyUserInput = {
   id?: string
-  exerciseId: string
-  submissionId: string
-  saveRequestId: string
+  attemptType?: $Enums.LearningAttemptType
+  exerciseId?: string | null
+  submissionId?: string | null
+  saveRequestId?: string | null
+  pronunciationAssessmentId?: string | null
   score: number
   errorTypes: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  gradingHash: string
+  gradingHash?: string | null
+  evidenceHash?: string | null
+  policyVersion?: string | null
   savedAt?: Date | string
 }
 
 export type LearningAttemptUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  attemptType?: Prisma.EnumLearningAttemptTypeFieldUpdateOperationsInput | $Enums.LearningAttemptType
   score?: Prisma.IntFieldUpdateOperationsInput | number
   errorTypes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  gradingHash?: Prisma.StringFieldUpdateOperationsInput | string
+  gradingHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  evidenceHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  policyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   savedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  exercise?: Prisma.ExerciseUpdateOneRequiredWithoutAttemptsNestedInput
-  submission?: Prisma.ExerciseSubmissionUpdateOneRequiredWithoutAttemptNestedInput
-  saveRequest?: Prisma.CoachRequestUpdateOneRequiredWithoutSavedAttemptNestedInput
+  exercise?: Prisma.ExerciseUpdateOneWithoutAttemptsNestedInput
+  submission?: Prisma.ExerciseSubmissionUpdateOneWithoutAttemptNestedInput
+  saveRequest?: Prisma.CoachRequestUpdateOneWithoutSavedAttemptNestedInput
+  pronunciationAssessment?: Prisma.PronunciationAssessmentUpdateOneWithoutLearningAttemptNestedInput
   reviewEvents?: Prisma.LearningReviewEventUpdateManyWithoutAttemptNestedInput
   latestItemStates?: Prisma.LearningItemStateUpdateManyWithoutLastAttemptNestedInput
 }
 
 export type LearningAttemptUncheckedUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  exerciseId?: Prisma.StringFieldUpdateOperationsInput | string
-  submissionId?: Prisma.StringFieldUpdateOperationsInput | string
-  saveRequestId?: Prisma.StringFieldUpdateOperationsInput | string
+  attemptType?: Prisma.EnumLearningAttemptTypeFieldUpdateOperationsInput | $Enums.LearningAttemptType
+  exerciseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  submissionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  saveRequestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pronunciationAssessmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   score?: Prisma.IntFieldUpdateOperationsInput | number
   errorTypes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  gradingHash?: Prisma.StringFieldUpdateOperationsInput | string
+  gradingHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  evidenceHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  policyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   savedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   reviewEvents?: Prisma.LearningReviewEventUncheckedUpdateManyWithoutAttemptNestedInput
   latestItemStates?: Prisma.LearningItemStateUncheckedUpdateManyWithoutLastAttemptNestedInput
@@ -1088,35 +1394,47 @@ export type LearningAttemptUncheckedUpdateWithoutUserInput = {
 
 export type LearningAttemptUncheckedUpdateManyWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  exerciseId?: Prisma.StringFieldUpdateOperationsInput | string
-  submissionId?: Prisma.StringFieldUpdateOperationsInput | string
-  saveRequestId?: Prisma.StringFieldUpdateOperationsInput | string
+  attemptType?: Prisma.EnumLearningAttemptTypeFieldUpdateOperationsInput | $Enums.LearningAttemptType
+  exerciseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  submissionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  saveRequestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pronunciationAssessmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   score?: Prisma.IntFieldUpdateOperationsInput | number
   errorTypes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  gradingHash?: Prisma.StringFieldUpdateOperationsInput | string
+  gradingHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  evidenceHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  policyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   savedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type LearningAttemptCreateManyExerciseInput = {
   id?: string
   userId: string
-  submissionId: string
-  saveRequestId: string
+  attemptType?: $Enums.LearningAttemptType
+  submissionId?: string | null
+  saveRequestId?: string | null
+  pronunciationAssessmentId?: string | null
   score: number
   errorTypes: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  gradingHash: string
+  gradingHash?: string | null
+  evidenceHash?: string | null
+  policyVersion?: string | null
   savedAt?: Date | string
 }
 
 export type LearningAttemptUpdateWithoutExerciseInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  attemptType?: Prisma.EnumLearningAttemptTypeFieldUpdateOperationsInput | $Enums.LearningAttemptType
   score?: Prisma.IntFieldUpdateOperationsInput | number
   errorTypes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  gradingHash?: Prisma.StringFieldUpdateOperationsInput | string
+  gradingHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  evidenceHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  policyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   savedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutLearningAttemptsNestedInput
-  submission?: Prisma.ExerciseSubmissionUpdateOneRequiredWithoutAttemptNestedInput
-  saveRequest?: Prisma.CoachRequestUpdateOneRequiredWithoutSavedAttemptNestedInput
+  submission?: Prisma.ExerciseSubmissionUpdateOneWithoutAttemptNestedInput
+  saveRequest?: Prisma.CoachRequestUpdateOneWithoutSavedAttemptNestedInput
+  pronunciationAssessment?: Prisma.PronunciationAssessmentUpdateOneWithoutLearningAttemptNestedInput
   reviewEvents?: Prisma.LearningReviewEventUpdateManyWithoutAttemptNestedInput
   latestItemStates?: Prisma.LearningItemStateUpdateManyWithoutLastAttemptNestedInput
 }
@@ -1124,11 +1442,15 @@ export type LearningAttemptUpdateWithoutExerciseInput = {
 export type LearningAttemptUncheckedUpdateWithoutExerciseInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  submissionId?: Prisma.StringFieldUpdateOperationsInput | string
-  saveRequestId?: Prisma.StringFieldUpdateOperationsInput | string
+  attemptType?: Prisma.EnumLearningAttemptTypeFieldUpdateOperationsInput | $Enums.LearningAttemptType
+  submissionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  saveRequestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pronunciationAssessmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   score?: Prisma.IntFieldUpdateOperationsInput | number
   errorTypes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  gradingHash?: Prisma.StringFieldUpdateOperationsInput | string
+  gradingHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  evidenceHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  policyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   savedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   reviewEvents?: Prisma.LearningReviewEventUncheckedUpdateManyWithoutAttemptNestedInput
   latestItemStates?: Prisma.LearningItemStateUncheckedUpdateManyWithoutLastAttemptNestedInput
@@ -1137,11 +1459,15 @@ export type LearningAttemptUncheckedUpdateWithoutExerciseInput = {
 export type LearningAttemptUncheckedUpdateManyWithoutExerciseInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  submissionId?: Prisma.StringFieldUpdateOperationsInput | string
-  saveRequestId?: Prisma.StringFieldUpdateOperationsInput | string
+  attemptType?: Prisma.EnumLearningAttemptTypeFieldUpdateOperationsInput | $Enums.LearningAttemptType
+  submissionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  saveRequestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pronunciationAssessmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   score?: Prisma.IntFieldUpdateOperationsInput | number
   errorTypes?: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  gradingHash?: Prisma.StringFieldUpdateOperationsInput | string
+  gradingHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  evidenceHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  policyVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   savedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -1188,17 +1514,22 @@ export type LearningAttemptCountOutputTypeCountLatestItemStatesArgs<ExtArgs exte
 export type LearningAttemptSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   userId?: boolean
+  attemptType?: boolean
   exerciseId?: boolean
   submissionId?: boolean
   saveRequestId?: boolean
+  pronunciationAssessmentId?: boolean
   score?: boolean
   errorTypes?: boolean
   gradingHash?: boolean
+  evidenceHash?: boolean
+  policyVersion?: boolean
   savedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  exercise?: boolean | Prisma.ExerciseDefaultArgs<ExtArgs>
-  submission?: boolean | Prisma.ExerciseSubmissionDefaultArgs<ExtArgs>
-  saveRequest?: boolean | Prisma.CoachRequestDefaultArgs<ExtArgs>
+  exercise?: boolean | Prisma.LearningAttempt$exerciseArgs<ExtArgs>
+  submission?: boolean | Prisma.LearningAttempt$submissionArgs<ExtArgs>
+  saveRequest?: boolean | Prisma.LearningAttempt$saveRequestArgs<ExtArgs>
+  pronunciationAssessment?: boolean | Prisma.LearningAttempt$pronunciationAssessmentArgs<ExtArgs>
   reviewEvents?: boolean | Prisma.LearningAttempt$reviewEventsArgs<ExtArgs>
   latestItemStates?: boolean | Prisma.LearningAttempt$latestItemStatesArgs<ExtArgs>
   _count?: boolean | Prisma.LearningAttemptCountOutputTypeDefaultArgs<ExtArgs>
@@ -1207,89 +1538,111 @@ export type LearningAttemptSelect<ExtArgs extends runtime.Types.Extensions.Inter
 export type LearningAttemptSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   userId?: boolean
+  attemptType?: boolean
   exerciseId?: boolean
   submissionId?: boolean
   saveRequestId?: boolean
+  pronunciationAssessmentId?: boolean
   score?: boolean
   errorTypes?: boolean
   gradingHash?: boolean
+  evidenceHash?: boolean
+  policyVersion?: boolean
   savedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  exercise?: boolean | Prisma.ExerciseDefaultArgs<ExtArgs>
-  submission?: boolean | Prisma.ExerciseSubmissionDefaultArgs<ExtArgs>
-  saveRequest?: boolean | Prisma.CoachRequestDefaultArgs<ExtArgs>
+  exercise?: boolean | Prisma.LearningAttempt$exerciseArgs<ExtArgs>
+  submission?: boolean | Prisma.LearningAttempt$submissionArgs<ExtArgs>
+  saveRequest?: boolean | Prisma.LearningAttempt$saveRequestArgs<ExtArgs>
+  pronunciationAssessment?: boolean | Prisma.LearningAttempt$pronunciationAssessmentArgs<ExtArgs>
 }, ExtArgs["result"]["learningAttempt"]>
 
 export type LearningAttemptSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   userId?: boolean
+  attemptType?: boolean
   exerciseId?: boolean
   submissionId?: boolean
   saveRequestId?: boolean
+  pronunciationAssessmentId?: boolean
   score?: boolean
   errorTypes?: boolean
   gradingHash?: boolean
+  evidenceHash?: boolean
+  policyVersion?: boolean
   savedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  exercise?: boolean | Prisma.ExerciseDefaultArgs<ExtArgs>
-  submission?: boolean | Prisma.ExerciseSubmissionDefaultArgs<ExtArgs>
-  saveRequest?: boolean | Prisma.CoachRequestDefaultArgs<ExtArgs>
+  exercise?: boolean | Prisma.LearningAttempt$exerciseArgs<ExtArgs>
+  submission?: boolean | Prisma.LearningAttempt$submissionArgs<ExtArgs>
+  saveRequest?: boolean | Prisma.LearningAttempt$saveRequestArgs<ExtArgs>
+  pronunciationAssessment?: boolean | Prisma.LearningAttempt$pronunciationAssessmentArgs<ExtArgs>
 }, ExtArgs["result"]["learningAttempt"]>
 
 export type LearningAttemptSelectScalar = {
   id?: boolean
   userId?: boolean
+  attemptType?: boolean
   exerciseId?: boolean
   submissionId?: boolean
   saveRequestId?: boolean
+  pronunciationAssessmentId?: boolean
   score?: boolean
   errorTypes?: boolean
   gradingHash?: boolean
+  evidenceHash?: boolean
+  policyVersion?: boolean
   savedAt?: boolean
 }
 
-export type LearningAttemptOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "exerciseId" | "submissionId" | "saveRequestId" | "score" | "errorTypes" | "gradingHash" | "savedAt", ExtArgs["result"]["learningAttempt"]>
+export type LearningAttemptOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "attemptType" | "exerciseId" | "submissionId" | "saveRequestId" | "pronunciationAssessmentId" | "score" | "errorTypes" | "gradingHash" | "evidenceHash" | "policyVersion" | "savedAt", ExtArgs["result"]["learningAttempt"]>
 export type LearningAttemptInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  exercise?: boolean | Prisma.ExerciseDefaultArgs<ExtArgs>
-  submission?: boolean | Prisma.ExerciseSubmissionDefaultArgs<ExtArgs>
-  saveRequest?: boolean | Prisma.CoachRequestDefaultArgs<ExtArgs>
+  exercise?: boolean | Prisma.LearningAttempt$exerciseArgs<ExtArgs>
+  submission?: boolean | Prisma.LearningAttempt$submissionArgs<ExtArgs>
+  saveRequest?: boolean | Prisma.LearningAttempt$saveRequestArgs<ExtArgs>
+  pronunciationAssessment?: boolean | Prisma.LearningAttempt$pronunciationAssessmentArgs<ExtArgs>
   reviewEvents?: boolean | Prisma.LearningAttempt$reviewEventsArgs<ExtArgs>
   latestItemStates?: boolean | Prisma.LearningAttempt$latestItemStatesArgs<ExtArgs>
   _count?: boolean | Prisma.LearningAttemptCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type LearningAttemptIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  exercise?: boolean | Prisma.ExerciseDefaultArgs<ExtArgs>
-  submission?: boolean | Prisma.ExerciseSubmissionDefaultArgs<ExtArgs>
-  saveRequest?: boolean | Prisma.CoachRequestDefaultArgs<ExtArgs>
+  exercise?: boolean | Prisma.LearningAttempt$exerciseArgs<ExtArgs>
+  submission?: boolean | Prisma.LearningAttempt$submissionArgs<ExtArgs>
+  saveRequest?: boolean | Prisma.LearningAttempt$saveRequestArgs<ExtArgs>
+  pronunciationAssessment?: boolean | Prisma.LearningAttempt$pronunciationAssessmentArgs<ExtArgs>
 }
 export type LearningAttemptIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  exercise?: boolean | Prisma.ExerciseDefaultArgs<ExtArgs>
-  submission?: boolean | Prisma.ExerciseSubmissionDefaultArgs<ExtArgs>
-  saveRequest?: boolean | Prisma.CoachRequestDefaultArgs<ExtArgs>
+  exercise?: boolean | Prisma.LearningAttempt$exerciseArgs<ExtArgs>
+  submission?: boolean | Prisma.LearningAttempt$submissionArgs<ExtArgs>
+  saveRequest?: boolean | Prisma.LearningAttempt$saveRequestArgs<ExtArgs>
+  pronunciationAssessment?: boolean | Prisma.LearningAttempt$pronunciationAssessmentArgs<ExtArgs>
 }
 
 export type $LearningAttemptPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "LearningAttempt"
   objects: {
     user: Prisma.$UserPayload<ExtArgs>
-    exercise: Prisma.$ExercisePayload<ExtArgs>
-    submission: Prisma.$ExerciseSubmissionPayload<ExtArgs>
-    saveRequest: Prisma.$CoachRequestPayload<ExtArgs>
+    exercise: Prisma.$ExercisePayload<ExtArgs> | null
+    submission: Prisma.$ExerciseSubmissionPayload<ExtArgs> | null
+    saveRequest: Prisma.$CoachRequestPayload<ExtArgs> | null
+    pronunciationAssessment: Prisma.$PronunciationAssessmentPayload<ExtArgs> | null
     reviewEvents: Prisma.$LearningReviewEventPayload<ExtArgs>[]
     latestItemStates: Prisma.$LearningItemStatePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     userId: string
-    exerciseId: string
-    submissionId: string
-    saveRequestId: string
+    attemptType: $Enums.LearningAttemptType
+    exerciseId: string | null
+    submissionId: string | null
+    saveRequestId: string | null
+    pronunciationAssessmentId: string | null
     score: number
     errorTypes: runtime.JsonValue
-    gradingHash: string
+    gradingHash: string | null
+    evidenceHash: string | null
+    policyVersion: string | null
     savedAt: Date
   }, ExtArgs["result"]["learningAttempt"]>
   composites: {}
@@ -1686,9 +2039,10 @@ readonly fields: LearningAttemptFieldRefs;
 export interface Prisma__LearningAttemptClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-  exercise<T extends Prisma.ExerciseDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ExerciseDefaultArgs<ExtArgs>>): Prisma.Prisma__ExerciseClient<runtime.Types.Result.GetResult<Prisma.$ExercisePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-  submission<T extends Prisma.ExerciseSubmissionDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ExerciseSubmissionDefaultArgs<ExtArgs>>): Prisma.Prisma__ExerciseSubmissionClient<runtime.Types.Result.GetResult<Prisma.$ExerciseSubmissionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-  saveRequest<T extends Prisma.CoachRequestDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CoachRequestDefaultArgs<ExtArgs>>): Prisma.Prisma__CoachRequestClient<runtime.Types.Result.GetResult<Prisma.$CoachRequestPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  exercise<T extends Prisma.LearningAttempt$exerciseArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.LearningAttempt$exerciseArgs<ExtArgs>>): Prisma.Prisma__ExerciseClient<runtime.Types.Result.GetResult<Prisma.$ExercisePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  submission<T extends Prisma.LearningAttempt$submissionArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.LearningAttempt$submissionArgs<ExtArgs>>): Prisma.Prisma__ExerciseSubmissionClient<runtime.Types.Result.GetResult<Prisma.$ExerciseSubmissionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  saveRequest<T extends Prisma.LearningAttempt$saveRequestArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.LearningAttempt$saveRequestArgs<ExtArgs>>): Prisma.Prisma__CoachRequestClient<runtime.Types.Result.GetResult<Prisma.$CoachRequestPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  pronunciationAssessment<T extends Prisma.LearningAttempt$pronunciationAssessmentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.LearningAttempt$pronunciationAssessmentArgs<ExtArgs>>): Prisma.Prisma__PronunciationAssessmentClient<runtime.Types.Result.GetResult<Prisma.$PronunciationAssessmentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   reviewEvents<T extends Prisma.LearningAttempt$reviewEventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.LearningAttempt$reviewEventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LearningReviewEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   latestItemStates<T extends Prisma.LearningAttempt$latestItemStatesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.LearningAttempt$latestItemStatesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LearningItemStatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
@@ -1722,12 +2076,16 @@ export interface Prisma__LearningAttemptClient<T, Null = never, ExtArgs extends 
 export interface LearningAttemptFieldRefs {
   readonly id: Prisma.FieldRef<"LearningAttempt", 'String'>
   readonly userId: Prisma.FieldRef<"LearningAttempt", 'String'>
+  readonly attemptType: Prisma.FieldRef<"LearningAttempt", 'LearningAttemptType'>
   readonly exerciseId: Prisma.FieldRef<"LearningAttempt", 'String'>
   readonly submissionId: Prisma.FieldRef<"LearningAttempt", 'String'>
   readonly saveRequestId: Prisma.FieldRef<"LearningAttempt", 'String'>
+  readonly pronunciationAssessmentId: Prisma.FieldRef<"LearningAttempt", 'String'>
   readonly score: Prisma.FieldRef<"LearningAttempt", 'Int'>
   readonly errorTypes: Prisma.FieldRef<"LearningAttempt", 'Json'>
   readonly gradingHash: Prisma.FieldRef<"LearningAttempt", 'String'>
+  readonly evidenceHash: Prisma.FieldRef<"LearningAttempt", 'String'>
+  readonly policyVersion: Prisma.FieldRef<"LearningAttempt", 'String'>
   readonly savedAt: Prisma.FieldRef<"LearningAttempt", 'DateTime'>
 }
     
@@ -2127,6 +2485,82 @@ export type LearningAttemptDeleteManyArgs<ExtArgs extends runtime.Types.Extensio
    * Limit how many LearningAttempts to delete.
    */
   limit?: number
+}
+
+/**
+ * LearningAttempt.exercise
+ */
+export type LearningAttempt$exerciseArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Exercise
+   */
+  select?: Prisma.ExerciseSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Exercise
+   */
+  omit?: Prisma.ExerciseOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ExerciseInclude<ExtArgs> | null
+  where?: Prisma.ExerciseWhereInput
+}
+
+/**
+ * LearningAttempt.submission
+ */
+export type LearningAttempt$submissionArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ExerciseSubmission
+   */
+  select?: Prisma.ExerciseSubmissionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ExerciseSubmission
+   */
+  omit?: Prisma.ExerciseSubmissionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ExerciseSubmissionInclude<ExtArgs> | null
+  where?: Prisma.ExerciseSubmissionWhereInput
+}
+
+/**
+ * LearningAttempt.saveRequest
+ */
+export type LearningAttempt$saveRequestArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the CoachRequest
+   */
+  select?: Prisma.CoachRequestSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the CoachRequest
+   */
+  omit?: Prisma.CoachRequestOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CoachRequestInclude<ExtArgs> | null
+  where?: Prisma.CoachRequestWhereInput
+}
+
+/**
+ * LearningAttempt.pronunciationAssessment
+ */
+export type LearningAttempt$pronunciationAssessmentArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PronunciationAssessment
+   */
+  select?: Prisma.PronunciationAssessmentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PronunciationAssessment
+   */
+  omit?: Prisma.PronunciationAssessmentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PronunciationAssessmentInclude<ExtArgs> | null
+  where?: Prisma.PronunciationAssessmentWhereInput
 }
 
 /**

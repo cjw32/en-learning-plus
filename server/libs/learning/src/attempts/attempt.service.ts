@@ -202,11 +202,39 @@ export class PrismaAttemptRepository implements AttemptRepository {
         },
         findAttemptBySubmission: async (submissionId) => {
           const attempt = await database.learningAttempt.findUnique({
-            where: { submissionId },
-            include: { reviewEvents: { orderBy: { createdAt: 'asc' } } },
+            where: { submissionId, attemptType: 'EXERCISE' },
+            include: {
+              reviewEvents: {
+                where: { evidenceKind: 'EXERCISE_GRADING' },
+                orderBy: { createdAt: 'asc' },
+              },
+            },
           });
           if (!attempt) return null;
+          if (
+            attempt.attemptType !== 'EXERCISE' ||
+            !attempt.exerciseId ||
+            !attempt.submissionId ||
+            !attempt.saveRequestId ||
+            !attempt.gradingHash
+          ) {
+            throw new LearningDomainError(
+              'STATE_CONFLICT',
+              '旧练习学习记录不完整',
+              409,
+            );
+          }
           const changes: AttemptChange[] = attempt.reviewEvents.map((event) => {
+            if (
+              event.targetType !== 'WORD' &&
+              event.targetType !== 'ERROR_TYPE'
+            ) {
+              throw new LearningDomainError(
+                'STATE_CONFLICT',
+                '旧练习包含不兼容的学习目标',
+                409,
+              );
+            }
             const previous = stateJsonSchema.parse(event.previousState);
             const next = stateJsonSchema.parse(event.nextState);
             return {
@@ -248,7 +276,7 @@ export class PrismaAttemptRepository implements AttemptRepository {
           return state
             ? {
                 subjectId: state.userId,
-                targetType: state.targetType,
+                targetType,
                 targetKey: state.targetKey,
                 wordId: state.wordId,
                 reviewState: state.reviewState,
@@ -267,6 +295,7 @@ export class PrismaAttemptRepository implements AttemptRepository {
             data: {
               id: attempt.id,
               userId: attempt.subjectId,
+              attemptType: 'EXERCISE',
               exerciseId: attempt.exerciseId,
               submissionId: attempt.submissionId,
               saveRequestId: attempt.saveRequestId,

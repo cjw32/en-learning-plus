@@ -1,0 +1,356 @@
+{
+  "$defs": {
+    "__schema0": {
+      "const": "pronunciation-provider-result.v1",
+      "type": "string"
+    },
+    "__schema1": {
+      "maxLength": 64,
+      "minLength": 1,
+      "type": "string"
+    },
+    "__schema10": {
+      "maximum": 89,
+      "minimum": 0,
+      "type": "integer"
+    },
+    "__schema11": {
+      "maxLength": 100,
+      "minLength": 1,
+      "type": "string"
+    },
+    "__schema12": {
+      "anyOf": [
+        {
+          "maximum": 30000,
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "__schema13": {
+      "anyOf": [
+        {
+          "maximum": 30000,
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "__schema14": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/__schema8"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "__schema15": {
+      "enum": ["NONE", "MISPRONUNCIATION", "OMISSION", "INSERTION", "UNKNOWN"],
+      "type": "string"
+    },
+    "__schema2": {
+      "maxLength": 128,
+      "minLength": 1,
+      "type": "string"
+    },
+    "__schema3": {
+      "anyOf": [
+        {
+          "maxLength": 256,
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "__schema4": {
+      "maximum": 30000,
+      "minimum": 0,
+      "type": "integer"
+    },
+    "__schema5": {
+      "maximum": 30000,
+      "minimum": 0,
+      "type": "integer"
+    },
+    "__schema6": {
+      "minimum": 0,
+      "type": "number"
+    },
+    "__schema7": {
+      "pattern": "^[A-Z]{3}$",
+      "type": "string"
+    },
+    "__schema8": {
+      "maximum": 100,
+      "minimum": 0,
+      "type": "number"
+    },
+    "__schema9": {
+      "additionalProperties": false,
+      "properties": {
+        "durationMs": {
+          "$ref": "#/$defs/__schema13"
+        },
+        "errorType": {
+          "$ref": "#/$defs/__schema15"
+        },
+        "lexicalForm": {
+          "$ref": "#/$defs/__schema11"
+        },
+        "offsetMs": {
+          "$ref": "#/$defs/__schema12"
+        },
+        "score": {
+          "$ref": "#/$defs/__schema14"
+        },
+        "sequence": {
+          "$ref": "#/$defs/__schema10"
+        }
+      },
+      "required": [
+        "sequence",
+        "lexicalForm",
+        "offsetMs",
+        "durationMs",
+        "score",
+        "errorType"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "https://en-learning-plus.local/schemas/pronunciation-provider-result.v1.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "anyOf": [
+    {
+      "additionalProperties": false,
+      "properties": {
+        "adapterVersion": {
+          "$ref": "#/$defs/__schema2"
+        },
+        "apiContractVersion": {
+          "$ref": "#/$defs/__schema2"
+        },
+        "billableDurationMs": {
+          "$ref": "#/$defs/__schema5"
+        },
+        "capabilityVersion": {
+          "$ref": "#/$defs/__schema2"
+        },
+        "cost": {
+          "$ref": "#/$defs/__schema6"
+        },
+        "currency": {
+          "$ref": "#/$defs/__schema7"
+        },
+        "latencyMs": {
+          "$ref": "#/$defs/__schema4"
+        },
+        "modelVersion": {
+          "$ref": "#/$defs/__schema2"
+        },
+        "outcome": {
+          "const": "SUCCESS",
+          "type": "string"
+        },
+        "priceVersion": {
+          "$ref": "#/$defs/__schema2"
+        },
+        "provider": {
+          "$ref": "#/$defs/__schema1"
+        },
+        "providerAccepted": {
+          "const": true,
+          "type": "boolean"
+        },
+        "providerRequestId": {
+          "$ref": "#/$defs/__schema3"
+        },
+        "recognitionConfidence": {
+          "maximum": 1,
+          "minimum": 0,
+          "type": "number"
+        },
+        "recognizedText": {
+          "maxLength": 500,
+          "type": "string"
+        },
+        "schemaVersion": {
+          "$ref": "#/$defs/__schema0"
+        },
+        "scores": {
+          "additionalProperties": false,
+          "properties": {
+            "accuracy": {
+              "$ref": "#/$defs/__schema8"
+            },
+            "completeness": {
+              "$ref": "#/$defs/__schema8"
+            },
+            "fluency": {
+              "$ref": "#/$defs/__schema8"
+            },
+            "overall": {
+              "$ref": "#/$defs/__schema8"
+            },
+            "prosody": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/__schema8"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "overall",
+            "accuracy",
+            "completeness",
+            "fluency",
+            "prosody"
+          ],
+          "type": "object"
+        },
+        "words": {
+          "items": {
+            "$ref": "#/$defs/__schema9"
+          },
+          "maxItems": 90,
+          "type": "array"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "provider",
+        "modelVersion",
+        "adapterVersion",
+        "apiContractVersion",
+        "capabilityVersion",
+        "providerAccepted",
+        "providerRequestId",
+        "latencyMs",
+        "billableDurationMs",
+        "cost",
+        "currency",
+        "priceVersion",
+        "outcome",
+        "recognizedText",
+        "recognitionConfidence",
+        "scores",
+        "words"
+      ],
+      "type": "object"
+    },
+    {
+      "additionalProperties": false,
+      "properties": {
+        "adapterVersion": {
+          "$ref": "#/$defs/__schema2"
+        },
+        "apiContractVersion": {
+          "$ref": "#/$defs/__schema2"
+        },
+        "billableDurationMs": {
+          "$ref": "#/$defs/__schema5"
+        },
+        "capabilityVersion": {
+          "$ref": "#/$defs/__schema2"
+        },
+        "cost": {
+          "$ref": "#/$defs/__schema6"
+        },
+        "currency": {
+          "$ref": "#/$defs/__schema7"
+        },
+        "latencyMs": {
+          "$ref": "#/$defs/__schema4"
+        },
+        "modelVersion": {
+          "$ref": "#/$defs/__schema2"
+        },
+        "outcome": {
+          "enum": [
+            "UNRECOGNIZABLE",
+            "TIMEOUT",
+            "RATE_LIMITED",
+            "CANCELLED",
+            "SERVICE_ERROR",
+            "INVALID_RESPONSE"
+          ],
+          "type": "string"
+        },
+        "priceVersion": {
+          "$ref": "#/$defs/__schema2"
+        },
+        "provider": {
+          "$ref": "#/$defs/__schema1"
+        },
+        "providerAccepted": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "providerRequestId": {
+          "$ref": "#/$defs/__schema3"
+        },
+        "retryable": {
+          "type": "boolean"
+        },
+        "retryAfterSeconds": {
+          "anyOf": [
+            {
+              "maximum": 86400,
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "schemaVersion": {
+          "$ref": "#/$defs/__schema0"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "provider",
+        "modelVersion",
+        "adapterVersion",
+        "apiContractVersion",
+        "capabilityVersion",
+        "providerAccepted",
+        "providerRequestId",
+        "latencyMs",
+        "billableDurationMs",
+        "cost",
+        "currency",
+        "priceVersion",
+        "outcome",
+        "retryable",
+        "retryAfterSeconds"
+      ],
+      "type": "object"
+    }
+  ],
+  "description": "Internal provider-neutral adapter output. Raw responses and audio bytes are excluded.",
+  "title": "PronunciationProviderResultV1"
+}
