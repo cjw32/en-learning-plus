@@ -1,0 +1,861 @@
+{
+  "$id": "https://en-learning-plus.local/schemas/search-learning-materials.v2.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "input": {
+      "additionalProperties": false,
+      "properties": {
+        "filters": {
+          "additionalProperties": false,
+          "properties": {
+            "accessScopes": {
+              "items": {
+                "enum": [
+                  "PUBLIC",
+                  "OWNED_COURSE",
+                  "PRIVATE_OWNER"
+                ],
+                "type": "string"
+              },
+              "maxItems": 3,
+              "type": "array"
+            },
+            "categories": {
+              "items": {
+                "enum": [
+                  "WORD_MEANING",
+                  "WORD_TRANSLATION",
+                  "WORD_PRONUNCIATION",
+                  "WORD_FORM",
+                  "WORD_USAGE",
+                  "COLLOCATION",
+                  "EXAMPLE_SENTENCE",
+                  "GRAMMAR_RULE",
+                  "GRAMMAR_EXCEPTION",
+                  "COURSE_LESSON",
+                  "EXERCISE_KNOWLEDGE",
+                  "USER_ERROR",
+                  "LEARNING_SUMMARY"
+                ],
+                "type": "string"
+              },
+              "maxItems": 13,
+              "minItems": 1,
+              "type": "array"
+            },
+            "courseIds": {
+              "items": {
+                "maxLength": 64,
+                "minLength": 1,
+                "type": "string"
+              },
+              "maxItems": 20,
+              "type": "array"
+            },
+            "levels": {
+              "items": {
+                "enum": [
+                  "A1",
+                  "A2",
+                  "B1",
+                  "B2",
+                  "C1",
+                  "C2"
+                ],
+                "type": "string"
+              },
+              "maxItems": 6,
+              "type": "array"
+            },
+            "sources": {
+              "items": {
+                "maxLength": 128,
+                "minLength": 1,
+                "type": "string"
+              },
+              "maxItems": 20,
+              "type": "array"
+            },
+            "wordIds": {
+              "items": {
+                "maxLength": 64,
+                "minLength": 1,
+                "type": "string"
+              },
+              "maxItems": 50,
+              "type": "array"
+            }
+          },
+          "required": [
+            "categories",
+            "sources",
+            "courseIds",
+            "wordIds"
+          ],
+          "type": "object"
+        },
+        "minimumRelevance": {
+          "maximum": 1,
+          "minimum": 0,
+          "type": "number"
+        },
+        "query": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "type": "string"
+        },
+        "schemaVersion": {
+          "const": "coach.tool.v2",
+          "type": "string"
+        },
+        "topK": {
+          "maximum": 20,
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "query",
+        "filters",
+        "topK"
+      ],
+      "type": "object"
+    },
+    "output": {
+      "anyOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "appliedFilters": {
+              "additionalProperties": false,
+              "properties": {
+                "accessScopes": {
+                  "items": {
+                    "enum": [
+                      "PUBLIC",
+                      "OWNED_COURSE",
+                      "PRIVATE_OWNER"
+                    ],
+                    "type": "string"
+                  },
+                  "maxItems": 3,
+                  "minItems": 1,
+                  "type": "array"
+                },
+                "categories": {
+                  "items": {
+                    "enum": [
+                      "WORD_MEANING",
+                      "WORD_TRANSLATION",
+                      "WORD_PRONUNCIATION",
+                      "WORD_FORM",
+                      "WORD_USAGE",
+                      "COLLOCATION",
+                      "EXAMPLE_SENTENCE",
+                      "GRAMMAR_RULE",
+                      "GRAMMAR_EXCEPTION",
+                      "COURSE_LESSON",
+                      "EXERCISE_KNOWLEDGE",
+                      "USER_ERROR",
+                      "LEARNING_SUMMARY"
+                    ],
+                    "type": "string"
+                  },
+                  "minItems": 1,
+                  "type": "array"
+                },
+                "chunkingVersion": {
+                  "maxLength": 128,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "contentVersionPolicy": {
+                  "maxLength": 128,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "courseIds": {
+                  "items": {
+                    "maxLength": 64,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "maxItems": 20,
+                  "type": "array"
+                },
+                "embeddingVersion": {
+                  "maxLength": 256,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "indexVersion": {
+                  "maxLength": 128,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "levelFilterApplied": {
+                  "type": "boolean"
+                },
+                "levels": {
+                  "items": {
+                    "enum": [
+                      "A1",
+                      "A2",
+                      "B1",
+                      "B2",
+                      "C1",
+                      "C2"
+                    ],
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "minimumRelevance": {
+                  "maximum": 1,
+                  "minimum": 0,
+                  "type": "number"
+                },
+                "privateOwnerEnforced": {
+                  "const": true,
+                  "type": "boolean"
+                },
+                "retrievalConfigVersion": {
+                  "maxLength": 128,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "sourceRightsSnapshotVersion": {
+                  "maxLength": 128,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "sources": {
+                  "items": {
+                    "maxLength": 128,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "maxItems": 20,
+                  "type": "array"
+                },
+                "topK": {
+                  "maximum": 20,
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "wordIds": {
+                  "items": {
+                    "maxLength": 64,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "maxItems": 50,
+                  "type": "array"
+                }
+              },
+              "required": [
+                "levels",
+                "levelFilterApplied",
+                "categories",
+                "sources",
+                "courseIds",
+                "wordIds",
+                "accessScopes",
+                "privateOwnerEnforced",
+                "topK",
+                "minimumRelevance",
+                "sourceRightsSnapshotVersion",
+                "contentVersionPolicy",
+                "chunkingVersion",
+                "embeddingVersion",
+                "retrievalConfigVersion",
+                "indexVersion"
+              ],
+              "type": "object"
+            },
+            "citations": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "accessScope": {
+                    "enum": [
+                      "PUBLIC",
+                      "OWNED_COURSE",
+                      "PRIVATE_OWNER"
+                    ],
+                    "type": "string"
+                  },
+                  "category": {
+                    "enum": [
+                      "WORD_MEANING",
+                      "WORD_TRANSLATION",
+                      "WORD_PRONUNCIATION",
+                      "WORD_FORM",
+                      "WORD_USAGE",
+                      "COLLOCATION",
+                      "EXAMPLE_SENTENCE",
+                      "GRAMMAR_RULE",
+                      "GRAMMAR_EXCEPTION",
+                      "COURSE_LESSON",
+                      "EXERCISE_KNOWLEDGE",
+                      "USER_ERROR",
+                      "LEARNING_SUMMARY"
+                    ],
+                    "type": "string"
+                  },
+                  "citationId": {
+                    "pattern": "^cit_[A-Za-z0-9_-]{10,48}$",
+                    "type": "string"
+                  },
+                  "courseId": {
+                    "anyOf": [
+                      {
+                        "maxLength": 64,
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "excerpt": {
+                    "maxLength": 2000,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "source": {
+                    "maxLength": 128,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "sourceId": {
+                    "maxLength": 300,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "status": {
+                    "const": "active",
+                    "type": "string"
+                  },
+                  "title": {
+                    "maxLength": 300,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "usage": {
+                    "enum": [
+                      "answer_evidence",
+                      "conflict_context"
+                    ],
+                    "type": "string"
+                  },
+                  "wordId": {
+                    "anyOf": [
+                      {
+                        "maxLength": 64,
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "citationId",
+                  "source",
+                  "sourceId",
+                  "title",
+                  "excerpt",
+                  "category",
+                  "wordId",
+                  "courseId",
+                  "accessScope",
+                  "status",
+                  "usage"
+                ],
+                "type": "object"
+              },
+              "maxItems": 20,
+              "type": "array"
+            },
+            "conflicts": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "citationIds": {
+                    "items": {
+                      "pattern": "^cit_[A-Za-z0-9_-]{10,48}$",
+                      "type": "string"
+                    },
+                    "maxItems": 10,
+                    "minItems": 2,
+                    "type": "array"
+                  },
+                  "conflictId": {
+                    "maxLength": 64,
+                    "minLength": 10,
+                    "type": "string"
+                  },
+                  "resolution": {
+                    "enum": [
+                      "resolved_by_version",
+                      "resolved_by_authority",
+                      "unresolved"
+                    ],
+                    "type": "string"
+                  },
+                  "topic": {
+                    "maxLength": 300,
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "conflictId",
+                  "topic",
+                  "citationIds",
+                  "resolution"
+                ],
+                "type": "object"
+              },
+              "maxItems": 20,
+              "type": "array"
+            },
+            "ok": {
+              "const": true,
+              "type": "boolean"
+            },
+            "query": {
+              "maxLength": 1000,
+              "minLength": 1,
+              "type": "string"
+            },
+            "results": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "accessScope": {
+                    "enum": [
+                      "PUBLIC",
+                      "OWNED_COURSE",
+                      "PRIVATE_OWNER"
+                    ],
+                    "type": "string"
+                  },
+                  "category": {
+                    "enum": [
+                      "WORD_MEANING",
+                      "WORD_TRANSLATION",
+                      "WORD_PRONUNCIATION",
+                      "WORD_FORM",
+                      "WORD_USAGE",
+                      "COLLOCATION",
+                      "EXAMPLE_SENTENCE",
+                      "GRAMMAR_RULE",
+                      "GRAMMAR_EXCEPTION",
+                      "COURSE_LESSON",
+                      "EXERCISE_KNOWLEDGE",
+                      "USER_ERROR",
+                      "LEARNING_SUMMARY"
+                    ],
+                    "type": "string"
+                  },
+                  "chunkId": {
+                    "maxLength": 64,
+                    "minLength": 10,
+                    "type": "string"
+                  },
+                  "citationId": {
+                    "pattern": "^cit_[A-Za-z0-9_-]{10,48}$",
+                    "type": "string"
+                  },
+                  "contentVersion": {
+                    "maxLength": 128,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "courseId": {
+                    "anyOf": [
+                      {
+                        "maxLength": 64,
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "documentId": {
+                    "maxLength": 64,
+                    "minLength": 10,
+                    "type": "string"
+                  },
+                  "embeddingVersion": {
+                    "maxLength": 256,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "excerpt": {
+                    "maxLength": 2000,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "level": {
+                    "anyOf": [
+                      {
+                        "enum": [
+                          "A1",
+                          "A2",
+                          "B1",
+                          "B2",
+                          "C1",
+                          "C2"
+                        ],
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "rank": {
+                    "maximum": 20,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "relevanceScore": {
+                    "maximum": 1,
+                    "minimum": 0,
+                    "type": "number"
+                  },
+                  "resultId": {
+                    "maxLength": 64,
+                    "minLength": 10,
+                    "type": "string"
+                  },
+                  "source": {
+                    "maxLength": 128,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "sourceId": {
+                    "maxLength": 300,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "status": {
+                    "const": "valid",
+                    "type": "string"
+                  },
+                  "title": {
+                    "maxLength": 300,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "wordId": {
+                    "anyOf": [
+                      {
+                        "maxLength": 64,
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "resultId",
+                  "chunkId",
+                  "documentId",
+                  "citationId",
+                  "source",
+                  "sourceId",
+                  "title",
+                  "category",
+                  "excerpt",
+                  "level",
+                  "courseId",
+                  "wordId",
+                  "accessScope",
+                  "rank",
+                  "relevanceScore",
+                  "contentVersion",
+                  "embeddingVersion",
+                  "status"
+                ],
+                "type": "object"
+              },
+              "maxItems": 20,
+              "type": "array"
+            },
+            "retrievalStatus": {
+              "enum": [
+                "success",
+                "insufficient"
+              ],
+              "type": "string"
+            },
+            "schemaVersion": {
+              "const": "coach.tool.v2",
+              "type": "string"
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "ok",
+            "query",
+            "appliedFilters",
+            "results",
+            "citations",
+            "conflicts",
+            "retrievalStatus"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "appliedFilters": {
+              "additionalProperties": false,
+              "properties": {
+                "accessScopes": {
+                  "items": {
+                    "enum": [
+                      "PUBLIC",
+                      "OWNED_COURSE",
+                      "PRIVATE_OWNER"
+                    ],
+                    "type": "string"
+                  },
+                  "maxItems": 3,
+                  "minItems": 1,
+                  "type": "array"
+                },
+                "categories": {
+                  "items": {
+                    "enum": [
+                      "WORD_MEANING",
+                      "WORD_TRANSLATION",
+                      "WORD_PRONUNCIATION",
+                      "WORD_FORM",
+                      "WORD_USAGE",
+                      "COLLOCATION",
+                      "EXAMPLE_SENTENCE",
+                      "GRAMMAR_RULE",
+                      "GRAMMAR_EXCEPTION",
+                      "COURSE_LESSON",
+                      "EXERCISE_KNOWLEDGE",
+                      "USER_ERROR",
+                      "LEARNING_SUMMARY"
+                    ],
+                    "type": "string"
+                  },
+                  "minItems": 1,
+                  "type": "array"
+                },
+                "chunkingVersion": {
+                  "maxLength": 128,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "contentVersionPolicy": {
+                  "maxLength": 128,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "courseIds": {
+                  "items": {
+                    "maxLength": 64,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "maxItems": 20,
+                  "type": "array"
+                },
+                "embeddingVersion": {
+                  "maxLength": 256,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "indexVersion": {
+                  "maxLength": 128,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "levelFilterApplied": {
+                  "type": "boolean"
+                },
+                "levels": {
+                  "items": {
+                    "enum": [
+                      "A1",
+                      "A2",
+                      "B1",
+                      "B2",
+                      "C1",
+                      "C2"
+                    ],
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "minimumRelevance": {
+                  "maximum": 1,
+                  "minimum": 0,
+                  "type": "number"
+                },
+                "privateOwnerEnforced": {
+                  "const": true,
+                  "type": "boolean"
+                },
+                "retrievalConfigVersion": {
+                  "maxLength": 128,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "sourceRightsSnapshotVersion": {
+                  "maxLength": 128,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "sources": {
+                  "items": {
+                    "maxLength": 128,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "maxItems": 20,
+                  "type": "array"
+                },
+                "topK": {
+                  "maximum": 20,
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "wordIds": {
+                  "items": {
+                    "maxLength": 64,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "maxItems": 50,
+                  "type": "array"
+                }
+              },
+              "required": [
+                "levels",
+                "levelFilterApplied",
+                "categories",
+                "sources",
+                "courseIds",
+                "wordIds",
+                "accessScopes",
+                "privateOwnerEnforced",
+                "topK",
+                "minimumRelevance",
+                "sourceRightsSnapshotVersion",
+                "contentVersionPolicy",
+                "chunkingVersion",
+                "embeddingVersion",
+                "retrievalConfigVersion",
+                "indexVersion"
+              ],
+              "type": "object"
+            },
+            "citations": {
+              "items": {
+                "not": {}
+              },
+              "maxItems": 0,
+              "type": "array"
+            },
+            "conflicts": {
+              "items": {
+                "not": {}
+              },
+              "maxItems": 0,
+              "type": "array"
+            },
+            "failure": {
+              "additionalProperties": false,
+              "properties": {
+                "code": {
+                  "enum": [
+                    "RAG_DISABLED",
+                    "EMBEDDING_UNAVAILABLE",
+                    "TOOL_TIMEOUT",
+                    "CONFIGURATION_UNAPPROVED",
+                    "SCHEMA_INVALID",
+                    "CANCELLED",
+                    "INTERNAL_ERROR"
+                  ],
+                  "type": "string"
+                },
+                "message": {
+                  "maxLength": 500,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "retryable": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "code",
+                "message",
+                "retryable"
+              ],
+              "type": "object"
+            },
+            "ok": {
+              "const": false,
+              "type": "boolean"
+            },
+            "query": {
+              "maxLength": 1000,
+              "minLength": 1,
+              "type": "string"
+            },
+            "results": {
+              "items": {
+                "not": {}
+              },
+              "maxItems": 0,
+              "type": "array"
+            },
+            "retrievalStatus": {
+              "const": "failed",
+              "type": "string"
+            },
+            "schemaVersion": {
+              "const": "coach.tool.v2",
+              "type": "string"
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "ok",
+            "query",
+            "appliedFilters",
+            "results",
+            "citations",
+            "conflicts",
+            "retrievalStatus",
+            "failure"
+          ],
+          "type": "object"
+        }
+      ]
+    }
+  },
+  "required": [
+    "input",
+    "output"
+  ],
+  "title": "SearchLearningMaterialsV2",
+  "type": "object"
+}

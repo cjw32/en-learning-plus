@@ -1,11 +1,13 @@
 export type CoachModelPrice = Readonly<{
   provider: string;
   modelName: string;
+  usageType?: 'model' | 'embedding';
   priceVersion: string;
   inputMicrosPerMillionTokens: number;
   outputMicrosPerMillionTokens: number;
   validFrom: string;
   validUntil: string;
+  approved?: boolean;
 }>;
 
 export class CoachPriceUnavailableError extends Error {
@@ -44,6 +46,7 @@ export class CoachModelPriceCatalog {
   resolve(input: {
     provider: string;
     modelName: string;
+    usageType?: 'model' | 'embedding';
     priceVersion: string;
     at: Date;
   }): CoachModelPrice {
@@ -52,7 +55,9 @@ export class CoachModelPriceCatalog {
       (candidate) =>
         candidate.provider === input.provider &&
         candidate.modelName === input.modelName &&
+        (candidate.usageType ?? 'model') === (input.usageType ?? 'model') &&
         candidate.priceVersion === input.priceVersion &&
+        candidate.approved !== false &&
         timestamp >= Date.parse(candidate.validFrom) &&
         timestamp < Date.parse(candidate.validUntil),
     );

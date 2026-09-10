@@ -1,0 +1,267 @@
+{
+  "components": {
+    "schemas": {
+      "ActiveCitation": {
+        "additionalProperties": false,
+        "properties": {
+          "accessScope": {
+            "enum": [
+              "PUBLIC",
+              "OWNED_COURSE",
+              "PRIVATE_OWNER"
+            ],
+            "type": "string"
+          },
+          "category": {
+            "enum": [
+              "WORD_MEANING",
+              "WORD_TRANSLATION",
+              "WORD_PRONUNCIATION",
+              "WORD_FORM",
+              "WORD_USAGE",
+              "COLLOCATION",
+              "EXAMPLE_SENTENCE",
+              "GRAMMAR_RULE",
+              "GRAMMAR_EXCEPTION",
+              "COURSE_LESSON",
+              "EXERCISE_KNOWLEDGE",
+              "USER_ERROR",
+              "LEARNING_SUMMARY"
+            ],
+            "type": "string"
+          },
+          "citationId": {
+            "pattern": "^cit_[A-Za-z0-9_-]{10,48}$",
+            "type": "string"
+          },
+          "excerpt": {
+            "maxLength": 2000,
+            "minLength": 1,
+            "type": "string"
+          },
+          "locator": {
+            "oneOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "id": {
+                    "maxLength": 128,
+                    "minLength": 1,
+                    "pattern": "^[A-Za-z0-9_-]+$",
+                    "type": "string"
+                  },
+                  "kind": {
+                    "const": "word"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "id"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "id": {
+                    "maxLength": 128,
+                    "minLength": 1,
+                    "pattern": "^[A-Za-z0-9_-]+$",
+                    "type": "string"
+                  },
+                  "kind": {
+                    "const": "course"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "id"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "id": {
+                    "maxLength": 128,
+                    "minLength": 1,
+                    "pattern": "^[A-Za-z0-9_-]+$",
+                    "type": "string"
+                  },
+                  "kind": {
+                    "const": "grammar"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "id"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "id": {
+                    "maxLength": 128,
+                    "minLength": 1,
+                    "pattern": "^[A-Za-z0-9_-]+$",
+                    "type": "string"
+                  },
+                  "kind": {
+                    "const": "exercise"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "id"
+                ],
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "source": {
+            "maxLength": 128,
+            "minLength": 1,
+            "type": "string"
+          },
+          "status": {
+            "const": "active"
+          },
+          "title": {
+            "maxLength": 300,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "citationId",
+          "status",
+          "source",
+          "title",
+          "category",
+          "excerpt",
+          "accessScope",
+          "locator"
+        ],
+        "type": "object"
+      },
+      "Citation": {
+        "discriminator": {
+          "propertyName": "status"
+        },
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/ActiveCitation"
+          },
+          {
+            "$ref": "#/components/schemas/UnavailableCitation"
+          }
+        ]
+      },
+      "CitationResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "const": 200,
+            "type": "integer"
+          },
+          "data": {
+            "$ref": "#/components/schemas/Citation"
+          },
+          "msg": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "msg",
+          "data"
+        ],
+        "type": "object"
+      },
+      "UnavailableCitation": {
+        "additionalProperties": false,
+        "properties": {
+          "citationId": {
+            "pattern": "^cit_[A-Za-z0-9_-]{10,48}$",
+            "type": "string"
+          },
+          "reason": {
+            "const": "SOURCE_UNAVAILABLE"
+          },
+          "status": {
+            "const": "unavailable"
+          }
+        },
+        "required": [
+          "citationId",
+          "status",
+          "reason"
+        ],
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "bearerFormat": "JWT",
+        "scheme": "bearer",
+        "type": "http"
+      }
+    }
+  },
+  "info": {
+    "description": "Resolves server-issued citations after reauthorizing the current access-token subject.",
+    "title": "en-learning-plus Coach RAG Citation API",
+    "version": "2.0.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/coach/citations/{citationId}": {
+      "get": {
+        "operationId": "getCoachCitation",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "citationId",
+            "required": true,
+            "schema": {
+              "pattern": "^cit_[A-Za-z0-9_-]{10,48}$",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CitationResponse"
+                }
+              }
+            },
+            "description": "Current safe citation projection"
+          },
+          "401": {
+            "description": "Missing, expired, or invalid access token"
+          },
+          "404": {
+            "description": "Citation does not exist or is not accessible"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "/api"
+    }
+  ]
+}

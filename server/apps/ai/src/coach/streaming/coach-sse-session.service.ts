@@ -1,12 +1,15 @@
 import { Inject, Injectable } from '@nestjs/common';
-import type { CoachRequestStatus, CoachResult } from '@en/common/coach';
+import type {
+  AnyPublicCoachResult,
+  CoachRequestStatus,
+} from '@en/common/coach';
 import type { CoachExecutionContext } from '@libs/shared';
 import { CoachEventStreamService } from './coach-event-stream.service';
 
 export type CoachSseOwnedRequest = Readonly<{
   id: string;
   status: CoachRequestStatus;
-  finalResult: CoachResult | null;
+  finalResult: AnyPublicCoachResult | null;
 }>;
 
 export interface CoachSseAccessRepository {
@@ -53,7 +56,11 @@ export class CoachSseSessionService {
       throw new CoachSseSessionError(404, '学习资源不存在或不可访问');
     }
     try {
-      const events = await this.stream.readAfter(requestId, lastEventId);
+      const events = await this.stream.readAfter(
+        requestId,
+        lastEventId,
+        context.subjectId,
+      );
       if (events === null) {
         throw new CoachSseSessionError(410, '流式回放已过期');
       }

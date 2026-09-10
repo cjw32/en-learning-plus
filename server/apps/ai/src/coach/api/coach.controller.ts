@@ -26,6 +26,7 @@ import {
   createCoachRequestSchema,
   idempotencyKeySchema,
   deleteCoachDataSchema,
+  citationIdSchema,
 } from '@en/common/coach';
 import { z } from '@en/common/coach/zod';
 import { AuthGuard, CoachExecutionContext } from '@libs/shared';
@@ -159,6 +160,17 @@ export class CoachController {
     @Param('requestId') requestId: string,
   ) {
     return this.api.getRequest(contextFrom(request), requestId);
+  }
+
+  @Get('citations/:citationId')
+  getCitation(
+    @Req() request: CoachRequest,
+    @Param('citationId') citationId: string,
+  ) {
+    return this.api.getCitation(
+      contextFrom(request),
+      parse(citationIdSchema, citationId),
+    );
   }
 
   @Post('requests/:requestId/cancel')

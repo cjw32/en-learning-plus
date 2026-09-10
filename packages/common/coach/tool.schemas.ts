@@ -10,6 +10,7 @@ import {
 } from './result.schemas';
 
 export const COACH_TOOL_SCHEMA_VERSION = 'coach.tool.v1' as const;
+export const COACH_RAG_TOOL_SCHEMA_VERSION = 'coach.tool.v2' as const;
 
 const schemaVersion = z.literal(COACH_TOOL_SCHEMA_VERSION);
 const isoDateTime = z.iso.datetime({ offset: true });
@@ -208,6 +209,230 @@ export const getDueWordsOutputSchema = z.union([
 ]);
 
 export const materialTypeSchema = z.enum(['word', 'course', 'grammar']);
+
+export const ragKnowledgeCategorySchema = z.enum([
+  'WORD_MEANING',
+  'WORD_TRANSLATION',
+  'WORD_PRONUNCIATION',
+  'WORD_FORM',
+  'WORD_USAGE',
+  'COLLOCATION',
+  'EXAMPLE_SENTENCE',
+  'GRAMMAR_RULE',
+  'GRAMMAR_EXCEPTION',
+  'COURSE_LESSON',
+  'EXERCISE_KNOWLEDGE',
+  'USER_ERROR',
+  'LEARNING_SUMMARY',
+]);
+export const ragAccessScopeSchema = z.enum([
+  'PUBLIC',
+  'OWNED_COURSE',
+  'PRIVATE_OWNER',
+]);
+
+const ragSchemaVersion = z.literal(COACH_RAG_TOOL_SCHEMA_VERSION);
+const boundedUniqueStrings = (maximum: number, itemMaximum: number) =>
+  z
+    .array(z.string().min(1).max(itemMaximum))
+    .max(maximum)
+    .refine(unique, 'items must be unique');
+
+export const searchLearningMaterialsV2FiltersSchema = z
+  .object({
+    levels: z
+      .array(cefrLevelSchema)
+      .max(6)
+      .refine(unique, 'levels must be unique')
+      .optional(),
+    categories: z
+      .array(ragKnowledgeCategorySchema)
+      .min(1)
+      .max(13)
+      .refine(unique, 'categories must be unique'),
+    sources: boundedUniqueStrings(20, 128),
+    courseIds: boundedUniqueStrings(20, 64),
+    wordIds: boundedUniqueStrings(50, 64),
+    accessScopes: z
+      .array(ragAccessScopeSchema)
+      .max(3)
+      .refine(unique, 'accessScopes must be unique')
+      .optional(),
+  })
+  .strict();
+
+export const searchLearningMaterialsV2InputSchema = z
+  .object({
+    schemaVersion: ragSchemaVersion,
+    query: z.string().trim().min(1).max(1000),
+    filters: searchLearningMaterialsV2FiltersSchema,
+    topK: z.number().int().min(1).max(20),
+    minimumRelevance: z.number().min(0).max(1).optional(),
+  })
+  .strict();
+
+export const ragAppliedFiltersSchema = z
+  .object({
+    levels: z.array(cefrLevelSchema).refine(unique),
+    levelFilterApplied: z.boolean(),
+    categories: z.array(ragKnowledgeCategorySchema).min(1).refine(unique),
+    sources: boundedUniqueStrings(20, 128),
+    courseIds: boundedUniqueStrings(20, 64),
+    wordIds: boundedUniqueStrings(50, 64),
+    accessScopes: z.array(ragAccessScopeSchema).min(1).max(3).refine(unique),
+    privateOwnerEnforced: z.literal(true),
+    topK: z.number().int().min(1).max(20),
+    minimumRelevance: z.number().min(0).max(1),
+    sourceRightsSnapshotVersion: z.string().min(1).max(128),
+    contentVersionPolicy: z.string().min(1).max(128),
+    chunkingVersion: z.string().min(1).max(128),
+    embeddingVersion: z.string().min(1).max(256),
+    retrievalConfigVersion: z.string().min(1).max(128),
+    indexVersion: z.string().min(1).max(128),
+  })
+  .strict();
+
+export const ragRetrievalResultSchema = z
+  .object({
+    resultId: z.string().min(10).max(64),
+    chunkId: z.string().min(10).max(64),
+    documentId: z.string().min(10).max(64),
+    citationId: z.string().regex(/^cit_[A-Za-z0-9_-]{10,48}$/),
+    source: z.string().min(1).max(128),
+    sourceId: z.string().min(1).max(300),
+    title: z.string().min(1).max(300),
+    category: ragKnowledgeCategorySchema,
+    excerpt: z.string().min(1).max(2000),
+    level: cefrLevelSchema.nullable(),
+    courseId: z.string().max(64).nullable(),
+    wordId: z.string().max(64).nullable(),
+    accessScope: ragAccessScopeSchema,
+    rank: z.number().int().min(1).max(20),
+    relevanceScore: z.number().min(0).max(1),
+    contentVersion: z.string().min(1).max(128),
+    embeddingVersion: z.string().min(1).max(256),
+    status: z.literal('valid'),
+  })
+  .strict();
+
+export const ragToolCitationSchema = z
+  .object({
+    citationId: z.string().regex(/^cit_[A-Za-z0-9_-]{10,48}$/),
+    source: z.string().min(1).max(128),
+    sourceId: z.string().min(1).max(300),
+    title: z.string().min(1).max(300),
+    excerpt: z.string().min(1).max(2000),
+    category: ragKnowledgeCategorySchema,
+    wordId: z.string().max(64).nullable(),
+    courseId: z.string().max(64).nullable(),
+    accessScope: ragAccessScopeSchema,
+    status: z.literal('active'),
+    usage: z.enum(['answer_evidence', 'conflict_context']),
+  })
+  .strict();
+
+export const ragConflictSchema = z
+  .object({
+    conflictId: z.string().min(10).max(64),
+    topic: z.string().min(1).max(300),
+    citationIds: z
+      .array(z.string().regex(/^cit_[A-Za-z0-9_-]{10,48}$/))
+      .min(2)
+      .max(10)
+      .refine(unique),
+    resolution: z.enum([
+      'resolved_by_version',
+      'resolved_by_authority',
+      'unresolved',
+    ]),
+  })
+  .strict();
+
+const ragSuccessfulOutputSchema = z
+  .object({
+    schemaVersion: ragSchemaVersion,
+    ok: z.literal(true),
+    query: z.string().min(1).max(1000),
+    appliedFilters: ragAppliedFiltersSchema,
+    results: z.array(ragRetrievalResultSchema).max(20),
+    citations: z.array(ragToolCitationSchema).max(20),
+    conflicts: z.array(ragConflictSchema).max(20),
+    retrievalStatus: z.enum(['success', 'insufficient']),
+  })
+  .strict()
+  .superRefine((output, context) => {
+    if (
+      output.retrievalStatus === 'success' &&
+      (output.results.length === 0 || output.citations.length === 0)
+    ) {
+      context.addIssue({
+        code: 'custom',
+        message: 'successful retrieval requires results and citations',
+      });
+    }
+    if (output.retrievalStatus === 'insufficient' && output.results.length > 0) {
+      context.addIssue({
+        code: 'custom',
+        message: 'insufficient retrieval cannot contain results',
+      });
+    }
+    output.results.forEach((result, index) => {
+      if (result.rank !== index + 1 || result.rank > output.appliedFilters.topK) {
+        context.addIssue({
+          code: 'custom',
+          path: ['results', index, 'rank'],
+          message: 'result ranks must be sequential and within applied topK',
+        });
+      }
+    });
+  });
+
+export const ragRetrievalFailureCodeSchema = z.enum([
+  'RAG_DISABLED',
+  'EMBEDDING_UNAVAILABLE',
+  'TOOL_TIMEOUT',
+  'CONFIGURATION_UNAPPROVED',
+  'SCHEMA_INVALID',
+  'CANCELLED',
+  'INTERNAL_ERROR',
+]);
+
+const ragFailedOutputSchema = z
+  .object({
+    schemaVersion: ragSchemaVersion,
+    ok: z.literal(false),
+    query: z.string().min(1).max(1000),
+    appliedFilters: ragAppliedFiltersSchema,
+    results: z.array(z.never()).max(0),
+    citations: z.array(z.never()).max(0),
+    conflicts: z.array(z.never()).max(0),
+    retrievalStatus: z.literal('failed'),
+    failure: z
+      .object({
+        code: ragRetrievalFailureCodeSchema,
+        message: z.string().min(1).max(500),
+        retryable: z.boolean(),
+      })
+      .strict(),
+  })
+  .strict();
+
+export const searchLearningMaterialsV2OutputSchema = z.union([
+  ragSuccessfulOutputSchema,
+  ragFailedOutputSchema,
+]);
+
+export const searchLearningMaterialsV2ContractSchema = z
+  .object({
+    input: searchLearningMaterialsV2InputSchema,
+    output: searchLearningMaterialsV2OutputSchema,
+  })
+  .strict();
+
+export const searchLearningMaterialsV2ContractJsonSchema = z.toJSONSchema(
+  searchLearningMaterialsV2ContractSchema,
+  { target: 'draft-2020-12', io: 'input' },
+);
 
 export const searchLearningMaterialsInputSchema = z
   .object({
@@ -470,6 +695,12 @@ export type SearchLearningMaterialsInput = z.infer<
 >;
 export type SearchLearningMaterialsOutput = z.infer<
   typeof searchLearningMaterialsOutputSchema
+>;
+export type SearchLearningMaterialsV2Input = z.infer<
+  typeof searchLearningMaterialsV2InputSchema
+>;
+export type SearchLearningMaterialsV2Output = z.infer<
+  typeof searchLearningMaterialsV2OutputSchema
 >;
 export type CreateExerciseInput = z.infer<typeof createExerciseInputSchema>;
 export type CreateExerciseOutput = z.infer<typeof createExerciseOutputSchema>;

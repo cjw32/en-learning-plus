@@ -78,6 +78,12 @@ export type AttemptReviewEvent = {
   nextState: Sm2ReviewState;
 };
 
+export type AttemptKnowledgeRebuild = Readonly<{
+  subjectId: string;
+  attemptId: string;
+  gradingHash: string;
+}>;
+
 export interface AttemptTransaction {
   lockOwnedSubmission(
     subjectId: string,
@@ -95,6 +101,7 @@ export interface AttemptTransaction {
   upsertItemState(state: AttemptItemState): Promise<void>;
   createReviewEvent(event: AttemptReviewEvent): Promise<void>;
   markSaved(submissionId: string, exerciseId: string): Promise<void>;
+  enqueueKnowledgeRebuild?(command: AttemptKnowledgeRebuild): Promise<void>;
 }
 
 export interface AttemptRepository {
@@ -339,6 +346,41 @@ export class PrismaAttemptRepository implements AttemptRepository {
             data: { status: 'SAVED' },
           });
         },
+        enqueueKnowledgeRebuild: async (command) => {
+          const source = await database.knowledgeSource.findUnique({
+            where: { sourceKey: 'private-learning' },
+            select: { id: true },
+          });
+          // Private RAG is default-off. Environments that enable it must first
+          // provision the audited source; legacy saves remain unaffected otherwise.
+          if (!source) return;
+          const contentVersion = `grading.sha256.${command.gradingHash}`;
+          await database.knowledgeIngestionJob.createMany({
+            skipDuplicates: true,
+            data: [
+              {
+                id: `kjob_${randomUUID().replaceAll('-', '')}`,
+                operation: 'UPSERT',
+                knowledgeSourceId: source.id,
+                sourceRecordType: 'LearningAttempt',
+                sourceRecordId: command.attemptId,
+                contentVersion,
+                pipelineVersion: 'private-wrong-answer.v1',
+                ownerUserId: command.subjectId,
+              },
+              {
+                id: `kjob_${randomUUID().replaceAll('-', '')}`,
+                operation: 'UPSERT',
+                knowledgeSourceId: source.id,
+                sourceRecordType: 'PrivateLearningSummary',
+                sourceRecordId: command.subjectId,
+                contentVersion,
+                pipelineVersion: 'private-learning-summary.v1',
+                ownerUserId: command.subjectId,
+              },
+            ],
+          });
+        },
       };
       return operation(transaction);
     });
@@ -350,6 +392,7 @@ export type AttemptTransactionState = {
   attempts: AttemptRecord[];
   itemStates: AttemptItemState[];
   reviewEvents: AttemptReviewEvent[];
+  knowledgeRebuilds: AttemptKnowledgeRebuild[];
 };
 
 function stateSnapshot(state: Sm2ReviewState): Sm2ReviewState {
@@ -535,6 +578,11 @@ export class AttemptService {
         });
       }
       await tx.markSaved(input.submissionId, submission.exerciseId);
+      await tx.enqueueKnowledgeRebuild?.({
+        subjectId: input.subjectId,
+        attemptId,
+        gradingHash: input.gradingHash,
+      });
       return {
         status: 'saved' as const,
         attemptId,

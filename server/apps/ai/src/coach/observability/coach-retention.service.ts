@@ -9,6 +9,14 @@ import { CoachRedisConnection } from '../streaming/coach-redis.module';
 const HOUR_MS = 60 * 60 * 1_000;
 const DAY_MS = 24 * HOUR_MS;
 
+export const COACH_RAG_RETENTION_POLICY = Object.freeze({
+  privateContentPurgeMs: DAY_MS,
+  diagnosticContentMs: 7 * DAY_MS,
+  traceMetadataMs: 180 * DAY_MS,
+  replayMs: HOUR_MS,
+  reconciliationMs: DAY_MS,
+});
+
 export interface CoachRetentionRepository {
   expireConversations(now: Date): Promise<string[]>;
   purgeTracesBefore(cutoff: Date): Promise<number>;
@@ -103,16 +111,22 @@ export class CoachRetentionService implements OnModuleInit, OnModuleDestroy {
   async purgeExpired(): Promise<void> {
     const now = this.now();
     await Promise.all([
-      this.ephemeral.purgeEventsBefore(new Date(now.getTime() - HOUR_MS)),
-      this.ephemeral.purgeReconciliationBefore(
-        new Date(now.getTime() - DAY_MS),
+      this.ephemeral.purgeEventsBefore(
+        new Date(now.getTime() - COACH_RAG_RETENTION_POLICY.replayMs),
       ),
-      this.repository.purgeTracesBefore(new Date(now.getTime() - 180 * DAY_MS)),
+      this.ephemeral.purgeReconciliationBefore(
+        new Date(now.getTime() - COACH_RAG_RETENTION_POLICY.reconciliationMs),
+      ),
+      this.repository.purgeTracesBefore(
+        new Date(now.getTime() - COACH_RAG_RETENTION_POLICY.traceMetadataMs),
+      ),
       this.repository.purgeFeedbackBefore(
-        new Date(now.getTime() - 180 * DAY_MS),
+        new Date(now.getTime() - COACH_RAG_RETENTION_POLICY.traceMetadataMs),
       ),
       this.repository.purgeDiagnosticsBefore(
-        new Date(now.getTime() - 7 * DAY_MS),
+        new Date(
+          now.getTime() - COACH_RAG_RETENTION_POLICY.diagnosticContentMs,
+        ),
       ),
     ]);
     const expiredThreads = await this.repository.expireConversations(now);
@@ -125,7 +139,10 @@ export class CoachRetentionService implements OnModuleInit, OnModuleDestroy {
     const requested = await this.repository.markSubjectDeleting(
       subjectId,
       requestedAt,
-      new Date(requestedAt.getTime() + DAY_MS),
+      new Date(
+        requestedAt.getTime() +
+          COACH_RAG_RETENTION_POLICY.privateContentPurgeMs,
+      ),
     );
     await this.learningDeletion.hideImmediately(subjectId, requestedAt);
     await Promise.all([

@@ -3,8 +3,15 @@ import type {
   CoachFeedbackInput,
   CoachProfileUpdate,
   CoachRequest,
-  CoachResult,
   CreateCoachRequest,
+  AnyPublicCoachResult,
+  PublicCoachCitationV2,
+} from '@en/common/coach'
+import {
+  anyPublicCoachResultSchema,
+  citationLocatorSchema,
+  publicCoachCitationV2Schema,
+  type CitationLocator,
 } from '@en/common/coach'
 
 export type {
@@ -12,8 +19,30 @@ export type {
   CoachFeedbackInput,
   CoachProfileUpdate,
   CoachRequest,
-  CoachResult,
   CreateCoachRequest,
+  PublicCoachCitationV2,
+}
+
+export type CoachResult = AnyPublicCoachResult
+
+export function parseCoachResultContract(value: unknown): CoachResult {
+  return anyPublicCoachResultSchema.parse(value)
+}
+
+export function parseCoachCitationContract(
+  value: unknown,
+): PublicCoachCitationV2 {
+  return publicCoachCitationV2Schema.parse(value)
+}
+
+export function controlledCitationRoute(value: unknown): string | null {
+  const parsed = citationLocatorSchema.safeParse(value)
+  if (!parsed.success) return null
+  const locator: CitationLocator = parsed.data
+  const id = encodeURIComponent(locator.id)
+  if (locator.kind === 'word') return `/word-book/index?citation=${id}`
+  if (locator.kind === 'course') return `/courses/index?citation=${id}`
+  return null
 }
 
 export type CoachConversation = {

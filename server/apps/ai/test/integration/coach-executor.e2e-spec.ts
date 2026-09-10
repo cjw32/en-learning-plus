@@ -1,5 +1,6 @@
 import {
   COACH_RESULT_SCHEMA_VERSION,
+  type AnyPublicCoachResult,
   type CoachResult,
 } from '@en/common/coach';
 import type { StoredCoachRequest } from '../../src/coach/api/coach-request.service';
@@ -51,7 +52,10 @@ function queuedRequest(): StoredCoachRequest {
   };
 }
 
-function fixture(runtime: CoachRuntimeWorkflow) {
+function fixture(
+  runtime: CoachRuntimeWorkflow,
+  expectedResult: AnyPublicCoachResult = result,
+) {
   const order: string[] = [];
   const traces: CoachTraceSnapshot[] = [];
   const repository: CoachExecutorRepository = {
@@ -61,7 +65,7 @@ function fixture(runtime: CoachRuntimeWorkflow) {
     },
     async completeExecution(input) {
       order.push('persist_result');
-      expect(input.result).toEqual(result);
+      expect(input.result).toEqual(expectedResult);
       return true;
     },
     async failExecution(input) {
@@ -206,5 +210,56 @@ describe('Coach production workflow executor', () => {
 
     expect(run).not.toHaveBeenCalled();
     expect(test.traces).toHaveLength(0);
+  });
+
+  it('validates, persists, and traces a grounded coach.result.v2', async () => {
+    const groundedResult: AnyPublicCoachResult = {
+      schemaVersion: 'coach.result.v2',
+      responseType: 'answer',
+      correction: '',
+      explanation: 'Went is the past tense of go.',
+      examples: [],
+      errorTypes: [],
+      score: null,
+      nextAction: 'continue',
+      nextActionReason: 'Continue practicing.',
+      traceId: 'trace_request_00001',
+      knowledgeStatus: 'grounded',
+      groundedClaims: [
+        {
+          claimId: 'claim_executor_v2_000001',
+          resultPath: '/explanation',
+          text: 'Went is the past tense of go.',
+          citationIds: ['cit_executor_v2_000001'],
+        },
+      ],
+      citations: [
+        {
+          citationId: 'cit_executor_v2_000001',
+          status: 'active',
+          source: 'synthetic-word-source',
+          title: 'went',
+          category: 'WORD_MEANING',
+          excerpt: 'Went is the past tense of go.',
+          accessScope: 'PUBLIC',
+          locator: { kind: 'word', id: 'word_went' },
+        },
+      ],
+    };
+    const runtime: CoachRuntimeWorkflow = {
+      async run() {
+        return { intent: 'ANSWER', result: groundedResult };
+      },
+    };
+    const test = fixture(runtime, groundedResult);
+
+    await test.executor.executeRequest('request_00001');
+
+    expect(test.order).toContain('persist_result');
+    expect(test.order).toContain('result_event');
+    expect(test.traces[0]).toMatchObject({
+      resultSchemaVersion: 'coach.result.v2',
+      terminalStatus: 'COMPLETED',
+    });
   });
 });

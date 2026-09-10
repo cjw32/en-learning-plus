@@ -1,5 +1,5 @@
 import { createPinia, setActivePinia } from 'pinia'
-import { beforeEach, describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { useCoachStore } from '@/stores/coach'
 
 function event(
@@ -132,5 +132,123 @@ describe('Coach stream reducer', () => {
     store.markReplayExpired()
     expect(store.streamState).toBe('reconciling')
     expect(store.retryRequested).toBe(false)
+  })
+
+  it('deduplicates v2 cards while preserving claim links and distinct sources', () => {
+    const store = useCoachStore()
+    const first = {
+      citationId: 'cit_store_first_000001',
+      status: 'active',
+      source: 'source-a',
+      title: 'Source A',
+      category: 'WORD_MEANING',
+      excerpt: 'Fact A.',
+      accessScope: 'PUBLIC',
+      locator: null,
+    } as const
+    expect(
+      store.acceptResult({
+        schemaVersion: 'coach.result.v2',
+        responseType: 'answer',
+        correction: '',
+        explanation: 'Fact A and Fact B.',
+        examples: [],
+        errorTypes: [],
+        score: null,
+        nextAction: 'continue',
+        nextActionReason: 'Continue.',
+        traceId: 'trace_store_v2_000001',
+        knowledgeStatus: 'grounded',
+        citations: [
+          first,
+          first,
+          {
+            ...first,
+            citationId: 'cit_store_second_000001',
+            source: 'source-b',
+            title: 'Source B',
+            excerpt: 'Fact B.',
+          },
+        ],
+        groundedClaims: [
+          {
+            claimId: 'claim_store_v2_000001',
+            resultPath: '/explanation',
+            text: 'Fact A.',
+            citationIds: ['cit_store_first_000001'],
+          },
+          {
+            claimId: 'claim_store_v2_000002',
+            resultPath: '/explanation',
+            text: 'Fact B.',
+            citationIds: [
+              'cit_store_first_000001',
+              'cit_store_second_000001',
+            ],
+          },
+        ],
+      }),
+    ).toBe(true)
+    expect(store.finalResult?.citations).toHaveLength(2)
+    expect(store.claimsByCitationId.get('cit_store_first_000001')).toHaveLength(2)
+    expect(store.claimsByCitationId.get('cit_store_second_000001')).toHaveLength(1)
+  })
+
+  it('lazily refreshes a citation into a generic unavailable state', async () => {
+    const store = useCoachStore()
+    store.acceptResult({
+      schemaVersion: 'coach.result.v2',
+      responseType: 'answer',
+      correction: '',
+      explanation: 'Historical fact.',
+      examples: [],
+      errorTypes: [],
+      score: null,
+      nextAction: 'continue',
+      nextActionReason: 'Continue.',
+      traceId: 'trace_store_refresh_000001',
+      knowledgeStatus: 'grounded',
+      citations: [
+        {
+          citationId: 'cit_store_refresh_000001',
+          status: 'active',
+          source: 'stale-source',
+          title: 'Stale source',
+          category: 'WORD_MEANING',
+          excerpt: 'STALE_WEB_EXCERPT_CANARY',
+          accessScope: 'PUBLIC',
+          locator: null,
+        },
+      ],
+      groundedClaims: [
+        {
+          claimId: 'claim_store_refresh_000001',
+          resultPath: '/explanation',
+          text: 'Historical fact.',
+          citationIds: ['cit_store_refresh_000001'],
+        },
+      ],
+    })
+    const resolver = vi.fn(async () => ({
+      code: 0,
+      message: 'Success',
+      data: {
+        citationId: 'cit_store_refresh_000001',
+        status: 'unavailable' as const,
+        reason: 'SOURCE_UNAVAILABLE' as const,
+      },
+    }))
+    await store.refreshCitations(resolver)
+    expect(resolver).toHaveBeenCalledTimes(1)
+    expect(JSON.stringify(store.finalResult)).not.toContain(
+      'STALE_WEB_EXCERPT_CANARY',
+    )
+    expect(store.finalResult?.citations).toEqual([
+      {
+        citationId: 'cit_store_refresh_000001',
+        status: 'unavailable',
+        reason: 'SOURCE_UNAVAILABLE',
+      },
+    ])
   })
 })
