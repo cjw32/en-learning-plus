@@ -3,6 +3,7 @@ import {
   citationSchema,
   errorTypeSchema,
   groundedClaimSchema,
+  pronunciationCoachSummarySchema,
   type Citation,
   type ErrorType,
   type GroundedClaim,
@@ -32,6 +33,12 @@ const coachIntentModelOutputSchema = z
     ]),
   })
   .strict();
+
+// This is the complete allowlist for pronunciation facts that may cross the
+// Coach model boundary. It intentionally excludes audio, storage, identity,
+// full reference/recognized text and raw Provider fields.
+export const pronunciationSummaryModelContextSchema =
+  pronunciationCoachSummarySchema;
 
 export const coachAnswerModelOutputSchema = z
   .object({
@@ -95,6 +102,10 @@ export interface CoachStructuredModel {
 @Injectable()
 export class CoachModelGateway {
   constructor(private readonly model: CoachStructuredModel) {}
+
+  validatePronunciationSummaryContext(value: unknown) {
+    return pronunciationSummaryModelContextSchema.parse(value);
+  }
 
   async classifyIntent(
     message: string,

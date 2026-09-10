@@ -88,7 +88,10 @@ export const coachExerciseSubmissionRequestSchema = z
   .strict();
 
 export const coachRecommendationRequestSchema = z
-  .object({ type: z.literal('RECOMMENDATION') })
+  .object({
+    type: z.literal('RECOMMENDATION'),
+    assessmentId: z.string().min(10).max(64).optional(),
+  })
   .strict();
 
 export const createCoachRequestSchema = z.discriminatedUnion('type', [

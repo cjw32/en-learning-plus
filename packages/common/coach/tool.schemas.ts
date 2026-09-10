@@ -634,6 +634,94 @@ export const saveAttemptOutputSchema = z.union([
   toolFailureSchema,
 ]);
 
+export const getPronunciationSummaryInputSchema = z
+  .object({
+    schemaVersion,
+    assessmentId: z.string().min(10).max(64),
+  })
+  .strict();
+
+const pronunciationSummaryScoreSchema = z.number().min(0).max(100).nullable();
+
+export const pronunciationCoachSummarySchema = z
+  .object({
+    assessmentId: z.string().min(10).max(64),
+    assessmentStatus: z.enum([
+      'COMPLETED',
+      'REFERENCE_ONLY',
+      'UNRECOGNIZABLE',
+      'REJECTED',
+      'CANCELLED',
+      'TIMED_OUT',
+      'FAILED',
+    ]),
+    confidenceTier: z
+      .enum(['RELIABLE', 'REFERENCE_ONLY', 'REJECTED'])
+      .nullable(),
+    scores: z
+      .object({
+        overall: pronunciationSummaryScoreSchema,
+        accuracy: pronunciationSummaryScoreSchema,
+        completeness: pronunciationSummaryScoreSchema,
+        fluency: pronunciationSummaryScoreSchema,
+        prosody: pronunciationSummaryScoreSchema,
+      })
+      .strict(),
+    weakWords: z
+      .array(
+        z
+          .object({
+            targetPosition: z.number().int().min(0).max(29),
+            word: z.string().min(1).max(100),
+            status: z.enum(['mispronounced', 'omitted']),
+            score: pronunciationSummaryScoreSchema,
+          })
+          .strict(),
+      )
+      .max(30),
+    reviewChanges: z
+      .array(
+        z
+          .object({
+            targetPosition: z.number().int().min(0).max(29),
+            word: z.string().min(1).max(100),
+            nextReviewState: z.enum(['LEARNING', 'REVIEW', 'MASTERED']),
+            nextReviewAt: isoDateTime,
+          })
+          .strict(),
+      )
+      .max(30),
+    learningWriteStatus: z.enum([
+      'NOT_ELIGIBLE',
+      'PENDING',
+      'SAVED',
+      'FAILED',
+      'COMPENSATING',
+      'COMPENSATED',
+    ]),
+    sourceStatus: z.enum(['ACTIVE', 'UNAVAILABLE']),
+    nextAction: z.enum(['retry', 'review', 'continue']),
+    recommendationReason: z.string().min(1).max(500),
+    versions: z
+      .object({
+        resultSchema: z.string().min(1).max(64),
+        assessmentRule: z.string().min(1).max(64),
+        confidencePolicy: z.string().min(1).max(64),
+        learningMapping: z.string().min(1).max(64),
+        scheduler: z.string().min(1).max(64),
+      })
+      .strict(),
+  })
+  .strict();
+
+export const getPronunciationSummaryOutputSchema = z.union([
+  pronunciationCoachSummarySchema.extend({
+    schemaVersion,
+    ok: z.literal(true),
+  }),
+  toolFailureSchema,
+]);
+
 export const coachToolSchemas = {
   get_learner_profile: {
     input: getLearnerProfileInputSchema,
@@ -659,6 +747,10 @@ export const coachToolSchemas = {
     input: saveAttemptInputSchema,
     output: saveAttemptOutputSchema,
   },
+  get_pronunciation_summary: {
+    input: getPronunciationSummaryInputSchema,
+    output: getPronunciationSummaryOutputSchema,
+  },
 } as const;
 
 export const coachToolContractsSchema = z
@@ -673,6 +765,9 @@ export const coachToolContractsSchema = z
     create_exercise: z.object(coachToolSchemas.create_exercise).strict(),
     grade_answer: z.object(coachToolSchemas.grade_answer).strict(),
     save_attempt: z.object(coachToolSchemas.save_attempt).strict(),
+    get_pronunciation_summary: z
+      .object(coachToolSchemas.get_pronunciation_summary)
+      .strict(),
   })
   .strict();
 
@@ -708,3 +803,12 @@ export type GradeAnswerInput = z.infer<typeof gradeAnswerInputSchema>;
 export type GradeAnswerOutput = z.infer<typeof gradeAnswerOutputSchema>;
 export type SaveAttemptInput = z.infer<typeof saveAttemptInputSchema>;
 export type SaveAttemptOutput = z.infer<typeof saveAttemptOutputSchema>;
+export type PronunciationCoachSummary = z.infer<
+  typeof pronunciationCoachSummarySchema
+>;
+export type GetPronunciationSummaryInput = z.infer<
+  typeof getPronunciationSummaryInputSchema
+>;
+export type GetPronunciationSummaryOutput = z.infer<
+  typeof getPronunciationSummaryOutputSchema
+>;

@@ -1,5 +1,8 @@
 import { createHash } from 'node:crypto';
 import { KnowledgeDomainError } from '../domain/knowledge.types';
+import { Injectable } from '@nestjs/common';
+import { PrismaService } from '@libs/shared';
+import type { PronunciationSummaryInvalidation } from '../../pronunciation/pronunciation-deletion.service';
 
 export type SavedLearningFact = Readonly<{
   attemptId: string;
@@ -76,6 +79,53 @@ export class PrivateLearningSummaryService {
       evidenceVersion: `summary-evidence.sha256.${evidenceHash}`,
       contentVersion: `learning-summary.sha256.${evidenceHash}`,
       sourceUpdatedAt: last.savedAt,
+    });
+  }
+}
+
+@Injectable()
+export class PrismaPronunciationSummaryInvalidation
+  implements PronunciationSummaryInvalidation
+{
+  constructor(private readonly prisma: PrismaService) {}
+
+  async invalidate(input: Readonly<{
+    deletionId: string;
+    subjectId: string;
+    targetKeys: readonly string[];
+  }>): Promise<void> {
+    const targetKeys = [...new Set(input.targetKeys)];
+    if (targetKeys.length === 0) return;
+    await this.prisma.$transaction(async (database) => {
+      await database.privateLearningSummary.updateMany({
+        where: {
+          userId: input.subjectId,
+          topicType: 'WORD',
+          topicKey: { in: targetKeys },
+          status: 'ACTIVE',
+        },
+        data: { status: 'SUPERSEDED' },
+      });
+      const documents = await database.knowledgeDocument.findMany({
+        where: {
+          userId: input.subjectId,
+          accessScope: 'PRIVATE_OWNER',
+          sourceRecordType: 'PrivateLearningSummary',
+          sourceRecordId: { in: targetKeys.map((key) => `WORD:${key}`) },
+          status: 'ACTIVE',
+        },
+        select: { id: true },
+      });
+      const ids = documents.map((document) => document.id);
+      if (ids.length === 0) return;
+      await database.knowledgeCitation.updateMany({
+        where: { documentId: { in: ids }, status: 'ACTIVE' },
+        data: { status: 'SOURCE_INVALID', invalidatedAt: new Date() },
+      });
+      await database.knowledgeDocument.updateMany({
+        where: { id: { in: ids } },
+        data: { status: 'INVALID' },
+      });
     });
   }
 }

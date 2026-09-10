@@ -121,7 +121,11 @@ export class PrismaExerciseRepository implements ExerciseRepository {
       include: {
         items: {
           orderBy: { position: 'asc' },
-          include: { targets: true },
+          include: {
+            targets: {
+              where: { targetType: { in: ['WORD', 'ERROR_TYPE'] } },
+            },
+          },
         },
       },
     });
@@ -149,12 +153,14 @@ export class PrismaExerciseRepository implements ExerciseRepository {
         ),
         maxScore: item.maxScore,
         citations: z.array(toolCitationSchema).parse(item.citations),
-        targets: item.targets.map((target) => ({
-          targetType: target.targetType,
-          targetKey: target.targetKey,
-          ...(target.wordId ? { wordId: target.wordId } : {}),
-          weight: Number(target.weight),
-        })),
+        targets: item.targets.map((target) =>
+          targetSchema.parse({
+            targetType: target.targetType,
+            targetKey: target.targetKey,
+            ...(target.wordId ? { wordId: target.wordId } : {}),
+            weight: Number(target.weight),
+          }),
+        ),
       })),
     };
   }

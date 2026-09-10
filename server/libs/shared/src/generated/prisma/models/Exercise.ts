@@ -729,10 +729,12 @@ export type ExerciseCreateNestedOneWithoutAttemptsInput = {
   connect?: Prisma.ExerciseWhereUniqueInput
 }
 
-export type ExerciseUpdateOneRequiredWithoutAttemptsNestedInput = {
+export type ExerciseUpdateOneWithoutAttemptsNestedInput = {
   create?: Prisma.XOR<Prisma.ExerciseCreateWithoutAttemptsInput, Prisma.ExerciseUncheckedCreateWithoutAttemptsInput>
   connectOrCreate?: Prisma.ExerciseCreateOrConnectWithoutAttemptsInput
   upsert?: Prisma.ExerciseUpsertWithoutAttemptsInput
+  disconnect?: Prisma.ExerciseWhereInput | boolean
+  delete?: Prisma.ExerciseWhereInput | boolean
   connect?: Prisma.ExerciseWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.ExerciseUpdateToOneWithWhereWithoutAttemptsInput, Prisma.ExerciseUpdateWithoutAttemptsInput>, Prisma.ExerciseUncheckedUpdateWithoutAttemptsInput>
 }

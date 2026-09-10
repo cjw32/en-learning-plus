@@ -69,6 +69,15 @@ export const ModelName = {
   ExerciseSubmission: 'ExerciseSubmission',
   ExerciseSubmissionItem: 'ExerciseSubmissionItem',
   LearningAttempt: 'LearningAttempt',
+  PronunciationAssessment: 'PronunciationAssessment',
+  PronunciationTarget: 'PronunciationTarget',
+  PronunciationAudioAsset: 'PronunciationAudioAsset',
+  PronunciationWordAssessment: 'PronunciationWordAssessment',
+  PronunciationProviderCall: 'PronunciationProviderCall',
+  PronunciationTrace: 'PronunciationTrace',
+  PronunciationTraceStep: 'PronunciationTraceStep',
+  PronunciationDeletionTombstone: 'PronunciationDeletionTombstone',
+  LearningStateRecalculationEvent: 'LearningStateRecalculationEvent',
   CoachTrace: 'CoachTrace',
   CoachDeletionTombstone: 'CoachDeletionTombstone',
   CoachStepTrace: 'CoachStepTrace',
@@ -260,6 +269,10 @@ export const LearningReviewEventScalarFieldEnum = {
   quality: 'quality',
   previousState: 'previousState',
   nextState: 'nextState',
+  evidenceKind: 'evidenceKind',
+  schedulerVersion: 'schedulerVersion',
+  policyVersion: 'policyVersion',
+  voidedAt: 'voidedAt',
   createdAt: 'createdAt'
 } as const
 
@@ -413,16 +426,285 @@ export type ExerciseSubmissionItemScalarFieldEnum = (typeof ExerciseSubmissionIt
 export const LearningAttemptScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
+  attemptType: 'attemptType',
   exerciseId: 'exerciseId',
   submissionId: 'submissionId',
   saveRequestId: 'saveRequestId',
+  pronunciationAssessmentId: 'pronunciationAssessmentId',
   score: 'score',
   errorTypes: 'errorTypes',
   gradingHash: 'gradingHash',
+  evidenceHash: 'evidenceHash',
+  policyVersion: 'policyVersion',
   savedAt: 'savedAt'
 } as const
 
 export type LearningAttemptScalarFieldEnum = (typeof LearningAttemptScalarFieldEnum)[keyof typeof LearningAttemptScalarFieldEnum]
+
+
+export const PronunciationAssessmentScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  clientIdempotencyKey: 'clientIdempotencyKey',
+  requestBodyHash: 'requestBodyHash',
+  contentFingerprint: 'contentFingerprint',
+  retryOfAssessmentId: 'retryOfAssessmentId',
+  status: 'status',
+  exerciseType: 'exerciseType',
+  confidenceTier: 'confidenceTier',
+  recognizedText: 'recognizedText',
+  overallScore: 'overallScore',
+  accuracyScore: 'accuracyScore',
+  completenessScore: 'completenessScore',
+  fluencyScore: 'fluencyScore',
+  prosodyScore: 'prosodyScore',
+  confidence: 'confidence',
+  summary: 'summary',
+  suggestions: 'suggestions',
+  nextAction: 'nextAction',
+  resultSchemaVersion: 'resultSchemaVersion',
+  resultHash: 'resultHash',
+  provider: 'provider',
+  modelVersion: 'modelVersion',
+  providerAdapterVersion: 'providerAdapterVersion',
+  providerApiVersion: 'providerApiVersion',
+  assessmentRuleVersion: 'assessmentRuleVersion',
+  normalizationVersion: 'normalizationVersion',
+  alignmentVersion: 'alignmentVersion',
+  confidencePolicyVersion: 'confidencePolicyVersion',
+  weaknessMappingVersion: 'weaknessMappingVersion',
+  schedulerVersion: 'schedulerVersion',
+  budgetVersion: 'budgetVersion',
+  priceVersion: 'priceVersion',
+  publicErrorCode: 'publicErrorCode',
+  learningWriteStatus: 'learningWriteStatus',
+  deadlineAt: 'deadlineAt',
+  cancelRequestedAt: 'cancelRequestedAt',
+  queuedAt: 'queuedAt',
+  startedAt: 'startedAt',
+  finishedAt: 'finishedAt',
+  hiddenAt: 'hiddenAt',
+  deletedAt: 'deletedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PronunciationAssessmentScalarFieldEnum = (typeof PronunciationAssessmentScalarFieldEnum)[keyof typeof PronunciationAssessmentScalarFieldEnum]
+
+
+export const PronunciationTargetScalarFieldEnum = {
+  id: 'id',
+  assessmentId: 'assessmentId',
+  userId: 'userId',
+  sourceType: 'sourceType',
+  exerciseType: 'exerciseType',
+  languageTag: 'languageTag',
+  referenceText: 'referenceText',
+  normalizedTokens: 'normalizedTokens',
+  targetHash: 'targetHash',
+  wordId: 'wordId',
+  courseId: 'courseId',
+  knowledgeCitationId: 'knowledgeCitationId',
+  coachRequestId: 'coachRequestId',
+  exerciseId: 'exerciseId',
+  itemId: 'itemId',
+  sourceRecordType: 'sourceRecordType',
+  sourceRecordId: 'sourceRecordId',
+  sourceVersion: 'sourceVersion',
+  sourceContentHash: 'sourceContentHash',
+  sourceRightsVersion: 'sourceRightsVersion',
+  authorizedAt: 'authorizedAt',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt'
+} as const
+
+export type PronunciationTargetScalarFieldEnum = (typeof PronunciationTargetScalarFieldEnum)[keyof typeof PronunciationTargetScalarFieldEnum]
+
+
+export const PronunciationAudioAssetScalarFieldEnum = {
+  id: 'id',
+  assessmentId: 'assessmentId',
+  userId: 'userId',
+  objectKey: 'objectKey',
+  declaredMediaType: 'declaredMediaType',
+  detectedMediaType: 'detectedMediaType',
+  container: 'container',
+  codec: 'codec',
+  byteSize: 'byteSize',
+  durationMs: 'durationMs',
+  sampleRate: 'sampleRate',
+  channelCount: 'channelCount',
+  sha256: 'sha256',
+  qualityStatus: 'qualityStatus',
+  status: 'status',
+  expiresAt: 'expiresAt',
+  accessRevokedAt: 'accessRevokedAt',
+  purgedAt: 'purgedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PronunciationAudioAssetScalarFieldEnum = (typeof PronunciationAudioAssetScalarFieldEnum)[keyof typeof PronunciationAudioAssetScalarFieldEnum]
+
+
+export const PronunciationWordAssessmentScalarFieldEnum = {
+  id: 'id',
+  assessmentId: 'assessmentId',
+  sequence: 'sequence',
+  targetPosition: 'targetPosition',
+  insertionAfterPosition: 'insertionAfterPosition',
+  word: 'word',
+  normalizedWord: 'normalizedWord',
+  startMs: 'startMs',
+  endMs: 'endMs',
+  score: 'score',
+  status: 'status',
+  feedback: 'feedback',
+  wordId: 'wordId',
+  alignmentConfidence: 'alignmentConfidence',
+  alignmentReliable: 'alignmentReliable',
+  quality: 'quality',
+  mappingVersion: 'mappingVersion',
+  createdAt: 'createdAt'
+} as const
+
+export type PronunciationWordAssessmentScalarFieldEnum = (typeof PronunciationWordAssessmentScalarFieldEnum)[keyof typeof PronunciationWordAssessmentScalarFieldEnum]
+
+
+export const PronunciationProviderCallScalarFieldEnum = {
+  id: 'id',
+  assessmentId: 'assessmentId',
+  attemptNo: 'attemptNo',
+  provider: 'provider',
+  modelVersion: 'modelVersion',
+  providerAdapterVersion: 'providerAdapterVersion',
+  apiContractVersion: 'apiContractVersion',
+  capabilityVersion: 'capabilityVersion',
+  applicationConnectionId: 'applicationConnectionId',
+  providerRequestId: 'providerRequestId',
+  inputHash: 'inputHash',
+  status: 'status',
+  providerAccepted: 'providerAccepted',
+  startedAt: 'startedAt',
+  finishedAt: 'finishedAt',
+  latencyMs: 'latencyMs',
+  billableDurationMs: 'billableDurationMs',
+  cost: 'cost',
+  currency: 'currency',
+  priceVersion: 'priceVersion',
+  failureCode: 'failureCode',
+  retryDecision: 'retryDecision',
+  lateResultDiscardedAt: 'lateResultDiscardedAt',
+  responseHash: 'responseHash',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PronunciationProviderCallScalarFieldEnum = (typeof PronunciationProviderCallScalarFieldEnum)[keyof typeof PronunciationProviderCallScalarFieldEnum]
+
+
+export const PronunciationTraceScalarFieldEnum = {
+  id: 'id',
+  assessmentId: 'assessmentId',
+  traceSubjectId: 'traceSubjectId',
+  exerciseType: 'exerciseType',
+  targetWordCount: 'targetWordCount',
+  targetCharacterCount: 'targetCharacterCount',
+  audioMediaType: 'audioMediaType',
+  audioByteSize: 'audioByteSize',
+  audioDurationMs: 'audioDurationMs',
+  provider: 'provider',
+  modelVersion: 'modelVersion',
+  uploadDurationMs: 'uploadDurationMs',
+  queueDurationMs: 'queueDurationMs',
+  decodeDurationMs: 'decodeDurationMs',
+  providerDurationMs: 'providerDurationMs',
+  totalDurationMs: 'totalDurationMs',
+  terminalStatus: 'terminalStatus',
+  confidence: 'confidence',
+  confidenceTier: 'confidenceTier',
+  retryCount: 'retryCount',
+  cancelled: 'cancelled',
+  timedOut: 'timedOut',
+  degraded: 'degraded',
+  learningWriteStatus: 'learningWriteStatus',
+  learningWriteCount: 'learningWriteCount',
+  estimatedCost: 'estimatedCost',
+  actualCost: 'actualCost',
+  currency: 'currency',
+  resultSchemaVersion: 'resultSchemaVersion',
+  providerAdapterVersion: 'providerAdapterVersion',
+  providerApiVersion: 'providerApiVersion',
+  normalizationVersion: 'normalizationVersion',
+  alignmentVersion: 'alignmentVersion',
+  assessmentRuleVersion: 'assessmentRuleVersion',
+  confidencePolicyVersion: 'confidencePolicyVersion',
+  learningMappingVersion: 'learningMappingVersion',
+  schedulerVersion: 'schedulerVersion',
+  budgetVersion: 'budgetVersion',
+  priceVersion: 'priceVersion',
+  createdAt: 'createdAt',
+  expiresAt: 'expiresAt'
+} as const
+
+export type PronunciationTraceScalarFieldEnum = (typeof PronunciationTraceScalarFieldEnum)[keyof typeof PronunciationTraceScalarFieldEnum]
+
+
+export const PronunciationTraceStepScalarFieldEnum = {
+  id: 'id',
+  traceId: 'traceId',
+  sequence: 'sequence',
+  stepName: 'stepName',
+  status: 'status',
+  durationMs: 'durationMs',
+  errorCode: 'errorCode',
+  redactedMetadata: 'redactedMetadata',
+  createdAt: 'createdAt'
+} as const
+
+export type PronunciationTraceStepScalarFieldEnum = (typeof PronunciationTraceStepScalarFieldEnum)[keyof typeof PronunciationTraceStepScalarFieldEnum]
+
+
+export const PronunciationDeletionTombstoneScalarFieldEnum = {
+  id: 'id',
+  subjectHash: 'subjectHash',
+  resourceHash: 'resourceHash',
+  scope: 'scope',
+  status: 'status',
+  idempotencyKeyHash: 'idempotencyKeyHash',
+  requestedAt: 'requestedAt',
+  hiddenAt: 'hiddenAt',
+  purgeDeadline: 'purgeDeadline',
+  completedAt: 'completedAt',
+  failureCode: 'failureCode',
+  expiresAt: 'expiresAt',
+  claimedAt: 'claimedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PronunciationDeletionTombstoneScalarFieldEnum = (typeof PronunciationDeletionTombstoneScalarFieldEnum)[keyof typeof PronunciationDeletionTombstoneScalarFieldEnum]
+
+
+export const LearningStateRecalculationEventScalarFieldEnum = {
+  id: 'id',
+  deletionId: 'deletionId',
+  itemStateId: 'itemStateId',
+  sourceAttemptHash: 'sourceAttemptHash',
+  previousState: 'previousState',
+  nextState: 'nextState',
+  schedulerVersion: 'schedulerVersion',
+  policyVersion: 'policyVersion',
+  recalculationVersion: 'recalculationVersion',
+  replayedEventCount: 'replayedEventCount',
+  status: 'status',
+  startedAt: 'startedAt',
+  finishedAt: 'finishedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type LearningStateRecalculationEventScalarFieldEnum = (typeof LearningStateRecalculationEventScalarFieldEnum)[keyof typeof LearningStateRecalculationEventScalarFieldEnum]
 
 
 export const CoachTraceScalarFieldEnum = {

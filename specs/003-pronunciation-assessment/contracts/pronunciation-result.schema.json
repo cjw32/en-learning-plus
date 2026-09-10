@@ -1,0 +1,452 @@
+{
+  "$defs": {
+    "__schema0": {
+      "const": "pronunciation-result.v1",
+      "type": "string"
+    },
+    "__schema1": {
+      "maxLength": 128,
+      "minLength": 1,
+      "type": "string"
+    },
+    "__schema10": {
+      "maximum": 89,
+      "minimum": 0,
+      "type": "integer"
+    },
+    "__schema11": {
+      "anyOf": [
+        {
+          "maximum": 29,
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "__schema12": {
+      "maxLength": 100,
+      "minLength": 1,
+      "type": "string"
+    },
+    "__schema13": {
+      "maxLength": 100,
+      "minLength": 1,
+      "type": "string"
+    },
+    "__schema14": {
+      "anyOf": [
+        {
+          "maximum": 30000,
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "__schema15": {
+      "anyOf": [
+        {
+          "maximum": 30000,
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "__schema16": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/__schema5"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "__schema17": {
+      "enum": ["correct", "mispronounced", "omitted", "inserted", "uncertain"],
+      "type": "string"
+    },
+    "__schema18": {
+      "anyOf": [
+        {
+          "maxLength": 500,
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "__schema19": {
+      "maxLength": 1000,
+      "minLength": 1,
+      "type": "string"
+    },
+    "__schema2": {
+      "maxLength": 200,
+      "minLength": 1,
+      "type": "string"
+    },
+    "__schema20": {
+      "items": {
+        "$ref": "#/$defs/__schema21"
+      },
+      "maxItems": 5,
+      "type": "array"
+    },
+    "__schema21": {
+      "maxLength": 500,
+      "minLength": 1,
+      "type": "string"
+    },
+    "__schema22": {
+      "enum": ["retry", "review", "continue"],
+      "type": "string"
+    },
+    "__schema23": {
+      "maxLength": 64,
+      "minLength": 1,
+      "type": "string"
+    },
+    "__schema24": {
+      "maxLength": 128,
+      "minLength": 1,
+      "type": "string"
+    },
+    "__schema25": {
+      "additionalProperties": false,
+      "properties": {
+        "changedItems": {
+          "$ref": "#/$defs/__schema27"
+        },
+        "message": {
+          "$ref": "#/$defs/__schema30"
+        },
+        "status": {
+          "$ref": "#/$defs/__schema26"
+        }
+      },
+      "required": ["status", "changedItems"],
+      "type": "object"
+    },
+    "__schema26": {
+      "enum": ["PROPOSED", "SAVED", "NOT_ELIGIBLE", "FAILED", "COMPENSATED"],
+      "type": "string"
+    },
+    "__schema27": {
+      "items": {
+        "$ref": "#/$defs/__schema28"
+      },
+      "maxItems": 30,
+      "type": "array"
+    },
+    "__schema28": {
+      "additionalProperties": false,
+      "properties": {
+        "nextReviewAt": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/__schema29"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "nextReviewState": {
+          "enum": ["NEW", "LEARNING", "REVIEW", "MASTERED"],
+          "type": "string"
+        },
+        "previousReviewState": {
+          "enum": ["NEW", "LEARNING", "REVIEW", "MASTERED"],
+          "type": "string"
+        },
+        "targetPosition": {
+          "maximum": 29,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "word": {
+          "maxLength": 100,
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "targetPosition",
+        "word",
+        "previousReviewState",
+        "nextReviewState",
+        "nextReviewAt"
+      ],
+      "type": "object"
+    },
+    "__schema29": {
+      "format": "date-time",
+      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+      "type": "string"
+    },
+    "__schema3": {
+      "maxLength": 500,
+      "type": "string"
+    },
+    "__schema30": {
+      "maxLength": 500,
+      "type": "string"
+    },
+    "__schema31": {
+      "additionalProperties": false,
+      "properties": {
+        "available": {
+          "type": "boolean"
+        },
+        "expiresAt": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/__schema29"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": ["available", "expiresAt"],
+      "type": "object"
+    },
+    "__schema32": {
+      "additionalProperties": false,
+      "properties": {
+        "alignment": {
+          "$ref": "#/$defs/__schema24"
+        },
+        "assessmentRule": {
+          "$ref": "#/$defs/__schema24"
+        },
+        "budget": {
+          "$ref": "#/$defs/__schema24"
+        },
+        "confidencePolicy": {
+          "$ref": "#/$defs/__schema24"
+        },
+        "learningMapping": {
+          "$ref": "#/$defs/__schema24"
+        },
+        "normalization": {
+          "$ref": "#/$defs/__schema24"
+        },
+        "price": {
+          "$ref": "#/$defs/__schema24"
+        },
+        "providerAdapter": {
+          "$ref": "#/$defs/__schema24"
+        },
+        "providerApi": {
+          "$ref": "#/$defs/__schema24"
+        },
+        "scheduler": {
+          "$ref": "#/$defs/__schema24"
+        }
+      },
+      "required": [
+        "providerAdapter",
+        "providerApi",
+        "normalization",
+        "alignment",
+        "assessmentRule",
+        "confidencePolicy",
+        "learningMapping",
+        "scheduler",
+        "budget",
+        "price"
+      ],
+      "type": "object"
+    },
+    "__schema33": {
+      "maxLength": 128,
+      "minLength": 1,
+      "type": "string"
+    },
+    "__schema4": {
+      "additionalProperties": false,
+      "properties": {
+        "accuracy": {
+          "$ref": "#/$defs/__schema5"
+        },
+        "completeness": {
+          "$ref": "#/$defs/__schema5"
+        },
+        "fluency": {
+          "$ref": "#/$defs/__schema5"
+        },
+        "overall": {
+          "$ref": "#/$defs/__schema5"
+        },
+        "prosody": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/__schema5"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": ["overall", "accuracy", "completeness", "fluency", "prosody"],
+      "type": "object"
+    },
+    "__schema5": {
+      "maximum": 100,
+      "minimum": 0,
+      "type": "number"
+    },
+    "__schema6": {
+      "maximum": 1,
+      "minimum": 0,
+      "type": "number"
+    },
+    "__schema7": {
+      "enum": ["RELIABLE", "REFERENCE_ONLY"],
+      "type": "string"
+    },
+    "__schema8": {
+      "items": {
+        "$ref": "#/$defs/__schema9"
+      },
+      "maxItems": 90,
+      "type": "array"
+    },
+    "__schema9": {
+      "additionalProperties": false,
+      "properties": {
+        "endMs": {
+          "$ref": "#/$defs/__schema15"
+        },
+        "feedback": {
+          "$ref": "#/$defs/__schema18"
+        },
+        "normalizedWord": {
+          "$ref": "#/$defs/__schema13"
+        },
+        "score": {
+          "$ref": "#/$defs/__schema16"
+        },
+        "sequence": {
+          "$ref": "#/$defs/__schema10"
+        },
+        "startMs": {
+          "$ref": "#/$defs/__schema14"
+        },
+        "status": {
+          "$ref": "#/$defs/__schema17"
+        },
+        "targetPosition": {
+          "$ref": "#/$defs/__schema11"
+        },
+        "word": {
+          "$ref": "#/$defs/__schema12"
+        }
+      },
+      "required": [
+        "sequence",
+        "targetPosition",
+        "word",
+        "normalizedWord",
+        "startMs",
+        "endMs",
+        "score",
+        "status",
+        "feedback"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "https://en-learning-plus.local/schemas/pronunciation-result.v1.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Strict provider-neutral public pronunciation result.",
+  "properties": {
+    "assessmentId": {
+      "$ref": "#/$defs/__schema1"
+    },
+    "audio": {
+      "$ref": "#/$defs/__schema31"
+    },
+    "confidence": {
+      "$ref": "#/$defs/__schema6"
+    },
+    "confidenceTier": {
+      "$ref": "#/$defs/__schema7"
+    },
+    "learningUpdate": {
+      "$ref": "#/$defs/__schema25"
+    },
+    "modelVersion": {
+      "$ref": "#/$defs/__schema24"
+    },
+    "nextAction": {
+      "$ref": "#/$defs/__schema22"
+    },
+    "provider": {
+      "$ref": "#/$defs/__schema23"
+    },
+    "recognizedText": {
+      "$ref": "#/$defs/__schema3"
+    },
+    "referenceText": {
+      "$ref": "#/$defs/__schema2"
+    },
+    "schemaVersion": {
+      "$ref": "#/$defs/__schema0"
+    },
+    "scores": {
+      "$ref": "#/$defs/__schema4"
+    },
+    "suggestions": {
+      "$ref": "#/$defs/__schema20"
+    },
+    "summary": {
+      "$ref": "#/$defs/__schema19"
+    },
+    "traceId": {
+      "$ref": "#/$defs/__schema33"
+    },
+    "versions": {
+      "$ref": "#/$defs/__schema32"
+    },
+    "words": {
+      "$ref": "#/$defs/__schema8"
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "assessmentId",
+    "referenceText",
+    "recognizedText",
+    "scores",
+    "confidence",
+    "confidenceTier",
+    "words",
+    "summary",
+    "suggestions",
+    "nextAction",
+    "provider",
+    "modelVersion",
+    "learningUpdate",
+    "audio",
+    "versions",
+    "traceId"
+  ],
+  "title": "PronunciationResultV1",
+  "type": "object"
+}

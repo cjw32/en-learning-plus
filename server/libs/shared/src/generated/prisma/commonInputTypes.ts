@@ -368,6 +368,13 @@ export type JsonFilterBase<$PrismaModel = never> = {
   not?: runtime.InputJsonValue | Prisma.JsonFieldRefInput<$PrismaModel> | Prisma.JsonNullValueFilter
 }
 
+export type EnumLearningEvidenceKindFilter<$PrismaModel = never> = {
+  equals?: $Enums.LearningEvidenceKind | Prisma.EnumLearningEvidenceKindFieldRefInput<$PrismaModel>
+  in?: $Enums.LearningEvidenceKind[] | Prisma.ListEnumLearningEvidenceKindFieldRefInput<$PrismaModel>
+  notIn?: $Enums.LearningEvidenceKind[] | Prisma.ListEnumLearningEvidenceKindFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumLearningEvidenceKindFilter<$PrismaModel> | $Enums.LearningEvidenceKind
+}
+
 export type JsonWithAggregatesFilter<$PrismaModel = never> =
 | Prisma.PatchUndefined<
     Prisma.Either<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
@@ -393,6 +400,16 @@ export type JsonWithAggregatesFilterBase<$PrismaModel = never> = {
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedJsonFilter<$PrismaModel>
   _max?: Prisma.NestedJsonFilter<$PrismaModel>
+}
+
+export type EnumLearningEvidenceKindWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.LearningEvidenceKind | Prisma.EnumLearningEvidenceKindFieldRefInput<$PrismaModel>
+  in?: $Enums.LearningEvidenceKind[] | Prisma.ListEnumLearningEvidenceKindFieldRefInput<$PrismaModel>
+  notIn?: $Enums.LearningEvidenceKind[] | Prisma.ListEnumLearningEvidenceKindFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumLearningEvidenceKindWithAggregatesFilter<$PrismaModel> | $Enums.LearningEvidenceKind
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumLearningEvidenceKindFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumLearningEvidenceKindFilter<$PrismaModel>
 }
 
 export type EnumCoachConversationStatusFilter<$PrismaModel = never> = {
@@ -614,6 +631,322 @@ export type EnumExerciseSubmissionStatusWithAggregatesFilter<$PrismaModel = neve
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumExerciseSubmissionStatusFilter<$PrismaModel>
   _max?: Prisma.NestedEnumExerciseSubmissionStatusFilter<$PrismaModel>
+}
+
+export type EnumLearningAttemptTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.LearningAttemptType | Prisma.EnumLearningAttemptTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.LearningAttemptType[] | Prisma.ListEnumLearningAttemptTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.LearningAttemptType[] | Prisma.ListEnumLearningAttemptTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumLearningAttemptTypeFilter<$PrismaModel> | $Enums.LearningAttemptType
+}
+
+export type EnumLearningAttemptTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.LearningAttemptType | Prisma.EnumLearningAttemptTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.LearningAttemptType[] | Prisma.ListEnumLearningAttemptTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.LearningAttemptType[] | Prisma.ListEnumLearningAttemptTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumLearningAttemptTypeWithAggregatesFilter<$PrismaModel> | $Enums.LearningAttemptType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumLearningAttemptTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumLearningAttemptTypeFilter<$PrismaModel>
+}
+
+export type EnumPronunciationAssessmentStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.PronunciationAssessmentStatus | Prisma.EnumPronunciationAssessmentStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.PronunciationAssessmentStatus[] | Prisma.ListEnumPronunciationAssessmentStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PronunciationAssessmentStatus[] | Prisma.ListEnumPronunciationAssessmentStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPronunciationAssessmentStatusFilter<$PrismaModel> | $Enums.PronunciationAssessmentStatus
+}
+
+export type EnumPronunciationExerciseTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.PronunciationExerciseType | Prisma.EnumPronunciationExerciseTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.PronunciationExerciseType[] | Prisma.ListEnumPronunciationExerciseTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PronunciationExerciseType[] | Prisma.ListEnumPronunciationExerciseTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPronunciationExerciseTypeFilter<$PrismaModel> | $Enums.PronunciationExerciseType
+}
+
+export type EnumPronunciationConfidenceTierNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.PronunciationConfidenceTier | Prisma.EnumPronunciationConfidenceTierFieldRefInput<$PrismaModel> | null
+  in?: $Enums.PronunciationConfidenceTier[] | Prisma.ListEnumPronunciationConfidenceTierFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.PronunciationConfidenceTier[] | Prisma.ListEnumPronunciationConfidenceTierFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumPronunciationConfidenceTierNullableFilter<$PrismaModel> | $Enums.PronunciationConfidenceTier | null
+}
+
+export type DecimalNullableFilter<$PrismaModel = never> = {
+  equals?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel> | null
+  in?: runtime.Decimal[] | runtime.DecimalJsLike[] | number[] | string[] | Prisma.ListDecimalFieldRefInput<$PrismaModel> | null
+  notIn?: runtime.Decimal[] | runtime.DecimalJsLike[] | number[] | string[] | Prisma.ListDecimalFieldRefInput<$PrismaModel> | null
+  lt?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel>
+  lte?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel>
+  gt?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel>
+  gte?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedDecimalNullableFilter<$PrismaModel> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+}
+
+export type EnumPronunciationNextActionNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.PronunciationNextAction | Prisma.EnumPronunciationNextActionFieldRefInput<$PrismaModel> | null
+  in?: $Enums.PronunciationNextAction[] | Prisma.ListEnumPronunciationNextActionFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.PronunciationNextAction[] | Prisma.ListEnumPronunciationNextActionFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumPronunciationNextActionNullableFilter<$PrismaModel> | $Enums.PronunciationNextAction | null
+}
+
+export type EnumPronunciationLearningWriteStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.PronunciationLearningWriteStatus | Prisma.EnumPronunciationLearningWriteStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.PronunciationLearningWriteStatus[] | Prisma.ListEnumPronunciationLearningWriteStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PronunciationLearningWriteStatus[] | Prisma.ListEnumPronunciationLearningWriteStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPronunciationLearningWriteStatusFilter<$PrismaModel> | $Enums.PronunciationLearningWriteStatus
+}
+
+export type EnumPronunciationAssessmentStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PronunciationAssessmentStatus | Prisma.EnumPronunciationAssessmentStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.PronunciationAssessmentStatus[] | Prisma.ListEnumPronunciationAssessmentStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PronunciationAssessmentStatus[] | Prisma.ListEnumPronunciationAssessmentStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPronunciationAssessmentStatusWithAggregatesFilter<$PrismaModel> | $Enums.PronunciationAssessmentStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPronunciationAssessmentStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPronunciationAssessmentStatusFilter<$PrismaModel>
+}
+
+export type EnumPronunciationExerciseTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PronunciationExerciseType | Prisma.EnumPronunciationExerciseTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.PronunciationExerciseType[] | Prisma.ListEnumPronunciationExerciseTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PronunciationExerciseType[] | Prisma.ListEnumPronunciationExerciseTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPronunciationExerciseTypeWithAggregatesFilter<$PrismaModel> | $Enums.PronunciationExerciseType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPronunciationExerciseTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPronunciationExerciseTypeFilter<$PrismaModel>
+}
+
+export type EnumPronunciationConfidenceTierNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PronunciationConfidenceTier | Prisma.EnumPronunciationConfidenceTierFieldRefInput<$PrismaModel> | null
+  in?: $Enums.PronunciationConfidenceTier[] | Prisma.ListEnumPronunciationConfidenceTierFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.PronunciationConfidenceTier[] | Prisma.ListEnumPronunciationConfidenceTierFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumPronunciationConfidenceTierNullableWithAggregatesFilter<$PrismaModel> | $Enums.PronunciationConfidenceTier | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPronunciationConfidenceTierNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPronunciationConfidenceTierNullableFilter<$PrismaModel>
+}
+
+export type DecimalNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel> | null
+  in?: runtime.Decimal[] | runtime.DecimalJsLike[] | number[] | string[] | Prisma.ListDecimalFieldRefInput<$PrismaModel> | null
+  notIn?: runtime.Decimal[] | runtime.DecimalJsLike[] | number[] | string[] | Prisma.ListDecimalFieldRefInput<$PrismaModel> | null
+  lt?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel>
+  lte?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel>
+  gt?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel>
+  gte?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedDecimalNullableWithAggregatesFilter<$PrismaModel> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _avg?: Prisma.NestedDecimalNullableFilter<$PrismaModel>
+  _sum?: Prisma.NestedDecimalNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedDecimalNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedDecimalNullableFilter<$PrismaModel>
+}
+
+export type EnumPronunciationNextActionNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PronunciationNextAction | Prisma.EnumPronunciationNextActionFieldRefInput<$PrismaModel> | null
+  in?: $Enums.PronunciationNextAction[] | Prisma.ListEnumPronunciationNextActionFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.PronunciationNextAction[] | Prisma.ListEnumPronunciationNextActionFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumPronunciationNextActionNullableWithAggregatesFilter<$PrismaModel> | $Enums.PronunciationNextAction | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPronunciationNextActionNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPronunciationNextActionNullableFilter<$PrismaModel>
+}
+
+export type EnumPronunciationLearningWriteStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PronunciationLearningWriteStatus | Prisma.EnumPronunciationLearningWriteStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.PronunciationLearningWriteStatus[] | Prisma.ListEnumPronunciationLearningWriteStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PronunciationLearningWriteStatus[] | Prisma.ListEnumPronunciationLearningWriteStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPronunciationLearningWriteStatusWithAggregatesFilter<$PrismaModel> | $Enums.PronunciationLearningWriteStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPronunciationLearningWriteStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPronunciationLearningWriteStatusFilter<$PrismaModel>
+}
+
+export type EnumPronunciationTargetSourceFilter<$PrismaModel = never> = {
+  equals?: $Enums.PronunciationTargetSource | Prisma.EnumPronunciationTargetSourceFieldRefInput<$PrismaModel>
+  in?: $Enums.PronunciationTargetSource[] | Prisma.ListEnumPronunciationTargetSourceFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PronunciationTargetSource[] | Prisma.ListEnumPronunciationTargetSourceFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPronunciationTargetSourceFilter<$PrismaModel> | $Enums.PronunciationTargetSource
+}
+
+export type EnumPronunciationTargetSourceWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PronunciationTargetSource | Prisma.EnumPronunciationTargetSourceFieldRefInput<$PrismaModel>
+  in?: $Enums.PronunciationTargetSource[] | Prisma.ListEnumPronunciationTargetSourceFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PronunciationTargetSource[] | Prisma.ListEnumPronunciationTargetSourceFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPronunciationTargetSourceWithAggregatesFilter<$PrismaModel> | $Enums.PronunciationTargetSource
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPronunciationTargetSourceFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPronunciationTargetSourceFilter<$PrismaModel>
+}
+
+export type EnumPronunciationAudioStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.PronunciationAudioStatus | Prisma.EnumPronunciationAudioStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.PronunciationAudioStatus[] | Prisma.ListEnumPronunciationAudioStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PronunciationAudioStatus[] | Prisma.ListEnumPronunciationAudioStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPronunciationAudioStatusFilter<$PrismaModel> | $Enums.PronunciationAudioStatus
+}
+
+export type EnumPronunciationAudioStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PronunciationAudioStatus | Prisma.EnumPronunciationAudioStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.PronunciationAudioStatus[] | Prisma.ListEnumPronunciationAudioStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PronunciationAudioStatus[] | Prisma.ListEnumPronunciationAudioStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPronunciationAudioStatusWithAggregatesFilter<$PrismaModel> | $Enums.PronunciationAudioStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPronunciationAudioStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPronunciationAudioStatusFilter<$PrismaModel>
+}
+
+export type EnumPronunciationWordStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.PronunciationWordStatus | Prisma.EnumPronunciationWordStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.PronunciationWordStatus[] | Prisma.ListEnumPronunciationWordStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PronunciationWordStatus[] | Prisma.ListEnumPronunciationWordStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPronunciationWordStatusFilter<$PrismaModel> | $Enums.PronunciationWordStatus
+}
+
+export type EnumPronunciationWordStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PronunciationWordStatus | Prisma.EnumPronunciationWordStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.PronunciationWordStatus[] | Prisma.ListEnumPronunciationWordStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PronunciationWordStatus[] | Prisma.ListEnumPronunciationWordStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPronunciationWordStatusWithAggregatesFilter<$PrismaModel> | $Enums.PronunciationWordStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPronunciationWordStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPronunciationWordStatusFilter<$PrismaModel>
+}
+
+export type EnumPronunciationProviderCallStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.PronunciationProviderCallStatus | Prisma.EnumPronunciationProviderCallStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.PronunciationProviderCallStatus[] | Prisma.ListEnumPronunciationProviderCallStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PronunciationProviderCallStatus[] | Prisma.ListEnumPronunciationProviderCallStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPronunciationProviderCallStatusFilter<$PrismaModel> | $Enums.PronunciationProviderCallStatus
+}
+
+export type EnumPronunciationProviderRetryDecisionFilter<$PrismaModel = never> = {
+  equals?: $Enums.PronunciationProviderRetryDecision | Prisma.EnumPronunciationProviderRetryDecisionFieldRefInput<$PrismaModel>
+  in?: $Enums.PronunciationProviderRetryDecision[] | Prisma.ListEnumPronunciationProviderRetryDecisionFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PronunciationProviderRetryDecision[] | Prisma.ListEnumPronunciationProviderRetryDecisionFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPronunciationProviderRetryDecisionFilter<$PrismaModel> | $Enums.PronunciationProviderRetryDecision
+}
+
+export type EnumPronunciationProviderCallStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PronunciationProviderCallStatus | Prisma.EnumPronunciationProviderCallStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.PronunciationProviderCallStatus[] | Prisma.ListEnumPronunciationProviderCallStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PronunciationProviderCallStatus[] | Prisma.ListEnumPronunciationProviderCallStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPronunciationProviderCallStatusWithAggregatesFilter<$PrismaModel> | $Enums.PronunciationProviderCallStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPronunciationProviderCallStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPronunciationProviderCallStatusFilter<$PrismaModel>
+}
+
+export type EnumPronunciationProviderRetryDecisionWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PronunciationProviderRetryDecision | Prisma.EnumPronunciationProviderRetryDecisionFieldRefInput<$PrismaModel>
+  in?: $Enums.PronunciationProviderRetryDecision[] | Prisma.ListEnumPronunciationProviderRetryDecisionFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PronunciationProviderRetryDecision[] | Prisma.ListEnumPronunciationProviderRetryDecisionFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPronunciationProviderRetryDecisionWithAggregatesFilter<$PrismaModel> | $Enums.PronunciationProviderRetryDecision
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPronunciationProviderRetryDecisionFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPronunciationProviderRetryDecisionFilter<$PrismaModel>
+}
+
+export type EnumPronunciationAssessmentStatusNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.PronunciationAssessmentStatus | Prisma.EnumPronunciationAssessmentStatusFieldRefInput<$PrismaModel> | null
+  in?: $Enums.PronunciationAssessmentStatus[] | Prisma.ListEnumPronunciationAssessmentStatusFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.PronunciationAssessmentStatus[] | Prisma.ListEnumPronunciationAssessmentStatusFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumPronunciationAssessmentStatusNullableFilter<$PrismaModel> | $Enums.PronunciationAssessmentStatus | null
+}
+
+export type EnumPronunciationAssessmentStatusNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PronunciationAssessmentStatus | Prisma.EnumPronunciationAssessmentStatusFieldRefInput<$PrismaModel> | null
+  in?: $Enums.PronunciationAssessmentStatus[] | Prisma.ListEnumPronunciationAssessmentStatusFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.PronunciationAssessmentStatus[] | Prisma.ListEnumPronunciationAssessmentStatusFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumPronunciationAssessmentStatusNullableWithAggregatesFilter<$PrismaModel> | $Enums.PronunciationAssessmentStatus | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPronunciationAssessmentStatusNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPronunciationAssessmentStatusNullableFilter<$PrismaModel>
+}
+
+export type EnumPronunciationTraceStepNameFilter<$PrismaModel = never> = {
+  equals?: $Enums.PronunciationTraceStepName | Prisma.EnumPronunciationTraceStepNameFieldRefInput<$PrismaModel>
+  in?: $Enums.PronunciationTraceStepName[] | Prisma.ListEnumPronunciationTraceStepNameFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PronunciationTraceStepName[] | Prisma.ListEnumPronunciationTraceStepNameFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPronunciationTraceStepNameFilter<$PrismaModel> | $Enums.PronunciationTraceStepName
+}
+
+export type EnumPronunciationTraceStepStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.PronunciationTraceStepStatus | Prisma.EnumPronunciationTraceStepStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.PronunciationTraceStepStatus[] | Prisma.ListEnumPronunciationTraceStepStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PronunciationTraceStepStatus[] | Prisma.ListEnumPronunciationTraceStepStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPronunciationTraceStepStatusFilter<$PrismaModel> | $Enums.PronunciationTraceStepStatus
+}
+
+export type EnumPronunciationTraceStepNameWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PronunciationTraceStepName | Prisma.EnumPronunciationTraceStepNameFieldRefInput<$PrismaModel>
+  in?: $Enums.PronunciationTraceStepName[] | Prisma.ListEnumPronunciationTraceStepNameFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PronunciationTraceStepName[] | Prisma.ListEnumPronunciationTraceStepNameFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPronunciationTraceStepNameWithAggregatesFilter<$PrismaModel> | $Enums.PronunciationTraceStepName
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPronunciationTraceStepNameFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPronunciationTraceStepNameFilter<$PrismaModel>
+}
+
+export type EnumPronunciationTraceStepStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PronunciationTraceStepStatus | Prisma.EnumPronunciationTraceStepStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.PronunciationTraceStepStatus[] | Prisma.ListEnumPronunciationTraceStepStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PronunciationTraceStepStatus[] | Prisma.ListEnumPronunciationTraceStepStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPronunciationTraceStepStatusWithAggregatesFilter<$PrismaModel> | $Enums.PronunciationTraceStepStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPronunciationTraceStepStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPronunciationTraceStepStatusFilter<$PrismaModel>
+}
+
+export type EnumPronunciationDeletionScopeFilter<$PrismaModel = never> = {
+  equals?: $Enums.PronunciationDeletionScope | Prisma.EnumPronunciationDeletionScopeFieldRefInput<$PrismaModel>
+  in?: $Enums.PronunciationDeletionScope[] | Prisma.ListEnumPronunciationDeletionScopeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PronunciationDeletionScope[] | Prisma.ListEnumPronunciationDeletionScopeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPronunciationDeletionScopeFilter<$PrismaModel> | $Enums.PronunciationDeletionScope
+}
+
+export type EnumPronunciationDeletionStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.PronunciationDeletionStatus | Prisma.EnumPronunciationDeletionStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.PronunciationDeletionStatus[] | Prisma.ListEnumPronunciationDeletionStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PronunciationDeletionStatus[] | Prisma.ListEnumPronunciationDeletionStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPronunciationDeletionStatusFilter<$PrismaModel> | $Enums.PronunciationDeletionStatus
+}
+
+export type EnumPronunciationDeletionScopeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PronunciationDeletionScope | Prisma.EnumPronunciationDeletionScopeFieldRefInput<$PrismaModel>
+  in?: $Enums.PronunciationDeletionScope[] | Prisma.ListEnumPronunciationDeletionScopeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PronunciationDeletionScope[] | Prisma.ListEnumPronunciationDeletionScopeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPronunciationDeletionScopeWithAggregatesFilter<$PrismaModel> | $Enums.PronunciationDeletionScope
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPronunciationDeletionScopeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPronunciationDeletionScopeFilter<$PrismaModel>
+}
+
+export type EnumPronunciationDeletionStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PronunciationDeletionStatus | Prisma.EnumPronunciationDeletionStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.PronunciationDeletionStatus[] | Prisma.ListEnumPronunciationDeletionStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PronunciationDeletionStatus[] | Prisma.ListEnumPronunciationDeletionStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPronunciationDeletionStatusWithAggregatesFilter<$PrismaModel> | $Enums.PronunciationDeletionStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPronunciationDeletionStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPronunciationDeletionStatusFilter<$PrismaModel>
+}
+
+export type EnumLearningStateRecalculationStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.LearningStateRecalculationStatus | Prisma.EnumLearningStateRecalculationStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.LearningStateRecalculationStatus[] | Prisma.ListEnumLearningStateRecalculationStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.LearningStateRecalculationStatus[] | Prisma.ListEnumLearningStateRecalculationStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumLearningStateRecalculationStatusFilter<$PrismaModel> | $Enums.LearningStateRecalculationStatus
+}
+
+export type EnumLearningStateRecalculationStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.LearningStateRecalculationStatus | Prisma.EnumLearningStateRecalculationStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.LearningStateRecalculationStatus[] | Prisma.ListEnumLearningStateRecalculationStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.LearningStateRecalculationStatus[] | Prisma.ListEnumLearningStateRecalculationStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumLearningStateRecalculationStatusWithAggregatesFilter<$PrismaModel> | $Enums.LearningStateRecalculationStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumLearningStateRecalculationStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumLearningStateRecalculationStatusFilter<$PrismaModel>
 }
 
 export type EnumCoachResponseTypeNullableFilter<$PrismaModel = never> = {
@@ -1326,6 +1659,13 @@ export type NestedFloatNullableFilter<$PrismaModel = never> = {
   not?: Prisma.NestedFloatNullableFilter<$PrismaModel> | number | null
 }
 
+export type NestedEnumLearningEvidenceKindFilter<$PrismaModel = never> = {
+  equals?: $Enums.LearningEvidenceKind | Prisma.EnumLearningEvidenceKindFieldRefInput<$PrismaModel>
+  in?: $Enums.LearningEvidenceKind[] | Prisma.ListEnumLearningEvidenceKindFieldRefInput<$PrismaModel>
+  notIn?: $Enums.LearningEvidenceKind[] | Prisma.ListEnumLearningEvidenceKindFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumLearningEvidenceKindFilter<$PrismaModel> | $Enums.LearningEvidenceKind
+}
+
 export type NestedJsonFilter<$PrismaModel = never> =
 | Prisma.PatchUndefined<
     Prisma.Either<Required<NestedJsonFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>,
@@ -1348,6 +1688,16 @@ export type NestedJsonFilterBase<$PrismaModel = never> = {
   gt?: runtime.InputJsonValue | Prisma.JsonFieldRefInput<$PrismaModel>
   gte?: runtime.InputJsonValue | Prisma.JsonFieldRefInput<$PrismaModel>
   not?: runtime.InputJsonValue | Prisma.JsonFieldRefInput<$PrismaModel> | Prisma.JsonNullValueFilter
+}
+
+export type NestedEnumLearningEvidenceKindWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.LearningEvidenceKind | Prisma.EnumLearningEvidenceKindFieldRefInput<$PrismaModel>
+  in?: $Enums.LearningEvidenceKind[] | Prisma.ListEnumLearningEvidenceKindFieldRefInput<$PrismaModel>
+  notIn?: $Enums.LearningEvidenceKind[] | Prisma.ListEnumLearningEvidenceKindFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumLearningEvidenceKindWithAggregatesFilter<$PrismaModel> | $Enums.LearningEvidenceKind
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumLearningEvidenceKindFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumLearningEvidenceKindFilter<$PrismaModel>
 }
 
 export type NestedEnumCoachConversationStatusFilter<$PrismaModel = never> = {
@@ -1542,6 +1892,322 @@ export type NestedEnumExerciseSubmissionStatusWithAggregatesFilter<$PrismaModel 
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumExerciseSubmissionStatusFilter<$PrismaModel>
   _max?: Prisma.NestedEnumExerciseSubmissionStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumLearningAttemptTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.LearningAttemptType | Prisma.EnumLearningAttemptTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.LearningAttemptType[] | Prisma.ListEnumLearningAttemptTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.LearningAttemptType[] | Prisma.ListEnumLearningAttemptTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumLearningAttemptTypeFilter<$PrismaModel> | $Enums.LearningAttemptType
+}
+
+export type NestedEnumLearningAttemptTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.LearningAttemptType | Prisma.EnumLearningAttemptTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.LearningAttemptType[] | Prisma.ListEnumLearningAttemptTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.LearningAttemptType[] | Prisma.ListEnumLearningAttemptTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumLearningAttemptTypeWithAggregatesFilter<$PrismaModel> | $Enums.LearningAttemptType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumLearningAttemptTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumLearningAttemptTypeFilter<$PrismaModel>
+}
+
+export type NestedEnumPronunciationAssessmentStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.PronunciationAssessmentStatus | Prisma.EnumPronunciationAssessmentStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.PronunciationAssessmentStatus[] | Prisma.ListEnumPronunciationAssessmentStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PronunciationAssessmentStatus[] | Prisma.ListEnumPronunciationAssessmentStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPronunciationAssessmentStatusFilter<$PrismaModel> | $Enums.PronunciationAssessmentStatus
+}
+
+export type NestedEnumPronunciationExerciseTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.PronunciationExerciseType | Prisma.EnumPronunciationExerciseTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.PronunciationExerciseType[] | Prisma.ListEnumPronunciationExerciseTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PronunciationExerciseType[] | Prisma.ListEnumPronunciationExerciseTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPronunciationExerciseTypeFilter<$PrismaModel> | $Enums.PronunciationExerciseType
+}
+
+export type NestedEnumPronunciationConfidenceTierNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.PronunciationConfidenceTier | Prisma.EnumPronunciationConfidenceTierFieldRefInput<$PrismaModel> | null
+  in?: $Enums.PronunciationConfidenceTier[] | Prisma.ListEnumPronunciationConfidenceTierFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.PronunciationConfidenceTier[] | Prisma.ListEnumPronunciationConfidenceTierFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumPronunciationConfidenceTierNullableFilter<$PrismaModel> | $Enums.PronunciationConfidenceTier | null
+}
+
+export type NestedDecimalNullableFilter<$PrismaModel = never> = {
+  equals?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel> | null
+  in?: runtime.Decimal[] | runtime.DecimalJsLike[] | number[] | string[] | Prisma.ListDecimalFieldRefInput<$PrismaModel> | null
+  notIn?: runtime.Decimal[] | runtime.DecimalJsLike[] | number[] | string[] | Prisma.ListDecimalFieldRefInput<$PrismaModel> | null
+  lt?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel>
+  lte?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel>
+  gt?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel>
+  gte?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedDecimalNullableFilter<$PrismaModel> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+}
+
+export type NestedEnumPronunciationNextActionNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.PronunciationNextAction | Prisma.EnumPronunciationNextActionFieldRefInput<$PrismaModel> | null
+  in?: $Enums.PronunciationNextAction[] | Prisma.ListEnumPronunciationNextActionFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.PronunciationNextAction[] | Prisma.ListEnumPronunciationNextActionFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumPronunciationNextActionNullableFilter<$PrismaModel> | $Enums.PronunciationNextAction | null
+}
+
+export type NestedEnumPronunciationLearningWriteStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.PronunciationLearningWriteStatus | Prisma.EnumPronunciationLearningWriteStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.PronunciationLearningWriteStatus[] | Prisma.ListEnumPronunciationLearningWriteStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PronunciationLearningWriteStatus[] | Prisma.ListEnumPronunciationLearningWriteStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPronunciationLearningWriteStatusFilter<$PrismaModel> | $Enums.PronunciationLearningWriteStatus
+}
+
+export type NestedEnumPronunciationAssessmentStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PronunciationAssessmentStatus | Prisma.EnumPronunciationAssessmentStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.PronunciationAssessmentStatus[] | Prisma.ListEnumPronunciationAssessmentStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PronunciationAssessmentStatus[] | Prisma.ListEnumPronunciationAssessmentStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPronunciationAssessmentStatusWithAggregatesFilter<$PrismaModel> | $Enums.PronunciationAssessmentStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPronunciationAssessmentStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPronunciationAssessmentStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumPronunciationExerciseTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PronunciationExerciseType | Prisma.EnumPronunciationExerciseTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.PronunciationExerciseType[] | Prisma.ListEnumPronunciationExerciseTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PronunciationExerciseType[] | Prisma.ListEnumPronunciationExerciseTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPronunciationExerciseTypeWithAggregatesFilter<$PrismaModel> | $Enums.PronunciationExerciseType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPronunciationExerciseTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPronunciationExerciseTypeFilter<$PrismaModel>
+}
+
+export type NestedEnumPronunciationConfidenceTierNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PronunciationConfidenceTier | Prisma.EnumPronunciationConfidenceTierFieldRefInput<$PrismaModel> | null
+  in?: $Enums.PronunciationConfidenceTier[] | Prisma.ListEnumPronunciationConfidenceTierFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.PronunciationConfidenceTier[] | Prisma.ListEnumPronunciationConfidenceTierFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumPronunciationConfidenceTierNullableWithAggregatesFilter<$PrismaModel> | $Enums.PronunciationConfidenceTier | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPronunciationConfidenceTierNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPronunciationConfidenceTierNullableFilter<$PrismaModel>
+}
+
+export type NestedDecimalNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel> | null
+  in?: runtime.Decimal[] | runtime.DecimalJsLike[] | number[] | string[] | Prisma.ListDecimalFieldRefInput<$PrismaModel> | null
+  notIn?: runtime.Decimal[] | runtime.DecimalJsLike[] | number[] | string[] | Prisma.ListDecimalFieldRefInput<$PrismaModel> | null
+  lt?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel>
+  lte?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel>
+  gt?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel>
+  gte?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedDecimalNullableWithAggregatesFilter<$PrismaModel> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _avg?: Prisma.NestedDecimalNullableFilter<$PrismaModel>
+  _sum?: Prisma.NestedDecimalNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedDecimalNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedDecimalNullableFilter<$PrismaModel>
+}
+
+export type NestedEnumPronunciationNextActionNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PronunciationNextAction | Prisma.EnumPronunciationNextActionFieldRefInput<$PrismaModel> | null
+  in?: $Enums.PronunciationNextAction[] | Prisma.ListEnumPronunciationNextActionFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.PronunciationNextAction[] | Prisma.ListEnumPronunciationNextActionFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumPronunciationNextActionNullableWithAggregatesFilter<$PrismaModel> | $Enums.PronunciationNextAction | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPronunciationNextActionNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPronunciationNextActionNullableFilter<$PrismaModel>
+}
+
+export type NestedEnumPronunciationLearningWriteStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PronunciationLearningWriteStatus | Prisma.EnumPronunciationLearningWriteStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.PronunciationLearningWriteStatus[] | Prisma.ListEnumPronunciationLearningWriteStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PronunciationLearningWriteStatus[] | Prisma.ListEnumPronunciationLearningWriteStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPronunciationLearningWriteStatusWithAggregatesFilter<$PrismaModel> | $Enums.PronunciationLearningWriteStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPronunciationLearningWriteStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPronunciationLearningWriteStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumPronunciationTargetSourceFilter<$PrismaModel = never> = {
+  equals?: $Enums.PronunciationTargetSource | Prisma.EnumPronunciationTargetSourceFieldRefInput<$PrismaModel>
+  in?: $Enums.PronunciationTargetSource[] | Prisma.ListEnumPronunciationTargetSourceFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PronunciationTargetSource[] | Prisma.ListEnumPronunciationTargetSourceFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPronunciationTargetSourceFilter<$PrismaModel> | $Enums.PronunciationTargetSource
+}
+
+export type NestedEnumPronunciationTargetSourceWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PronunciationTargetSource | Prisma.EnumPronunciationTargetSourceFieldRefInput<$PrismaModel>
+  in?: $Enums.PronunciationTargetSource[] | Prisma.ListEnumPronunciationTargetSourceFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PronunciationTargetSource[] | Prisma.ListEnumPronunciationTargetSourceFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPronunciationTargetSourceWithAggregatesFilter<$PrismaModel> | $Enums.PronunciationTargetSource
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPronunciationTargetSourceFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPronunciationTargetSourceFilter<$PrismaModel>
+}
+
+export type NestedEnumPronunciationAudioStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.PronunciationAudioStatus | Prisma.EnumPronunciationAudioStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.PronunciationAudioStatus[] | Prisma.ListEnumPronunciationAudioStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PronunciationAudioStatus[] | Prisma.ListEnumPronunciationAudioStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPronunciationAudioStatusFilter<$PrismaModel> | $Enums.PronunciationAudioStatus
+}
+
+export type NestedEnumPronunciationAudioStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PronunciationAudioStatus | Prisma.EnumPronunciationAudioStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.PronunciationAudioStatus[] | Prisma.ListEnumPronunciationAudioStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PronunciationAudioStatus[] | Prisma.ListEnumPronunciationAudioStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPronunciationAudioStatusWithAggregatesFilter<$PrismaModel> | $Enums.PronunciationAudioStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPronunciationAudioStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPronunciationAudioStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumPronunciationWordStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.PronunciationWordStatus | Prisma.EnumPronunciationWordStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.PronunciationWordStatus[] | Prisma.ListEnumPronunciationWordStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PronunciationWordStatus[] | Prisma.ListEnumPronunciationWordStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPronunciationWordStatusFilter<$PrismaModel> | $Enums.PronunciationWordStatus
+}
+
+export type NestedEnumPronunciationWordStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PronunciationWordStatus | Prisma.EnumPronunciationWordStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.PronunciationWordStatus[] | Prisma.ListEnumPronunciationWordStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PronunciationWordStatus[] | Prisma.ListEnumPronunciationWordStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPronunciationWordStatusWithAggregatesFilter<$PrismaModel> | $Enums.PronunciationWordStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPronunciationWordStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPronunciationWordStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumPronunciationProviderCallStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.PronunciationProviderCallStatus | Prisma.EnumPronunciationProviderCallStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.PronunciationProviderCallStatus[] | Prisma.ListEnumPronunciationProviderCallStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PronunciationProviderCallStatus[] | Prisma.ListEnumPronunciationProviderCallStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPronunciationProviderCallStatusFilter<$PrismaModel> | $Enums.PronunciationProviderCallStatus
+}
+
+export type NestedEnumPronunciationProviderRetryDecisionFilter<$PrismaModel = never> = {
+  equals?: $Enums.PronunciationProviderRetryDecision | Prisma.EnumPronunciationProviderRetryDecisionFieldRefInput<$PrismaModel>
+  in?: $Enums.PronunciationProviderRetryDecision[] | Prisma.ListEnumPronunciationProviderRetryDecisionFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PronunciationProviderRetryDecision[] | Prisma.ListEnumPronunciationProviderRetryDecisionFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPronunciationProviderRetryDecisionFilter<$PrismaModel> | $Enums.PronunciationProviderRetryDecision
+}
+
+export type NestedEnumPronunciationProviderCallStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PronunciationProviderCallStatus | Prisma.EnumPronunciationProviderCallStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.PronunciationProviderCallStatus[] | Prisma.ListEnumPronunciationProviderCallStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PronunciationProviderCallStatus[] | Prisma.ListEnumPronunciationProviderCallStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPronunciationProviderCallStatusWithAggregatesFilter<$PrismaModel> | $Enums.PronunciationProviderCallStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPronunciationProviderCallStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPronunciationProviderCallStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumPronunciationProviderRetryDecisionWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PronunciationProviderRetryDecision | Prisma.EnumPronunciationProviderRetryDecisionFieldRefInput<$PrismaModel>
+  in?: $Enums.PronunciationProviderRetryDecision[] | Prisma.ListEnumPronunciationProviderRetryDecisionFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PronunciationProviderRetryDecision[] | Prisma.ListEnumPronunciationProviderRetryDecisionFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPronunciationProviderRetryDecisionWithAggregatesFilter<$PrismaModel> | $Enums.PronunciationProviderRetryDecision
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPronunciationProviderRetryDecisionFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPronunciationProviderRetryDecisionFilter<$PrismaModel>
+}
+
+export type NestedEnumPronunciationAssessmentStatusNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.PronunciationAssessmentStatus | Prisma.EnumPronunciationAssessmentStatusFieldRefInput<$PrismaModel> | null
+  in?: $Enums.PronunciationAssessmentStatus[] | Prisma.ListEnumPronunciationAssessmentStatusFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.PronunciationAssessmentStatus[] | Prisma.ListEnumPronunciationAssessmentStatusFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumPronunciationAssessmentStatusNullableFilter<$PrismaModel> | $Enums.PronunciationAssessmentStatus | null
+}
+
+export type NestedEnumPronunciationAssessmentStatusNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PronunciationAssessmentStatus | Prisma.EnumPronunciationAssessmentStatusFieldRefInput<$PrismaModel> | null
+  in?: $Enums.PronunciationAssessmentStatus[] | Prisma.ListEnumPronunciationAssessmentStatusFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.PronunciationAssessmentStatus[] | Prisma.ListEnumPronunciationAssessmentStatusFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumPronunciationAssessmentStatusNullableWithAggregatesFilter<$PrismaModel> | $Enums.PronunciationAssessmentStatus | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPronunciationAssessmentStatusNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPronunciationAssessmentStatusNullableFilter<$PrismaModel>
+}
+
+export type NestedEnumPronunciationTraceStepNameFilter<$PrismaModel = never> = {
+  equals?: $Enums.PronunciationTraceStepName | Prisma.EnumPronunciationTraceStepNameFieldRefInput<$PrismaModel>
+  in?: $Enums.PronunciationTraceStepName[] | Prisma.ListEnumPronunciationTraceStepNameFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PronunciationTraceStepName[] | Prisma.ListEnumPronunciationTraceStepNameFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPronunciationTraceStepNameFilter<$PrismaModel> | $Enums.PronunciationTraceStepName
+}
+
+export type NestedEnumPronunciationTraceStepStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.PronunciationTraceStepStatus | Prisma.EnumPronunciationTraceStepStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.PronunciationTraceStepStatus[] | Prisma.ListEnumPronunciationTraceStepStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PronunciationTraceStepStatus[] | Prisma.ListEnumPronunciationTraceStepStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPronunciationTraceStepStatusFilter<$PrismaModel> | $Enums.PronunciationTraceStepStatus
+}
+
+export type NestedEnumPronunciationTraceStepNameWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PronunciationTraceStepName | Prisma.EnumPronunciationTraceStepNameFieldRefInput<$PrismaModel>
+  in?: $Enums.PronunciationTraceStepName[] | Prisma.ListEnumPronunciationTraceStepNameFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PronunciationTraceStepName[] | Prisma.ListEnumPronunciationTraceStepNameFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPronunciationTraceStepNameWithAggregatesFilter<$PrismaModel> | $Enums.PronunciationTraceStepName
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPronunciationTraceStepNameFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPronunciationTraceStepNameFilter<$PrismaModel>
+}
+
+export type NestedEnumPronunciationTraceStepStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PronunciationTraceStepStatus | Prisma.EnumPronunciationTraceStepStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.PronunciationTraceStepStatus[] | Prisma.ListEnumPronunciationTraceStepStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PronunciationTraceStepStatus[] | Prisma.ListEnumPronunciationTraceStepStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPronunciationTraceStepStatusWithAggregatesFilter<$PrismaModel> | $Enums.PronunciationTraceStepStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPronunciationTraceStepStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPronunciationTraceStepStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumPronunciationDeletionScopeFilter<$PrismaModel = never> = {
+  equals?: $Enums.PronunciationDeletionScope | Prisma.EnumPronunciationDeletionScopeFieldRefInput<$PrismaModel>
+  in?: $Enums.PronunciationDeletionScope[] | Prisma.ListEnumPronunciationDeletionScopeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PronunciationDeletionScope[] | Prisma.ListEnumPronunciationDeletionScopeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPronunciationDeletionScopeFilter<$PrismaModel> | $Enums.PronunciationDeletionScope
+}
+
+export type NestedEnumPronunciationDeletionStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.PronunciationDeletionStatus | Prisma.EnumPronunciationDeletionStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.PronunciationDeletionStatus[] | Prisma.ListEnumPronunciationDeletionStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PronunciationDeletionStatus[] | Prisma.ListEnumPronunciationDeletionStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPronunciationDeletionStatusFilter<$PrismaModel> | $Enums.PronunciationDeletionStatus
+}
+
+export type NestedEnumPronunciationDeletionScopeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PronunciationDeletionScope | Prisma.EnumPronunciationDeletionScopeFieldRefInput<$PrismaModel>
+  in?: $Enums.PronunciationDeletionScope[] | Prisma.ListEnumPronunciationDeletionScopeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PronunciationDeletionScope[] | Prisma.ListEnumPronunciationDeletionScopeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPronunciationDeletionScopeWithAggregatesFilter<$PrismaModel> | $Enums.PronunciationDeletionScope
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPronunciationDeletionScopeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPronunciationDeletionScopeFilter<$PrismaModel>
+}
+
+export type NestedEnumPronunciationDeletionStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PronunciationDeletionStatus | Prisma.EnumPronunciationDeletionStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.PronunciationDeletionStatus[] | Prisma.ListEnumPronunciationDeletionStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PronunciationDeletionStatus[] | Prisma.ListEnumPronunciationDeletionStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPronunciationDeletionStatusWithAggregatesFilter<$PrismaModel> | $Enums.PronunciationDeletionStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPronunciationDeletionStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPronunciationDeletionStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumLearningStateRecalculationStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.LearningStateRecalculationStatus | Prisma.EnumLearningStateRecalculationStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.LearningStateRecalculationStatus[] | Prisma.ListEnumLearningStateRecalculationStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.LearningStateRecalculationStatus[] | Prisma.ListEnumLearningStateRecalculationStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumLearningStateRecalculationStatusFilter<$PrismaModel> | $Enums.LearningStateRecalculationStatus
+}
+
+export type NestedEnumLearningStateRecalculationStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.LearningStateRecalculationStatus | Prisma.EnumLearningStateRecalculationStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.LearningStateRecalculationStatus[] | Prisma.ListEnumLearningStateRecalculationStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.LearningStateRecalculationStatus[] | Prisma.ListEnumLearningStateRecalculationStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumLearningStateRecalculationStatusWithAggregatesFilter<$PrismaModel> | $Enums.LearningStateRecalculationStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumLearningStateRecalculationStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumLearningStateRecalculationStatusFilter<$PrismaModel>
 }
 
 export type NestedEnumCoachResponseTypeNullableFilter<$PrismaModel = never> = {

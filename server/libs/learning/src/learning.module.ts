@@ -53,6 +53,33 @@ import {
 import { PrismaKnowledgeVectorRepository } from './knowledge/retrieval/vector.repository';
 import { PrismaCitationRepository } from './knowledge/citations/citation.repository';
 import { CitationProjectionService } from './knowledge/citations/citation-projection.service';
+import {
+  PrismaPronunciationTargetRepository,
+  PronunciationTargetService,
+} from './pronunciation/pronunciation-target.service';
+import {
+  PRONUNCIATION_SOURCE_RIGHTS_REPOSITORY,
+  PronunciationSourceRightsService,
+  UnavailablePronunciationSourceRightsRepository,
+} from './pronunciation/pronunciation-source-rights.service';
+import {
+  NoopPronunciationLearningTraceSink,
+  PrismaPronunciationLearningStateReader,
+  PronunciationLearningShadowService,
+} from './pronunciation/pronunciation-learning-shadow.service';
+import {
+  PrismaPronunciationLearningRepository,
+  PronunciationLearningService,
+} from './pronunciation/pronunciation-learning.service';
+import {
+  PrismaPronunciationContextRepository,
+  PronunciationContextService,
+} from './pronunciation/pronunciation-context.service';
+import {
+  PrismaPronunciationLearningDeletionRepository,
+  PronunciationLearningDeletionService,
+} from './pronunciation/pronunciation-deletion.service';
+import { PrismaPronunciationSummaryInvalidation } from './knowledge/summaries/private-learning-summary.service';
 
 @Module({
   imports: [PrismaModule],
@@ -180,6 +207,69 @@ import { CitationProjectionService } from './knowledge/citations/citation-projec
       useFactory: (repository: PrismaCitationRepository) =>
         new CitationProjectionService(repository),
     },
+    PrismaPronunciationTargetRepository,
+    {
+      provide: PronunciationTargetService,
+      inject: [PrismaPronunciationTargetRepository],
+      useFactory: (repository: PrismaPronunciationTargetRepository) =>
+        new PronunciationTargetService(repository),
+    },
+    UnavailablePronunciationSourceRightsRepository,
+    {
+      provide: PRONUNCIATION_SOURCE_RIGHTS_REPOSITORY,
+      useExisting: UnavailablePronunciationSourceRightsRepository,
+    },
+    {
+      provide: PronunciationSourceRightsService,
+      inject: [PRONUNCIATION_SOURCE_RIGHTS_REPOSITORY],
+      useFactory: (repository: UnavailablePronunciationSourceRightsRepository) =>
+        new PronunciationSourceRightsService(repository, false),
+    },
+    PrismaPronunciationLearningStateReader,
+    NoopPronunciationLearningTraceSink,
+    {
+      provide: PronunciationLearningShadowService,
+      inject: [
+        PrismaPronunciationLearningStateReader,
+        NoopPronunciationLearningTraceSink,
+      ],
+      useFactory: (
+        states: PrismaPronunciationLearningStateReader,
+        trace: NoopPronunciationLearningTraceSink,
+      ) => new PronunciationLearningShadowService(states, trace),
+    },
+    PrismaPronunciationLearningRepository,
+    {
+      provide: PronunciationLearningService,
+      inject: [PrismaPronunciationLearningRepository],
+      useFactory: (repository: PrismaPronunciationLearningRepository) =>
+        new PronunciationLearningService(repository),
+    },
+    PrismaPronunciationContextRepository,
+    {
+      provide: PronunciationContextService,
+      inject: [
+        PrismaPronunciationContextRepository,
+        PronunciationSourceRightsService,
+      ],
+      useFactory: (
+        repository: PrismaPronunciationContextRepository,
+        sourceRights: PronunciationSourceRightsService,
+      ) => new PronunciationContextService(repository, sourceRights),
+    },
+    PrismaPronunciationLearningDeletionRepository,
+    PrismaPronunciationSummaryInvalidation,
+    {
+      provide: PronunciationLearningDeletionService,
+      inject: [
+        PrismaPronunciationLearningDeletionRepository,
+        PrismaPronunciationSummaryInvalidation,
+      ],
+      useFactory: (
+        repository: PrismaPronunciationLearningDeletionRepository,
+        invalidation: PrismaPronunciationSummaryInvalidation,
+      ) => new PronunciationLearningDeletionService(repository, invalidation),
+    },
   ],
   exports: [
     OwnedResourceService,
@@ -198,6 +288,12 @@ import { CitationProjectionService } from './knowledge/citations/citation-projec
     PrismaKnowledgeVectorRepository,
     PrismaCitationRepository,
     CitationProjectionService,
+    PronunciationTargetService,
+    PronunciationSourceRightsService,
+    PronunciationLearningShadowService,
+    PronunciationLearningService,
+    PronunciationContextService,
+    PronunciationLearningDeletionService,
   ],
 })
 export class LearningModule {}

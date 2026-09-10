@@ -322,6 +322,8 @@ export type WordBookWhereInput = {
   learningItemStates?: Prisma.LearningItemStateListRelationFilter
   exerciseItemTargets?: Prisma.ExerciseItemTargetListRelationFilter
   knowledgeDocuments?: Prisma.KnowledgeDocumentListRelationFilter
+  pronunciationTargets?: Prisma.PronunciationTargetListRelationFilter
+  pronunciationWordAssessments?: Prisma.PronunciationWordAssessmentListRelationFilter
 }
 
 export type WordBookOrderByWithRelationInput = {
@@ -351,6 +353,8 @@ export type WordBookOrderByWithRelationInput = {
   learningItemStates?: Prisma.LearningItemStateOrderByRelationAggregateInput
   exerciseItemTargets?: Prisma.ExerciseItemTargetOrderByRelationAggregateInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentOrderByRelationAggregateInput
+  pronunciationTargets?: Prisma.PronunciationTargetOrderByRelationAggregateInput
+  pronunciationWordAssessments?: Prisma.PronunciationWordAssessmentOrderByRelationAggregateInput
 }
 
 export type WordBookWhereUniqueInput = Prisma.AtLeast<{
@@ -383,6 +387,8 @@ export type WordBookWhereUniqueInput = Prisma.AtLeast<{
   learningItemStates?: Prisma.LearningItemStateListRelationFilter
   exerciseItemTargets?: Prisma.ExerciseItemTargetListRelationFilter
   knowledgeDocuments?: Prisma.KnowledgeDocumentListRelationFilter
+  pronunciationTargets?: Prisma.PronunciationTargetListRelationFilter
+  pronunciationWordAssessments?: Prisma.PronunciationWordAssessmentListRelationFilter
 }, "id">
 
 export type WordBookOrderByWithAggregationInput = {
@@ -468,6 +474,8 @@ export type WordBookCreateInput = {
   learningItemStates?: Prisma.LearningItemStateCreateNestedManyWithoutWordInput
   exerciseItemTargets?: Prisma.ExerciseItemTargetCreateNestedManyWithoutWordInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentCreateNestedManyWithoutWordInput
+  pronunciationTargets?: Prisma.PronunciationTargetCreateNestedManyWithoutWordInput
+  pronunciationWordAssessments?: Prisma.PronunciationWordAssessmentCreateNestedManyWithoutWordRecordInput
 }
 
 export type WordBookUncheckedCreateInput = {
@@ -497,6 +505,8 @@ export type WordBookUncheckedCreateInput = {
   learningItemStates?: Prisma.LearningItemStateUncheckedCreateNestedManyWithoutWordInput
   exerciseItemTargets?: Prisma.ExerciseItemTargetUncheckedCreateNestedManyWithoutWordInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentUncheckedCreateNestedManyWithoutWordInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedCreateNestedManyWithoutWordInput
+  pronunciationWordAssessments?: Prisma.PronunciationWordAssessmentUncheckedCreateNestedManyWithoutWordRecordInput
 }
 
 export type WordBookUpdateInput = {
@@ -526,6 +536,8 @@ export type WordBookUpdateInput = {
   learningItemStates?: Prisma.LearningItemStateUpdateManyWithoutWordNestedInput
   exerciseItemTargets?: Prisma.ExerciseItemTargetUpdateManyWithoutWordNestedInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentUpdateManyWithoutWordNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUpdateManyWithoutWordNestedInput
+  pronunciationWordAssessments?: Prisma.PronunciationWordAssessmentUpdateManyWithoutWordRecordNestedInput
 }
 
 export type WordBookUncheckedUpdateInput = {
@@ -555,6 +567,8 @@ export type WordBookUncheckedUpdateInput = {
   learningItemStates?: Prisma.LearningItemStateUncheckedUpdateManyWithoutWordNestedInput
   exerciseItemTargets?: Prisma.ExerciseItemTargetUncheckedUpdateManyWithoutWordNestedInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentUncheckedUpdateManyWithoutWordNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedUpdateManyWithoutWordNestedInput
+  pronunciationWordAssessments?: Prisma.PronunciationWordAssessmentUncheckedUpdateManyWithoutWordRecordNestedInput
 }
 
 export type WordBookCreateManyInput = {
@@ -767,6 +781,38 @@ export type WordBookUpdateOneWithoutExerciseItemTargetsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.WordBookUpdateToOneWithWhereWithoutExerciseItemTargetsInput, Prisma.WordBookUpdateWithoutExerciseItemTargetsInput>, Prisma.WordBookUncheckedUpdateWithoutExerciseItemTargetsInput>
 }
 
+export type WordBookCreateNestedOneWithoutPronunciationTargetsInput = {
+  create?: Prisma.XOR<Prisma.WordBookCreateWithoutPronunciationTargetsInput, Prisma.WordBookUncheckedCreateWithoutPronunciationTargetsInput>
+  connectOrCreate?: Prisma.WordBookCreateOrConnectWithoutPronunciationTargetsInput
+  connect?: Prisma.WordBookWhereUniqueInput
+}
+
+export type WordBookUpdateOneWithoutPronunciationTargetsNestedInput = {
+  create?: Prisma.XOR<Prisma.WordBookCreateWithoutPronunciationTargetsInput, Prisma.WordBookUncheckedCreateWithoutPronunciationTargetsInput>
+  connectOrCreate?: Prisma.WordBookCreateOrConnectWithoutPronunciationTargetsInput
+  upsert?: Prisma.WordBookUpsertWithoutPronunciationTargetsInput
+  disconnect?: Prisma.WordBookWhereInput | boolean
+  delete?: Prisma.WordBookWhereInput | boolean
+  connect?: Prisma.WordBookWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.WordBookUpdateToOneWithWhereWithoutPronunciationTargetsInput, Prisma.WordBookUpdateWithoutPronunciationTargetsInput>, Prisma.WordBookUncheckedUpdateWithoutPronunciationTargetsInput>
+}
+
+export type WordBookCreateNestedOneWithoutPronunciationWordAssessmentsInput = {
+  create?: Prisma.XOR<Prisma.WordBookCreateWithoutPronunciationWordAssessmentsInput, Prisma.WordBookUncheckedCreateWithoutPronunciationWordAssessmentsInput>
+  connectOrCreate?: Prisma.WordBookCreateOrConnectWithoutPronunciationWordAssessmentsInput
+  connect?: Prisma.WordBookWhereUniqueInput
+}
+
+export type WordBookUpdateOneWithoutPronunciationWordAssessmentsNestedInput = {
+  create?: Prisma.XOR<Prisma.WordBookCreateWithoutPronunciationWordAssessmentsInput, Prisma.WordBookUncheckedCreateWithoutPronunciationWordAssessmentsInput>
+  connectOrCreate?: Prisma.WordBookCreateOrConnectWithoutPronunciationWordAssessmentsInput
+  upsert?: Prisma.WordBookUpsertWithoutPronunciationWordAssessmentsInput
+  disconnect?: Prisma.WordBookWhereInput | boolean
+  delete?: Prisma.WordBookWhereInput | boolean
+  connect?: Prisma.WordBookWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.WordBookUpdateToOneWithWhereWithoutPronunciationWordAssessmentsInput, Prisma.WordBookUpdateWithoutPronunciationWordAssessmentsInput>, Prisma.WordBookUncheckedUpdateWithoutPronunciationWordAssessmentsInput>
+}
+
 export type WordBookCreateNestedOneWithoutKnowledgeDocumentsInput = {
   create?: Prisma.XOR<Prisma.WordBookCreateWithoutKnowledgeDocumentsInput, Prisma.WordBookUncheckedCreateWithoutKnowledgeDocumentsInput>
   connectOrCreate?: Prisma.WordBookCreateOrConnectWithoutKnowledgeDocumentsInput
@@ -809,6 +855,8 @@ export type WordBookCreateWithoutWordBookRecordsInput = {
   learningItemStates?: Prisma.LearningItemStateCreateNestedManyWithoutWordInput
   exerciseItemTargets?: Prisma.ExerciseItemTargetCreateNestedManyWithoutWordInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentCreateNestedManyWithoutWordInput
+  pronunciationTargets?: Prisma.PronunciationTargetCreateNestedManyWithoutWordInput
+  pronunciationWordAssessments?: Prisma.PronunciationWordAssessmentCreateNestedManyWithoutWordRecordInput
 }
 
 export type WordBookUncheckedCreateWithoutWordBookRecordsInput = {
@@ -837,6 +885,8 @@ export type WordBookUncheckedCreateWithoutWordBookRecordsInput = {
   learningItemStates?: Prisma.LearningItemStateUncheckedCreateNestedManyWithoutWordInput
   exerciseItemTargets?: Prisma.ExerciseItemTargetUncheckedCreateNestedManyWithoutWordInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentUncheckedCreateNestedManyWithoutWordInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedCreateNestedManyWithoutWordInput
+  pronunciationWordAssessments?: Prisma.PronunciationWordAssessmentUncheckedCreateNestedManyWithoutWordRecordInput
 }
 
 export type WordBookCreateOrConnectWithoutWordBookRecordsInput = {
@@ -881,6 +931,8 @@ export type WordBookUpdateWithoutWordBookRecordsInput = {
   learningItemStates?: Prisma.LearningItemStateUpdateManyWithoutWordNestedInput
   exerciseItemTargets?: Prisma.ExerciseItemTargetUpdateManyWithoutWordNestedInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentUpdateManyWithoutWordNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUpdateManyWithoutWordNestedInput
+  pronunciationWordAssessments?: Prisma.PronunciationWordAssessmentUpdateManyWithoutWordRecordNestedInput
 }
 
 export type WordBookUncheckedUpdateWithoutWordBookRecordsInput = {
@@ -909,6 +961,8 @@ export type WordBookUncheckedUpdateWithoutWordBookRecordsInput = {
   learningItemStates?: Prisma.LearningItemStateUncheckedUpdateManyWithoutWordNestedInput
   exerciseItemTargets?: Prisma.ExerciseItemTargetUncheckedUpdateManyWithoutWordNestedInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentUncheckedUpdateManyWithoutWordNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedUpdateManyWithoutWordNestedInput
+  pronunciationWordAssessments?: Prisma.PronunciationWordAssessmentUncheckedUpdateManyWithoutWordRecordNestedInput
 }
 
 export type WordBookCreateWithoutLearningItemStatesInput = {
@@ -937,6 +991,8 @@ export type WordBookCreateWithoutLearningItemStatesInput = {
   wordBookRecords?: Prisma.WordBookRecordCreateNestedManyWithoutWordInput
   exerciseItemTargets?: Prisma.ExerciseItemTargetCreateNestedManyWithoutWordInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentCreateNestedManyWithoutWordInput
+  pronunciationTargets?: Prisma.PronunciationTargetCreateNestedManyWithoutWordInput
+  pronunciationWordAssessments?: Prisma.PronunciationWordAssessmentCreateNestedManyWithoutWordRecordInput
 }
 
 export type WordBookUncheckedCreateWithoutLearningItemStatesInput = {
@@ -965,6 +1021,8 @@ export type WordBookUncheckedCreateWithoutLearningItemStatesInput = {
   wordBookRecords?: Prisma.WordBookRecordUncheckedCreateNestedManyWithoutWordInput
   exerciseItemTargets?: Prisma.ExerciseItemTargetUncheckedCreateNestedManyWithoutWordInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentUncheckedCreateNestedManyWithoutWordInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedCreateNestedManyWithoutWordInput
+  pronunciationWordAssessments?: Prisma.PronunciationWordAssessmentUncheckedCreateNestedManyWithoutWordRecordInput
 }
 
 export type WordBookCreateOrConnectWithoutLearningItemStatesInput = {
@@ -1009,6 +1067,8 @@ export type WordBookUpdateWithoutLearningItemStatesInput = {
   wordBookRecords?: Prisma.WordBookRecordUpdateManyWithoutWordNestedInput
   exerciseItemTargets?: Prisma.ExerciseItemTargetUpdateManyWithoutWordNestedInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentUpdateManyWithoutWordNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUpdateManyWithoutWordNestedInput
+  pronunciationWordAssessments?: Prisma.PronunciationWordAssessmentUpdateManyWithoutWordRecordNestedInput
 }
 
 export type WordBookUncheckedUpdateWithoutLearningItemStatesInput = {
@@ -1037,6 +1097,8 @@ export type WordBookUncheckedUpdateWithoutLearningItemStatesInput = {
   wordBookRecords?: Prisma.WordBookRecordUncheckedUpdateManyWithoutWordNestedInput
   exerciseItemTargets?: Prisma.ExerciseItemTargetUncheckedUpdateManyWithoutWordNestedInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentUncheckedUpdateManyWithoutWordNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedUpdateManyWithoutWordNestedInput
+  pronunciationWordAssessments?: Prisma.PronunciationWordAssessmentUncheckedUpdateManyWithoutWordRecordNestedInput
 }
 
 export type WordBookCreateWithoutExerciseItemTargetsInput = {
@@ -1065,6 +1127,8 @@ export type WordBookCreateWithoutExerciseItemTargetsInput = {
   wordBookRecords?: Prisma.WordBookRecordCreateNestedManyWithoutWordInput
   learningItemStates?: Prisma.LearningItemStateCreateNestedManyWithoutWordInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentCreateNestedManyWithoutWordInput
+  pronunciationTargets?: Prisma.PronunciationTargetCreateNestedManyWithoutWordInput
+  pronunciationWordAssessments?: Prisma.PronunciationWordAssessmentCreateNestedManyWithoutWordRecordInput
 }
 
 export type WordBookUncheckedCreateWithoutExerciseItemTargetsInput = {
@@ -1093,6 +1157,8 @@ export type WordBookUncheckedCreateWithoutExerciseItemTargetsInput = {
   wordBookRecords?: Prisma.WordBookRecordUncheckedCreateNestedManyWithoutWordInput
   learningItemStates?: Prisma.LearningItemStateUncheckedCreateNestedManyWithoutWordInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentUncheckedCreateNestedManyWithoutWordInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedCreateNestedManyWithoutWordInput
+  pronunciationWordAssessments?: Prisma.PronunciationWordAssessmentUncheckedCreateNestedManyWithoutWordRecordInput
 }
 
 export type WordBookCreateOrConnectWithoutExerciseItemTargetsInput = {
@@ -1137,6 +1203,8 @@ export type WordBookUpdateWithoutExerciseItemTargetsInput = {
   wordBookRecords?: Prisma.WordBookRecordUpdateManyWithoutWordNestedInput
   learningItemStates?: Prisma.LearningItemStateUpdateManyWithoutWordNestedInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentUpdateManyWithoutWordNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUpdateManyWithoutWordNestedInput
+  pronunciationWordAssessments?: Prisma.PronunciationWordAssessmentUpdateManyWithoutWordRecordNestedInput
 }
 
 export type WordBookUncheckedUpdateWithoutExerciseItemTargetsInput = {
@@ -1165,6 +1233,280 @@ export type WordBookUncheckedUpdateWithoutExerciseItemTargetsInput = {
   wordBookRecords?: Prisma.WordBookRecordUncheckedUpdateManyWithoutWordNestedInput
   learningItemStates?: Prisma.LearningItemStateUncheckedUpdateManyWithoutWordNestedInput
   knowledgeDocuments?: Prisma.KnowledgeDocumentUncheckedUpdateManyWithoutWordNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedUpdateManyWithoutWordNestedInput
+  pronunciationWordAssessments?: Prisma.PronunciationWordAssessmentUncheckedUpdateManyWithoutWordRecordNestedInput
+}
+
+export type WordBookCreateWithoutPronunciationTargetsInput = {
+  id?: string
+  word: string
+  phonetic?: string | null
+  definition?: string | null
+  translation?: string | null
+  pos?: string | null
+  collins?: string | null
+  oxford?: string | null
+  tag?: string | null
+  bnc?: string | null
+  frq?: string | null
+  exchange?: string | null
+  gk?: boolean | null
+  zk?: boolean | null
+  gre?: boolean | null
+  toefl?: boolean | null
+  ielts?: boolean | null
+  cet6?: boolean | null
+  cet4?: boolean | null
+  ky?: boolean | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  wordBookRecords?: Prisma.WordBookRecordCreateNestedManyWithoutWordInput
+  learningItemStates?: Prisma.LearningItemStateCreateNestedManyWithoutWordInput
+  exerciseItemTargets?: Prisma.ExerciseItemTargetCreateNestedManyWithoutWordInput
+  knowledgeDocuments?: Prisma.KnowledgeDocumentCreateNestedManyWithoutWordInput
+  pronunciationWordAssessments?: Prisma.PronunciationWordAssessmentCreateNestedManyWithoutWordRecordInput
+}
+
+export type WordBookUncheckedCreateWithoutPronunciationTargetsInput = {
+  id?: string
+  word: string
+  phonetic?: string | null
+  definition?: string | null
+  translation?: string | null
+  pos?: string | null
+  collins?: string | null
+  oxford?: string | null
+  tag?: string | null
+  bnc?: string | null
+  frq?: string | null
+  exchange?: string | null
+  gk?: boolean | null
+  zk?: boolean | null
+  gre?: boolean | null
+  toefl?: boolean | null
+  ielts?: boolean | null
+  cet6?: boolean | null
+  cet4?: boolean | null
+  ky?: boolean | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  wordBookRecords?: Prisma.WordBookRecordUncheckedCreateNestedManyWithoutWordInput
+  learningItemStates?: Prisma.LearningItemStateUncheckedCreateNestedManyWithoutWordInput
+  exerciseItemTargets?: Prisma.ExerciseItemTargetUncheckedCreateNestedManyWithoutWordInput
+  knowledgeDocuments?: Prisma.KnowledgeDocumentUncheckedCreateNestedManyWithoutWordInput
+  pronunciationWordAssessments?: Prisma.PronunciationWordAssessmentUncheckedCreateNestedManyWithoutWordRecordInput
+}
+
+export type WordBookCreateOrConnectWithoutPronunciationTargetsInput = {
+  where: Prisma.WordBookWhereUniqueInput
+  create: Prisma.XOR<Prisma.WordBookCreateWithoutPronunciationTargetsInput, Prisma.WordBookUncheckedCreateWithoutPronunciationTargetsInput>
+}
+
+export type WordBookUpsertWithoutPronunciationTargetsInput = {
+  update: Prisma.XOR<Prisma.WordBookUpdateWithoutPronunciationTargetsInput, Prisma.WordBookUncheckedUpdateWithoutPronunciationTargetsInput>
+  create: Prisma.XOR<Prisma.WordBookCreateWithoutPronunciationTargetsInput, Prisma.WordBookUncheckedCreateWithoutPronunciationTargetsInput>
+  where?: Prisma.WordBookWhereInput
+}
+
+export type WordBookUpdateToOneWithWhereWithoutPronunciationTargetsInput = {
+  where?: Prisma.WordBookWhereInput
+  data: Prisma.XOR<Prisma.WordBookUpdateWithoutPronunciationTargetsInput, Prisma.WordBookUncheckedUpdateWithoutPronunciationTargetsInput>
+}
+
+export type WordBookUpdateWithoutPronunciationTargetsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  word?: Prisma.StringFieldUpdateOperationsInput | string
+  phonetic?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  definition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  translation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pos?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  collins?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  oxford?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bnc?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  frq?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exchange?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gk?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  zk?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  gre?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  toefl?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  ielts?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  cet6?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  cet4?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  ky?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  wordBookRecords?: Prisma.WordBookRecordUpdateManyWithoutWordNestedInput
+  learningItemStates?: Prisma.LearningItemStateUpdateManyWithoutWordNestedInput
+  exerciseItemTargets?: Prisma.ExerciseItemTargetUpdateManyWithoutWordNestedInput
+  knowledgeDocuments?: Prisma.KnowledgeDocumentUpdateManyWithoutWordNestedInput
+  pronunciationWordAssessments?: Prisma.PronunciationWordAssessmentUpdateManyWithoutWordRecordNestedInput
+}
+
+export type WordBookUncheckedUpdateWithoutPronunciationTargetsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  word?: Prisma.StringFieldUpdateOperationsInput | string
+  phonetic?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  definition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  translation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pos?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  collins?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  oxford?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bnc?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  frq?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exchange?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gk?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  zk?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  gre?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  toefl?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  ielts?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  cet6?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  cet4?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  ky?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  wordBookRecords?: Prisma.WordBookRecordUncheckedUpdateManyWithoutWordNestedInput
+  learningItemStates?: Prisma.LearningItemStateUncheckedUpdateManyWithoutWordNestedInput
+  exerciseItemTargets?: Prisma.ExerciseItemTargetUncheckedUpdateManyWithoutWordNestedInput
+  knowledgeDocuments?: Prisma.KnowledgeDocumentUncheckedUpdateManyWithoutWordNestedInput
+  pronunciationWordAssessments?: Prisma.PronunciationWordAssessmentUncheckedUpdateManyWithoutWordRecordNestedInput
+}
+
+export type WordBookCreateWithoutPronunciationWordAssessmentsInput = {
+  id?: string
+  word: string
+  phonetic?: string | null
+  definition?: string | null
+  translation?: string | null
+  pos?: string | null
+  collins?: string | null
+  oxford?: string | null
+  tag?: string | null
+  bnc?: string | null
+  frq?: string | null
+  exchange?: string | null
+  gk?: boolean | null
+  zk?: boolean | null
+  gre?: boolean | null
+  toefl?: boolean | null
+  ielts?: boolean | null
+  cet6?: boolean | null
+  cet4?: boolean | null
+  ky?: boolean | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  wordBookRecords?: Prisma.WordBookRecordCreateNestedManyWithoutWordInput
+  learningItemStates?: Prisma.LearningItemStateCreateNestedManyWithoutWordInput
+  exerciseItemTargets?: Prisma.ExerciseItemTargetCreateNestedManyWithoutWordInput
+  knowledgeDocuments?: Prisma.KnowledgeDocumentCreateNestedManyWithoutWordInput
+  pronunciationTargets?: Prisma.PronunciationTargetCreateNestedManyWithoutWordInput
+}
+
+export type WordBookUncheckedCreateWithoutPronunciationWordAssessmentsInput = {
+  id?: string
+  word: string
+  phonetic?: string | null
+  definition?: string | null
+  translation?: string | null
+  pos?: string | null
+  collins?: string | null
+  oxford?: string | null
+  tag?: string | null
+  bnc?: string | null
+  frq?: string | null
+  exchange?: string | null
+  gk?: boolean | null
+  zk?: boolean | null
+  gre?: boolean | null
+  toefl?: boolean | null
+  ielts?: boolean | null
+  cet6?: boolean | null
+  cet4?: boolean | null
+  ky?: boolean | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  wordBookRecords?: Prisma.WordBookRecordUncheckedCreateNestedManyWithoutWordInput
+  learningItemStates?: Prisma.LearningItemStateUncheckedCreateNestedManyWithoutWordInput
+  exerciseItemTargets?: Prisma.ExerciseItemTargetUncheckedCreateNestedManyWithoutWordInput
+  knowledgeDocuments?: Prisma.KnowledgeDocumentUncheckedCreateNestedManyWithoutWordInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedCreateNestedManyWithoutWordInput
+}
+
+export type WordBookCreateOrConnectWithoutPronunciationWordAssessmentsInput = {
+  where: Prisma.WordBookWhereUniqueInput
+  create: Prisma.XOR<Prisma.WordBookCreateWithoutPronunciationWordAssessmentsInput, Prisma.WordBookUncheckedCreateWithoutPronunciationWordAssessmentsInput>
+}
+
+export type WordBookUpsertWithoutPronunciationWordAssessmentsInput = {
+  update: Prisma.XOR<Prisma.WordBookUpdateWithoutPronunciationWordAssessmentsInput, Prisma.WordBookUncheckedUpdateWithoutPronunciationWordAssessmentsInput>
+  create: Prisma.XOR<Prisma.WordBookCreateWithoutPronunciationWordAssessmentsInput, Prisma.WordBookUncheckedCreateWithoutPronunciationWordAssessmentsInput>
+  where?: Prisma.WordBookWhereInput
+}
+
+export type WordBookUpdateToOneWithWhereWithoutPronunciationWordAssessmentsInput = {
+  where?: Prisma.WordBookWhereInput
+  data: Prisma.XOR<Prisma.WordBookUpdateWithoutPronunciationWordAssessmentsInput, Prisma.WordBookUncheckedUpdateWithoutPronunciationWordAssessmentsInput>
+}
+
+export type WordBookUpdateWithoutPronunciationWordAssessmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  word?: Prisma.StringFieldUpdateOperationsInput | string
+  phonetic?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  definition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  translation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pos?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  collins?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  oxford?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bnc?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  frq?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exchange?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gk?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  zk?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  gre?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  toefl?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  ielts?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  cet6?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  cet4?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  ky?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  wordBookRecords?: Prisma.WordBookRecordUpdateManyWithoutWordNestedInput
+  learningItemStates?: Prisma.LearningItemStateUpdateManyWithoutWordNestedInput
+  exerciseItemTargets?: Prisma.ExerciseItemTargetUpdateManyWithoutWordNestedInput
+  knowledgeDocuments?: Prisma.KnowledgeDocumentUpdateManyWithoutWordNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUpdateManyWithoutWordNestedInput
+}
+
+export type WordBookUncheckedUpdateWithoutPronunciationWordAssessmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  word?: Prisma.StringFieldUpdateOperationsInput | string
+  phonetic?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  definition?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  translation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pos?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  collins?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  oxford?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bnc?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  frq?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exchange?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gk?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  zk?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  gre?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  toefl?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  ielts?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  cet6?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  cet4?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  ky?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  wordBookRecords?: Prisma.WordBookRecordUncheckedUpdateManyWithoutWordNestedInput
+  learningItemStates?: Prisma.LearningItemStateUncheckedUpdateManyWithoutWordNestedInput
+  exerciseItemTargets?: Prisma.ExerciseItemTargetUncheckedUpdateManyWithoutWordNestedInput
+  knowledgeDocuments?: Prisma.KnowledgeDocumentUncheckedUpdateManyWithoutWordNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedUpdateManyWithoutWordNestedInput
 }
 
 export type WordBookCreateWithoutKnowledgeDocumentsInput = {
@@ -1193,6 +1535,8 @@ export type WordBookCreateWithoutKnowledgeDocumentsInput = {
   wordBookRecords?: Prisma.WordBookRecordCreateNestedManyWithoutWordInput
   learningItemStates?: Prisma.LearningItemStateCreateNestedManyWithoutWordInput
   exerciseItemTargets?: Prisma.ExerciseItemTargetCreateNestedManyWithoutWordInput
+  pronunciationTargets?: Prisma.PronunciationTargetCreateNestedManyWithoutWordInput
+  pronunciationWordAssessments?: Prisma.PronunciationWordAssessmentCreateNestedManyWithoutWordRecordInput
 }
 
 export type WordBookUncheckedCreateWithoutKnowledgeDocumentsInput = {
@@ -1221,6 +1565,8 @@ export type WordBookUncheckedCreateWithoutKnowledgeDocumentsInput = {
   wordBookRecords?: Prisma.WordBookRecordUncheckedCreateNestedManyWithoutWordInput
   learningItemStates?: Prisma.LearningItemStateUncheckedCreateNestedManyWithoutWordInput
   exerciseItemTargets?: Prisma.ExerciseItemTargetUncheckedCreateNestedManyWithoutWordInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedCreateNestedManyWithoutWordInput
+  pronunciationWordAssessments?: Prisma.PronunciationWordAssessmentUncheckedCreateNestedManyWithoutWordRecordInput
 }
 
 export type WordBookCreateOrConnectWithoutKnowledgeDocumentsInput = {
@@ -1265,6 +1611,8 @@ export type WordBookUpdateWithoutKnowledgeDocumentsInput = {
   wordBookRecords?: Prisma.WordBookRecordUpdateManyWithoutWordNestedInput
   learningItemStates?: Prisma.LearningItemStateUpdateManyWithoutWordNestedInput
   exerciseItemTargets?: Prisma.ExerciseItemTargetUpdateManyWithoutWordNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUpdateManyWithoutWordNestedInput
+  pronunciationWordAssessments?: Prisma.PronunciationWordAssessmentUpdateManyWithoutWordRecordNestedInput
 }
 
 export type WordBookUncheckedUpdateWithoutKnowledgeDocumentsInput = {
@@ -1293,6 +1641,8 @@ export type WordBookUncheckedUpdateWithoutKnowledgeDocumentsInput = {
   wordBookRecords?: Prisma.WordBookRecordUncheckedUpdateManyWithoutWordNestedInput
   learningItemStates?: Prisma.LearningItemStateUncheckedUpdateManyWithoutWordNestedInput
   exerciseItemTargets?: Prisma.ExerciseItemTargetUncheckedUpdateManyWithoutWordNestedInput
+  pronunciationTargets?: Prisma.PronunciationTargetUncheckedUpdateManyWithoutWordNestedInput
+  pronunciationWordAssessments?: Prisma.PronunciationWordAssessmentUncheckedUpdateManyWithoutWordRecordNestedInput
 }
 
 
@@ -1305,6 +1655,8 @@ export type WordBookCountOutputType = {
   learningItemStates: number
   exerciseItemTargets: number
   knowledgeDocuments: number
+  pronunciationTargets: number
+  pronunciationWordAssessments: number
 }
 
 export type WordBookCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1312,6 +1664,8 @@ export type WordBookCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensio
   learningItemStates?: boolean | WordBookCountOutputTypeCountLearningItemStatesArgs
   exerciseItemTargets?: boolean | WordBookCountOutputTypeCountExerciseItemTargetsArgs
   knowledgeDocuments?: boolean | WordBookCountOutputTypeCountKnowledgeDocumentsArgs
+  pronunciationTargets?: boolean | WordBookCountOutputTypeCountPronunciationTargetsArgs
+  pronunciationWordAssessments?: boolean | WordBookCountOutputTypeCountPronunciationWordAssessmentsArgs
 }
 
 /**
@@ -1352,6 +1706,20 @@ export type WordBookCountOutputTypeCountKnowledgeDocumentsArgs<ExtArgs extends r
   where?: Prisma.KnowledgeDocumentWhereInput
 }
 
+/**
+ * WordBookCountOutputType without action
+ */
+export type WordBookCountOutputTypeCountPronunciationTargetsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PronunciationTargetWhereInput
+}
+
+/**
+ * WordBookCountOutputType without action
+ */
+export type WordBookCountOutputTypeCountPronunciationWordAssessmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PronunciationWordAssessmentWhereInput
+}
+
 
 export type WordBookSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1380,6 +1748,8 @@ export type WordBookSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   learningItemStates?: boolean | Prisma.WordBook$learningItemStatesArgs<ExtArgs>
   exerciseItemTargets?: boolean | Prisma.WordBook$exerciseItemTargetsArgs<ExtArgs>
   knowledgeDocuments?: boolean | Prisma.WordBook$knowledgeDocumentsArgs<ExtArgs>
+  pronunciationTargets?: boolean | Prisma.WordBook$pronunciationTargetsArgs<ExtArgs>
+  pronunciationWordAssessments?: boolean | Prisma.WordBook$pronunciationWordAssessmentsArgs<ExtArgs>
   _count?: boolean | Prisma.WordBookCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["wordBook"]>
 
@@ -1464,6 +1834,8 @@ export type WordBookInclude<ExtArgs extends runtime.Types.Extensions.InternalArg
   learningItemStates?: boolean | Prisma.WordBook$learningItemStatesArgs<ExtArgs>
   exerciseItemTargets?: boolean | Prisma.WordBook$exerciseItemTargetsArgs<ExtArgs>
   knowledgeDocuments?: boolean | Prisma.WordBook$knowledgeDocumentsArgs<ExtArgs>
+  pronunciationTargets?: boolean | Prisma.WordBook$pronunciationTargetsArgs<ExtArgs>
+  pronunciationWordAssessments?: boolean | Prisma.WordBook$pronunciationWordAssessmentsArgs<ExtArgs>
   _count?: boolean | Prisma.WordBookCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type WordBookIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1476,6 +1848,8 @@ export type $WordBookPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     learningItemStates: Prisma.$LearningItemStatePayload<ExtArgs>[]
     exerciseItemTargets: Prisma.$ExerciseItemTargetPayload<ExtArgs>[]
     knowledgeDocuments: Prisma.$KnowledgeDocumentPayload<ExtArgs>[]
+    pronunciationTargets: Prisma.$PronunciationTargetPayload<ExtArgs>[]
+    pronunciationWordAssessments: Prisma.$PronunciationWordAssessmentPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1898,6 +2272,8 @@ export interface Prisma__WordBookClient<T, Null = never, ExtArgs extends runtime
   learningItemStates<T extends Prisma.WordBook$learningItemStatesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.WordBook$learningItemStatesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LearningItemStatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   exerciseItemTargets<T extends Prisma.WordBook$exerciseItemTargetsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.WordBook$exerciseItemTargetsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ExerciseItemTargetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   knowledgeDocuments<T extends Prisma.WordBook$knowledgeDocumentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.WordBook$knowledgeDocumentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$KnowledgeDocumentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  pronunciationTargets<T extends Prisma.WordBook$pronunciationTargetsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.WordBook$pronunciationTargetsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PronunciationTargetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  pronunciationWordAssessments<T extends Prisma.WordBook$pronunciationWordAssessmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.WordBook$pronunciationWordAssessmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PronunciationWordAssessmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2435,6 +2811,54 @@ export type WordBook$knowledgeDocumentsArgs<ExtArgs extends runtime.Types.Extens
   take?: number
   skip?: number
   distinct?: Prisma.KnowledgeDocumentScalarFieldEnum | Prisma.KnowledgeDocumentScalarFieldEnum[]
+}
+
+/**
+ * WordBook.pronunciationTargets
+ */
+export type WordBook$pronunciationTargetsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PronunciationTarget
+   */
+  select?: Prisma.PronunciationTargetSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PronunciationTarget
+   */
+  omit?: Prisma.PronunciationTargetOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PronunciationTargetInclude<ExtArgs> | null
+  where?: Prisma.PronunciationTargetWhereInput
+  orderBy?: Prisma.PronunciationTargetOrderByWithRelationInput | Prisma.PronunciationTargetOrderByWithRelationInput[]
+  cursor?: Prisma.PronunciationTargetWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PronunciationTargetScalarFieldEnum | Prisma.PronunciationTargetScalarFieldEnum[]
+}
+
+/**
+ * WordBook.pronunciationWordAssessments
+ */
+export type WordBook$pronunciationWordAssessmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PronunciationWordAssessment
+   */
+  select?: Prisma.PronunciationWordAssessmentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PronunciationWordAssessment
+   */
+  omit?: Prisma.PronunciationWordAssessmentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PronunciationWordAssessmentInclude<ExtArgs> | null
+  where?: Prisma.PronunciationWordAssessmentWhereInput
+  orderBy?: Prisma.PronunciationWordAssessmentOrderByWithRelationInput | Prisma.PronunciationWordAssessmentOrderByWithRelationInput[]
+  cursor?: Prisma.PronunciationWordAssessmentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PronunciationWordAssessmentScalarFieldEnum | Prisma.PronunciationWordAssessmentScalarFieldEnum[]
 }
 
 /**

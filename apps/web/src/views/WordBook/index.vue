@@ -43,6 +43,12 @@
                         <el-tag v-if="item.cet4" type="primary" size="small">四级</el-tag>
                         <el-tag v-if="item.ky" type="primary" size="small">考研</el-tag>
                     </div>
+                    <PronunciationEntry
+                        class="mt-3"
+                        compact
+                        :enabled="pronunciationCaptureEnabled"
+                        :target="{ sourceType: 'WORD_BOOK', wordId: item.id }"
+                    />
                 </div>
             </div>
             <el-pagination class="mt-10" background v-model:current-page="query.page" v-model:page-size="query.pageSize"
@@ -56,6 +62,12 @@ import { onMounted,ref  } from 'vue'
 import { Reading, VideoPlay } from '@element-plus/icons-vue'
 import type { WordQuery, WordList } from '@en/common/word'
 import { useAudio } from '@/hooks/useAudio'
+import PronunciationEntry from '@/components/Pronunciation/PronunciationEntry.vue'
+import { pronunciationRolloutCapabilities } from '@/stores/pronunciation'
+
+const pronunciationCaptureEnabled = pronunciationRolloutCapabilities(
+    import.meta.env,
+).recording
 
 const { playAudio } = useAudio({
     rate: 0.7,

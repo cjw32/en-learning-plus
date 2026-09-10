@@ -49,6 +49,18 @@
           class="mt-3 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
           placeholder="输入你的答案"
         />
+        <PronunciationEntry
+          v-if="coachRequestId"
+          class="mt-3"
+          compact
+          :enabled="pronunciationCaptureEnabled"
+          :target="{
+            sourceType: 'COACH_EXERCISE',
+            coachRequestId,
+            exerciseId: exercise.id,
+            itemId: item.id,
+          }"
+        />
       </fieldset>
       <button
         type="submit"
@@ -68,52 +80,56 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, watch } from 'vue'
-import type { AnyPublicCoachResult } from '@en/common/coach'
+import { computed, reactive, watch } from 'vue';
+import type { AnyPublicCoachResult } from '@en/common/coach';
+import PronunciationEntry from '@/components/Pronunciation/PronunciationEntry.vue';
 
-type Exercise = NonNullable<AnyPublicCoachResult['exercise']>
+type Exercise = NonNullable<AnyPublicCoachResult['exercise']>;
 const props = withDefaults(
   defineProps<{
-    exercise: Exercise | null
-    degradedMessage?: string
-    submitting?: boolean
+    exercise: Exercise | null;
+    degradedMessage?: string;
+    submitting?: boolean;
+    coachRequestId?: string | null;
   }>(),
-  { degradedMessage: '', submitting: false },
-)
+  { degradedMessage: '', submitting: false, coachRequestId: null },
+);
+const pronunciationCaptureEnabled =
+  import.meta.env.VITE_PRONUNCIATION_CAPTURE_ENABLED === 'true';
 const emit = defineEmits<{
-  submit: [answers: Array<{ itemId: string; answer: string }>]
-}>()
-const answers = reactive<Record<string, string>>({})
+  submit: [answers: Array<{ itemId: string; answer: string }>];
+}>();
+const answers = reactive<Record<string, string>>({});
 const typeNames: Record<Exercise['type'], string> = {
   MULTIPLE_CHOICE: '选择题',
   FILL_BLANK: '填空题',
   TRANSLATION: '翻译题',
   SITUATIONAL_DIALOGUE: '情境对话',
-}
+};
 const typeLabel = computed(() =>
   props.exercise ? typeNames[props.exercise.type] : '',
-)
+);
 const canSubmit = computed(
   () =>
     Boolean(props.exercise?.items.length) &&
     props.exercise!.items.every((item) => Boolean(answers[item.id]?.trim())),
-)
+);
 
 watch(
   () => props.exercise?.id,
   () => {
-    for (const key of Object.keys(answers)) delete answers[key]
+    for (const key of Object.keys(answers)) delete answers[key];
   },
-)
+);
 
 function submit() {
-  if (!props.exercise || !canSubmit.value) return
+  if (!props.exercise || !canSubmit.value) return;
   emit(
     'submit',
     props.exercise.items.map((item) => ({
       itemId: item.id,
       answer: answers[item.id]!,
     })),
-  )
+  );
 }
 </script>
