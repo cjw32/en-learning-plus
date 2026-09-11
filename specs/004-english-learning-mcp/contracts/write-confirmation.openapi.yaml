@@ -1,0 +1,261 @@
+openapi: 3.1.0
+info:
+  title: English Learning MCP Write Confirmation
+  version: en-learning.mcp.confirmation.v1
+  description: >-
+    Public contract for the implemented project-owned browser confirmation flow. These
+    endpoints use the existing Web user authentication, never the MCP access
+    token. Confirming or rejecting does not execute the learning write; the
+    original submit_answer call must be retried.
+servers:
+  - url: https://example.invalid
+    description: Approval-gated HTTPS deployment input; runtime remains default-off.
+tags:
+  - name: MCP write confirmation
+paths:
+  /ai/v1/mcp/confirmations/{selector}:
+    get:
+      tags: [MCP write confirmation]
+      operationId: getMcpWriteConfirmation
+      summary: Read the exact operation summary for the current Web user
+      security:
+        - WebBearer: []
+      parameters:
+        - $ref: '#/components/parameters/Selector'
+      responses:
+        '200':
+          description: Pending or already-decided confirmation owned by this user
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+                const: private, no-store
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfirmationView'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '410':
+          $ref: '#/components/responses/Expired'
+    post:
+      tags: [MCP write confirmation]
+      operationId: decideMcpWriteConfirmation
+      summary: Confirm or reject the displayed operation for the current Web user
+      description: >-
+        Performs only the PENDING to CONFIRMED or PENDING to REJECTED transition.
+        It never grades an answer, writes an attempt, or updates mastery/review.
+      security:
+        - WebBearer: []
+      parameters:
+        - $ref: '#/components/parameters/Selector'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [schemaVersion, decision, operationSummaryDigest]
+              properties:
+                schemaVersion:
+                  type: string
+                  const: en-learning.mcp.confirmation.v1
+                decision:
+                  type: string
+                  enum: [confirm, reject]
+                operationSummaryDigest:
+                  type: string
+                  minLength: 32
+                  maxLength: 128
+      responses:
+        '200':
+          description: Decision recorded; retry the original MCP call if confirmed
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+                const: private, no-store
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfirmationDecisionResult'
+        '400':
+          $ref: '#/components/responses/InvalidRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: Already decided, claimed, consumed, or conflicting decision
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SafeError'
+        '410':
+          $ref: '#/components/responses/Expired'
+components:
+  securitySchemes:
+    WebBearer:
+      type: http
+      scheme: bearer
+      bearerFormat: Existing en-learning-plus Web access token
+      description: >-
+        Existing Web authentication used only to prove the currently logged-in
+        local user. It must never be accepted at the MCP Streamable HTTP endpoint.
+  parameters:
+    Selector:
+      name: selector
+      in: path
+      required: true
+      description: >-
+        High-entropy opaque random reference. It contains no user, exercise,
+        answer, token, or pre-authenticated authority and is stored server-side
+        only as an HMAC.
+      schema:
+        type: string
+        minLength: 32
+        maxLength: 128
+        pattern: '^[A-Za-z0-9_-]+$'
+  schemas:
+    ConfirmationView:
+      type: object
+      additionalProperties: false
+      required:
+        - schemaVersion
+        - status
+        - clientDisplayName
+        - toolName
+        - exercise
+        - operationSummary
+        - operationSummaryDigest
+        - expiresAt
+        - retryInstruction
+      properties:
+        schemaVersion:
+          type: string
+          const: en-learning.mcp.confirmation.v1
+        status:
+          type: string
+          enum: [pending, confirmed, rejected]
+        clientDisplayName:
+          type: string
+          minLength: 1
+          maxLength: 120
+          description: Sanitized display only; OAuth client ID remains authoritative.
+        toolName:
+          type: string
+          const: submit_answer
+        exercise:
+          type: object
+          additionalProperties: false
+          required: [itemCount, version]
+          properties:
+            title:
+              type: [string, 'null']
+              maxLength: 200
+            itemCount:
+              type: integer
+              minimum: 1
+              maximum: 50
+            version:
+              type: string
+              minLength: 1
+              maxLength: 128
+        operationSummary:
+          type: object
+          additionalProperties: false
+          required: [answerCount, willSaveAttempt, willUpdateMastery, willUpdateReviewSchedule]
+          properties:
+            answerCount:
+              type: integer
+              minimum: 1
+              maximum: 50
+            willSaveAttempt:
+              type: boolean
+              const: true
+            willUpdateMastery:
+              type: boolean
+              const: true
+            willUpdateReviewSchedule:
+              type: boolean
+              const: true
+            notice:
+              type: string
+              minLength: 1
+              maxLength: 500
+        operationSummaryDigest:
+          type: string
+          minLength: 32
+          maxLength: 128
+        expiresAt:
+          type: string
+          format: date-time
+        retryInstruction:
+          type: string
+          minLength: 1
+          maxLength: 500
+    ConfirmationDecisionResult:
+      type: object
+      additionalProperties: false
+      required: [schemaVersion, status, writeExecuted, nextAction]
+      properties:
+        schemaVersion:
+          type: string
+          const: en-learning.mcp.confirmation.v1
+        status:
+          type: string
+          enum: [confirmed, rejected]
+        writeExecuted:
+          type: boolean
+          const: false
+        nextAction:
+          type: string
+          enum: [retry_original_mcp_call, no_action]
+    SafeError:
+      type: object
+      additionalProperties: false
+      required: [schemaVersion, code, message]
+      properties:
+        schemaVersion:
+          type: string
+          const: en-learning.mcp.confirmation.v1
+        code:
+          type: string
+          enum:
+            - UNAUTHENTICATED
+            - RESOURCE_NOT_FOUND
+            - VALIDATION_FAILED
+            - CONFIRMATION_EXPIRED
+            - CONFIRMATION_STATE_CONFLICT
+        message:
+          type: string
+          minLength: 1
+          maxLength: 300
+  responses:
+    Unauthenticated:
+      description: Existing Web authentication missing, invalid, or not the mapped user
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SafeError'
+    NotFound:
+      description: Missing or not owned; response does not distinguish the reason
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SafeError'
+    Expired:
+      description: Confirmation exceeded its five-minute lifetime
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SafeError'
+    InvalidRequest:
+      description: Strict request schema or displayed-summary digest mismatch
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SafeError'

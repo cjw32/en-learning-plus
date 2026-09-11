@@ -16,6 +16,10 @@ import type {
   CoachRuntimeIntent,
 } from '../workflow/coach-workflow.executor';
 import type { CoachSseEvent } from '@en/common/coach';
+import {
+  ownedCoachConversationWhere,
+  USER_COACH_CONVERSATION_ORIGIN,
+} from '../conversation/coach-conversation.service';
 
 export type PersistableCoachResult =
   | CoachResult
@@ -97,7 +101,7 @@ export class CoachRequestRepository
   async isConversationOwned(subjectId: string, conversationId: string) {
     return Boolean(
       await this.prisma.coachConversation.findFirst({
-        where: { id: conversationId, userId: subjectId, status: 'ACTIVE' },
+        where: ownedCoachConversationWhere(subjectId, conversationId),
         select: { id: true },
       }),
     );
@@ -296,6 +300,7 @@ export class CoachRequestRepository
         id: input.id,
         userId: input.subjectId,
         title: input.title,
+        origin: USER_COACH_CONVERSATION_ORIGIN,
         checkpointThreadId: input.checkpointThreadId,
         lastActivityAt: input.now,
         expiresAt: input.expiresAt,
@@ -305,7 +310,7 @@ export class CoachRequestRepository
 
   findOwnedConversation(subjectId: string, conversationId: string) {
     return this.prisma.coachConversation.findFirst({
-      where: { id: conversationId, userId: subjectId, status: 'ACTIVE' },
+      where: ownedCoachConversationWhere(subjectId, conversationId),
     });
   }
 
@@ -317,9 +322,7 @@ export class CoachRequestRepository
     const cursor = input.cursor
       ? await this.prisma.coachConversation.findFirst({
           where: {
-            id: input.cursor,
-            userId: input.subjectId,
-            status: 'ACTIVE',
+            ...ownedCoachConversationWhere(input.subjectId, input.cursor),
           },
           select: { id: true, lastActivityAt: true },
         })
@@ -327,8 +330,7 @@ export class CoachRequestRepository
     if (input.cursor && !cursor) return null;
     return this.prisma.coachConversation.findMany({
       where: {
-        userId: input.subjectId,
-        status: 'ACTIVE',
+        ...ownedCoachConversationWhere(input.subjectId),
         ...(cursor
           ? {
               OR: [

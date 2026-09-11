@@ -457,6 +457,101 @@ enum LearningStateRecalculationStatus {
   FAILED
 }
 
+enum CoachConversationOrigin {
+  COACH
+  MCP
+}
+
+enum McpAuthorizationStatus {
+  ACTIVE
+  REVOKED
+  DELETING
+}
+
+enum McpProtocolEra {
+  MODERN_2026_07_28
+  LEGACY_2025_11_25
+}
+
+enum McpTransport {
+  STREAMABLE_HTTP
+}
+
+enum McpCapabilityType {
+  RESOURCE
+  TOOL
+  PROMPT
+  DISCOVERY
+}
+
+enum McpInvocationStatus {
+  RECEIVED
+  AUTHORIZED
+  VALIDATED
+  RUNNING
+  INPUT_REQUIRED
+  COMPLETED
+  RECONCILING
+  REJECTED
+  CANCELLED
+  TIMED_OUT
+  FAILED
+}
+
+enum McpInvocationResultType {
+  SUCCESS
+  INPUT_REQUIRED
+  NOT_SAVED
+  REPLAYED
+  ERROR
+}
+
+enum McpIdempotencyToolName {
+  CREATE_QUIZ
+  SUBMIT_ANSWER
+}
+
+enum McpIdempotencyStatus {
+  RESERVED
+  PROCESSING
+  RECONCILING
+  COMPLETED
+  FAILED_RETRYABLE
+  FAILED_FINAL
+  CANCELLED
+}
+
+enum McpWriteConfirmationState {
+  PENDING
+  CONFIRMED
+  CLAIMED
+  CONSUMED
+  REJECTED
+  EXPIRED
+  CANCELLED
+  FAILED
+}
+
+enum McpTraceStepType {
+  PROTOCOL
+  AUTH
+  SCHEMA
+  GOVERNANCE
+  DOMAIN
+  RETRIEVAL
+  MODEL
+  WRITE
+}
+
+enum McpTraceStepStatus {
+  STARTED
+  SUCCEEDED
+  FAILED
+  SKIPPED
+  CANCELLED
+  TIMED_OUT
+}
+
 //用户表
 model User {
   id                       String                    @id @default(cuid()) // 用户ID
@@ -493,6 +588,11 @@ model User {
   pronunciationAssessments PronunciationAssessment[]
   pronunciationTargets     PronunciationTarget[]
   pronunciationAudioAssets PronunciationAudioAsset[]
+  mcpSubjectMappings       McpSubjectMapping[]
+  mcpClientAuthorizations  McpClientAuthorization[]
+  mcpInvocations           McpInvocation[]
+  mcpIdempotencyIntents    McpIdempotencyIntent[]
+  mcpWriteConfirmations    McpWriteConfirmation[]
 }
 
 //记录已操作的单词
@@ -669,6 +769,7 @@ model CoachConversation {
   userId             String
   title              String?                 @db.VarChar(120)
   status             CoachConversationStatus @default(ACTIVE)
+  origin             CoachConversationOrigin @default(COACH)
   checkpointThreadId String                  @unique @db.VarChar(128)
   lastActivityAt     DateTime                @default(now())
   expiresAt          DateTime
@@ -680,7 +781,7 @@ model CoachConversation {
   requests           CoachRequest[]
   exercises          Exercise[]
 
-  @@index([userId, status, lastActivityAt])
+  @@index([userId, origin, status, lastActivityAt])
 }
 
 model CoachMessage {
@@ -739,6 +840,7 @@ model CoachRequest {
   feedback                 CoachFeedback[]
   knowledgeCitations       KnowledgeCitation[]
   pronunciationTargets     PronunciationTarget[]
+  mcpInvocation            McpInvocation?
 
   @@unique([userId, clientRequestKey])
   @@index([conversationId, status, createdAt])
@@ -747,27 +849,29 @@ model CoachRequest {
 }
 
 model Exercise {
-  id                    String               @id @default(cuid())
+  id                    String                 @id @default(cuid())
   userId                String
   conversationId        String
-  requestId             String               @unique
+  requestId             String                 @unique
   type                  ExerciseType
-  status                ExerciseStatus       @default(DRAFT)
+  status                ExerciseStatus         @default(DRAFT)
   cefrDifficulty        ExerciseDifficulty
-  instructions          String               @db.VarChar(2000)
-  personalizationReason String               @db.VarChar(2000)
-  schemaVersion         String               @db.VarChar(64)
+  instructions          String                 @db.VarChar(2000)
+  personalizationReason String                 @db.VarChar(2000)
+  schemaVersion         String                 @db.VarChar(64)
   citations             Json
   expiresAt             DateTime
-  createdAt             DateTime             @default(now())
-  updatedAt             DateTime             @updatedAt
-  user                  User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
-  conversation          CoachConversation    @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-  request               CoachRequest         @relation("ExerciseGenerationRequest", fields: [requestId], references: [id], onDelete: Cascade)
-  contextualRequests    CoachRequest[]       @relation("RequestExerciseContext")
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+  user                  User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  conversation          CoachConversation      @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  request               CoachRequest           @relation("ExerciseGenerationRequest", fields: [requestId], references: [id], onDelete: Cascade)
+  contextualRequests    CoachRequest[]         @relation("RequestExerciseContext")
   items                 ExerciseItem[]
   submissions           ExerciseSubmission[]
   attempts              LearningAttempt[]
+  mcpIdempotencyIntents McpIdempotencyIntent[]
+  mcpWriteConfirmations McpWriteConfirmation[]
 
   @@index([userId, status, createdAt])
   @@index([conversationId])
@@ -804,25 +908,26 @@ model ExerciseItemTarget {
 }
 
 model ExerciseSubmission {
-  id                   String                   @id @default(cuid())
-  userId               String
-  exerciseId           String
-  gradeRequestId       String                   @unique
-  answerVersion        String                   @db.VarChar(128)
-  clientIdempotencyKey String                   @db.VarChar(128)
-  answers              Json
-  status               ExerciseSubmissionStatus @default(RECEIVED)
-  score                Int?
-  gradingHash          String?                  @db.VarChar(128)
-  resultSchemaVersion  String?                  @db.VarChar(64)
-  gradingResult        Json?
-  createdAt            DateTime                 @default(now())
-  updatedAt            DateTime                 @updatedAt
-  user                 User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  exercise             Exercise                 @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
-  gradeRequest         CoachRequest             @relation("SubmissionGradeRequest", fields: [gradeRequestId], references: [id], onDelete: Cascade)
-  items                ExerciseSubmissionItem[]
-  attempt              LearningAttempt?
+  id                    String                   @id @default(cuid())
+  userId                String
+  exerciseId            String
+  gradeRequestId        String                   @unique
+  answerVersion         String                   @db.VarChar(128)
+  clientIdempotencyKey  String                   @db.VarChar(128)
+  answers               Json
+  status                ExerciseSubmissionStatus @default(RECEIVED)
+  score                 Int?
+  gradingHash           String?                  @db.VarChar(128)
+  resultSchemaVersion   String?                  @db.VarChar(64)
+  gradingResult         Json?
+  createdAt             DateTime                 @default(now())
+  updatedAt             DateTime                 @updatedAt
+  user                  User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  exercise              Exercise                 @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+  gradeRequest          CoachRequest             @relation("SubmissionGradeRequest", fields: [gradeRequestId], references: [id], onDelete: Cascade)
+  items                 ExerciseSubmissionItem[]
+  attempt               LearningAttempt?
+  mcpIdempotencyIntents McpIdempotencyIntent[]
 
   @@unique([userId, exerciseId, answerVersion])
   @@unique([userId, clientIdempotencyKey])
@@ -868,6 +973,7 @@ model LearningAttempt {
   pronunciationAssessment   PronunciationAssessment? @relation(fields: [pronunciationAssessmentId], references: [id], onDelete: Cascade)
   reviewEvents              LearningReviewEvent[]
   latestItemStates          LearningItemState[]      @relation("LatestItemAttempt")
+  mcpIdempotencyIntents     McpIdempotencyIntent[]
 
   @@unique([userId, exerciseId, submissionId])
   @@index([userId, savedAt])
@@ -1201,9 +1307,252 @@ model CoachTrace {
   request             CoachRequest         @relation(fields: [requestId], references: [id], onDelete: Cascade)
   traceSubject        TraceSubjectMapping? @relation(fields: [traceSubjectId], references: [traceSubjectId], onDelete: SetNull)
   steps               CoachStepTrace[]
+  mcpTraces           McpTrace[]
 
   @@index([traceSubjectId, createdAt])
   @@index([expiresAt])
+}
+
+model McpSubjectMapping {
+  id                   String                   @id @default(cuid())
+  issuer               String                   @db.VarChar(512)
+  subjectHmac          String                   @db.VarChar(128)
+  hmacKeyVersion       String                   @db.VarChar(64)
+  userId               String
+  status               McpAuthorizationStatus   @default(ACTIVE)
+  linkedAt             DateTime                 @default(now())
+  revokedAt            DateTime?
+  createdAt            DateTime                 @default(now())
+  updatedAt            DateTime                 @updatedAt
+  user                 User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  clientAuthorizations McpClientAuthorization[]
+
+  @@unique([issuer, subjectHmac])
+  @@index([issuer, userId, status])
+  @@index([userId, status])
+}
+
+model McpClientAuthorization {
+  id                   String                 @id @default(cuid())
+  userId               String
+  subjectMappingId     String
+  issuer               String                 @db.VarChar(512)
+  audience             String                 @db.VarChar(1024)
+  clientId             String                 @db.VarChar(512)
+  clientDisplayName    String?                @db.VarChar(120)
+  scopes               String[]
+  authorizationVersion Int                    @default(1)
+  status               McpAuthorizationStatus @default(ACTIVE)
+  grantedAt            DateTime               @default(now())
+  lastSeenAt           DateTime               @default(now())
+  revokedAt            DateTime?
+  retentionExpiresAt   DateTime?
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime               @updatedAt
+  user                 User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subjectMapping       McpSubjectMapping      @relation(fields: [subjectMappingId], references: [id], onDelete: Cascade)
+  invocations          McpInvocation[]
+  idempotencyIntents   McpIdempotencyIntent[]
+  writeConfirmations   McpWriteConfirmation[]
+  traces               McpTrace[]
+
+  @@unique([userId, subjectMappingId, issuer, audience, clientId])
+  @@index([issuer, clientId, status])
+  @@index([userId, status, lastSeenAt])
+  @@index([retentionExpiresAt])
+}
+
+model McpInvocation {
+  id                    String                   @id @default(cuid())
+  authorizationId       String
+  userId                String
+  traceId               String                   @unique @db.VarChar(128)
+  protocolEra           McpProtocolEra
+  transport             McpTransport             @default(STREAMABLE_HTTP)
+  sessionIdHmac         String?                  @db.VarChar(128)
+  protocolRequestIdHmac String?                  @db.VarChar(128)
+  capabilityType        McpCapabilityType
+  capabilityName        String                   @db.VarChar(128)
+  capabilityVersion     String                   @db.VarChar(64)
+  inputSchemaVersion    String?                  @db.VarChar(64)
+  inputFingerprint      String?                  @db.VarChar(128)
+  status                McpInvocationStatus      @default(RECEIVED)
+  deadlineAt            DateTime
+  cancelRequestedAt     DateTime?
+  coachRequestId        String?                  @unique
+  idempotencyIntentId   String?
+  resultType            McpInvocationResultType?
+  safeErrorCode         String?                  @db.VarChar(64)
+  businessResultType    String?                  @db.VarChar(64)
+  businessResultIdHmac  String?                  @db.VarChar(128)
+  startedAt             DateTime?
+  finishedAt            DateTime?
+  createdAt             DateTime                 @default(now())
+  updatedAt             DateTime                 @updatedAt
+  authorization         McpClientAuthorization   @relation(fields: [authorizationId], references: [id], onDelete: Cascade)
+  user                  User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  coachRequest          CoachRequest?            @relation(fields: [coachRequestId], references: [id], onDelete: SetNull)
+  idempotencyIntent     McpIdempotencyIntent?    @relation(fields: [idempotencyIntentId], references: [id], onDelete: SetNull)
+  trace                 McpTrace?
+
+  @@index([authorizationId, status, createdAt])
+  @@index([userId, capabilityType, createdAt])
+  @@index([idempotencyIntentId])
+  @@index([deadlineAt, status])
+}
+
+model McpIdempotencyIntent {
+  id                     String                 @id @default(cuid())
+  userId                 String
+  authorizationId        String
+  issuer                 String                 @db.VarChar(512)
+  clientId               String                 @db.VarChar(512)
+  toolName               McpIdempotencyToolName
+  clientKeyDigest        String                 @db.VarChar(128)
+  requestFingerprint     String                 @db.VarChar(128)
+  logicalResource        String?                @db.VarChar(128)
+  status                 McpIdempotencyStatus   @default(RESERVED)
+  leaseOwnerHmac         String?                @db.VarChar(128)
+  leaseExpiresAt         DateTime?
+  attemptCount           Int                    @default(0)
+  exerciseId             String?
+  submissionId           String?
+  learningAttemptId      String?
+  gradingResult          Json?
+  gradingResultHash      String?                @db.VarChar(128)
+  safeTerminalProjection Json?
+  safeErrorCode          String?                @db.VarChar(64)
+  createdAt              DateTime               @default(now())
+  updatedAt              DateTime               @updatedAt
+  finishedAt             DateTime?
+  user                   User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  authorization          McpClientAuthorization @relation(fields: [authorizationId], references: [id], onDelete: Cascade)
+  exercise               Exercise?              @relation(fields: [exerciseId], references: [id], onDelete: SetNull)
+  submission             ExerciseSubmission?    @relation(fields: [submissionId], references: [id], onDelete: SetNull)
+  learningAttempt        LearningAttempt?       @relation(fields: [learningAttemptId], references: [id], onDelete: SetNull)
+  confirmation           McpWriteConfirmation?
+  invocations            McpInvocation[]
+
+  @@unique([userId, issuer, clientId, toolName, clientKeyDigest])
+  @@index([authorizationId, status, leaseExpiresAt])
+  @@index([exerciseId])
+  @@index([submissionId])
+  @@index([learningAttemptId])
+}
+
+model McpWriteConfirmation {
+  id                      String                    @id @default(cuid())
+  selectorHmac            String                    @unique @db.VarChar(128)
+  idempotencyIntentId     String                    @unique
+  userId                  String
+  authorizationId         String
+  issuer                  String                    @db.VarChar(512)
+  clientId                String                    @db.VarChar(512)
+  requiredScope           String                    @default("answer:submit") @db.VarChar(64)
+  scopeSnapshotDigest     String                    @db.VarChar(128)
+  toolVersion             String                    @db.VarChar(64)
+  exerciseId              String
+  exerciseVersion         String                    @db.VarChar(128)
+  answerDigest            String                    @db.VarChar(128)
+  operationSummary        Json
+  operationSummaryVersion String                    @db.VarChar(64)
+  operationSummaryDigest  String                    @db.VarChar(128)
+  state                   McpWriteConfirmationState @default(PENDING)
+  expiresAt               DateTime
+  confirmedAt             DateTime?
+  claimedAt               DateTime?
+  consumedAt              DateTime?
+  confirmingWebUserIdHmac String?                   @db.VarChar(128)
+  createdAt               DateTime                  @default(now())
+  updatedAt               DateTime                  @updatedAt
+  idempotencyIntent       McpIdempotencyIntent      @relation(fields: [idempotencyIntentId], references: [id], onDelete: Cascade)
+  user                    User                      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  authorization           McpClientAuthorization    @relation(fields: [authorizationId], references: [id], onDelete: Cascade)
+  exercise                Exercise                  @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+
+  @@index([authorizationId, state, expiresAt])
+  @@index([userId, state, expiresAt])
+  @@index([exerciseId])
+}
+
+model McpTrace {
+  id                           String                 @id @default(cuid())
+  traceId                      String                 @unique @db.VarChar(128)
+  invocationId                 String                 @unique
+  authorizationId              String
+  parentCoachTraceId           String?
+  subjectHmac                  String                 @db.VarChar(128)
+  clientHmac                   String                 @db.VarChar(128)
+  authorizationVersion         Int
+  protocolEra                  McpProtocolEra
+  protocolVersion              String                 @db.VarChar(32)
+  transport                    McpTransport           @default(STREAMABLE_HTTP)
+  protocolMethod               String                 @db.VarChar(128)
+  protocolRequestIdHmac        String?                @db.VarChar(128)
+  sessionIdHmac                String?                @db.VarChar(128)
+  negotiatedCapabilitiesDigest String?                @db.VarChar(128)
+  clientDisplayName            String?                @db.VarChar(120)
+  clientDisplayVersion         String?                @db.VarChar(64)
+  capabilityType               McpCapabilityType
+  capabilityName               String                 @db.VarChar(128)
+  capabilityVersion            String                 @db.VarChar(64)
+  capabilityEffect             String                 @db.VarChar(64)
+  requiredScopes               String[]
+  inputSchemaVersion           String?                @db.VarChar(64)
+  outputSchemaVersion          String?                @db.VarChar(64)
+  discoveryDecision            String?                @db.VarChar(64)
+  executionDecision            String?                @db.VarChar(64)
+  governancePolicyVersion      String                 @db.VarChar(64)
+  rateLimitResult              String?                @db.VarChar(64)
+  concurrencyResult            String?                @db.VarChar(64)
+  budgetResult                 String?                @db.VarChar(64)
+  retryCount                   Int                    @default(0)
+  deadlineAt                   DateTime
+  cancelled                    Boolean                @default(false)
+  timedOut                     Boolean                @default(false)
+  downstreamVersions           Json?
+  inputTokens                  Int                    @default(0)
+  outputTokens                 Int                    @default(0)
+  estimatedCostMicros          Int                    @default(0)
+  writeOutcome                 String?                @db.VarChar(64)
+  idempotencyIntentIdHmac      String?                @db.VarChar(128)
+  confirmationIdHmac           String?                @db.VarChar(128)
+  businessResultIdHmac         String?                @db.VarChar(128)
+  terminalStatus               String                 @db.VarChar(64)
+  safeErrorCode                String?                @db.VarChar(64)
+  outputBytes                  Int                    @default(0)
+  startedAt                    DateTime               @default(now())
+  finishedAt                   DateTime?
+  retentionExpiresAt           DateTime
+  createdAt                    DateTime               @default(now())
+  invocation                   McpInvocation          @relation(fields: [invocationId], references: [id], onDelete: Cascade)
+  authorization                McpClientAuthorization @relation(fields: [authorizationId], references: [id], onDelete: Cascade)
+  parentCoachTrace             CoachTrace?            @relation(fields: [parentCoachTraceId], references: [id], onDelete: SetNull)
+  steps                        McpTraceStep[]
+
+  @@index([authorizationId, createdAt])
+  @@index([subjectHmac, createdAt])
+  @@index([parentCoachTraceId])
+  @@index([retentionExpiresAt])
+}
+
+model McpTraceStep {
+  id               String             @id @default(cuid())
+  traceId          String
+  sequence         Int
+  stepType         McpTraceStepType
+  component        String             @db.VarChar(64)
+  operation        String             @db.VarChar(64)
+  status           McpTraceStepStatus
+  startedAt        DateTime
+  finishedAt       DateTime?
+  durationMs       Int?
+  safeErrorCode    String?            @db.VarChar(64)
+  approvedMetadata Json?
+  createdAt        DateTime           @default(now())
+  trace            McpTrace           @relation(fields: [traceId], references: [id], onDelete: Cascade)
+
+  @@unique([traceId, sequence])
 }
 
 model CoachDeletionTombstone {

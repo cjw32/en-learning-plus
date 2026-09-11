@@ -8,6 +8,7 @@ import { DigestModule } from './digest/digest.module';
 import { CoachModule } from './coach/coach.module';
 import { KnowledgeModule } from './knowledge/knowledge.module';
 import { PronunciationModule } from './pronunciation';
+import { McpModule } from './mcp';
 @Module({
   imports: [
     ChatModule,
@@ -17,6 +18,7 @@ import { PronunciationModule } from './pronunciation';
     CoachModule,
     KnowledgeModule,
     PronunciationModule,
+    McpModule,
   ],
   controllers: [AiController],
   providers: [AiService],

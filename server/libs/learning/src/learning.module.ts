@@ -80,6 +80,17 @@ import {
   PronunciationLearningDeletionService,
 } from './pronunciation/pronunciation-deletion.service';
 import { PrismaPronunciationSummaryInvalidation } from './knowledge/summaries/private-learning-summary.service';
+import { PrismaWordDictionaryRepository } from './dictionary/word-dictionary.repository';
+import { WordDictionaryService } from './dictionary/word-dictionary.service';
+import { PrismaLearningResourceRepository } from './resources/learning-resource.repository';
+import { LearningResourceReadService } from './resources/learning-resource-read.service';
+import { PrismaLearningReportRepository } from './reporting/learning-report.repository';
+import { LearningReportService } from './reporting/learning-report.service';
+import { LearningWriteEffectService } from './submission/learning-write-effect.service';
+import {
+  McpSubmitAnswerService,
+  PrismaMcpSubmitAnswerRepository,
+} from './submission/mcp-submit-answer.service';
 
 @Module({
   imports: [PrismaModule],
@@ -182,6 +193,44 @@ import { PrismaPronunciationSummaryInvalidation } from './knowledge/summaries/pr
         ),
     },
     {
+      provide: PrismaWordDictionaryRepository,
+      inject: [PrismaService],
+      useFactory: (prisma: PrismaService) =>
+        new PrismaWordDictionaryRepository(prisma),
+    },
+    {
+      provide: WordDictionaryService,
+      inject: [PrismaWordDictionaryRepository, SourceRightsService],
+      useFactory: (
+        repository: PrismaWordDictionaryRepository,
+        rights: SourceRightsService,
+      ) => new WordDictionaryService(repository, rights),
+    },
+    {
+      provide: PrismaLearningResourceRepository,
+      inject: [PrismaService],
+      useFactory: (prisma: PrismaService) =>
+        new PrismaLearningResourceRepository(prisma),
+    },
+    {
+      provide: LearningResourceReadService,
+      inject: [PrismaLearningResourceRepository],
+      useFactory: (repository: PrismaLearningResourceRepository) =>
+        new LearningResourceReadService(repository),
+    },
+    {
+      provide: PrismaLearningReportRepository,
+      inject: [PrismaService],
+      useFactory: (prisma: PrismaService) =>
+        new PrismaLearningReportRepository(prisma),
+    },
+    {
+      provide: LearningReportService,
+      inject: [PrismaLearningReportRepository],
+      useFactory: (repository: PrismaLearningReportRepository) =>
+        new LearningReportService(repository),
+    },
+    {
       provide: KnowledgeOutboxRepository,
       inject: [PrismaService],
       useFactory: (prisma: PrismaService) =>
@@ -222,8 +271,9 @@ import { PrismaPronunciationSummaryInvalidation } from './knowledge/summaries/pr
     {
       provide: PronunciationSourceRightsService,
       inject: [PRONUNCIATION_SOURCE_RIGHTS_REPOSITORY],
-      useFactory: (repository: UnavailablePronunciationSourceRightsRepository) =>
-        new PronunciationSourceRightsService(repository, false),
+      useFactory: (
+        repository: UnavailablePronunciationSourceRightsRepository,
+      ) => new PronunciationSourceRightsService(repository, false),
     },
     PrismaPronunciationLearningStateReader,
     NoopPronunciationLearningTraceSink,
@@ -270,6 +320,19 @@ import { PrismaPronunciationSummaryInvalidation } from './knowledge/summaries/pr
         invalidation: PrismaPronunciationSummaryInvalidation,
       ) => new PronunciationLearningDeletionService(repository, invalidation),
     },
+    {
+      provide: PrismaMcpSubmitAnswerRepository,
+      inject: [PrismaService],
+      useFactory: (prisma: PrismaService) =>
+        new PrismaMcpSubmitAnswerRepository(prisma),
+    },
+    {
+      provide: McpSubmitAnswerService,
+      inject: [PrismaMcpSubmitAnswerRepository],
+      useFactory: (repository: PrismaMcpSubmitAnswerRepository) =>
+        new McpSubmitAnswerService(repository),
+    },
+    LearningWriteEffectService,
   ],
   exports: [
     OwnedResourceService,
@@ -284,6 +347,9 @@ import { PrismaPronunciationSummaryInvalidation } from './knowledge/summaries/pr
     LegacyReviewInitializerService,
     LearningDataDeletionService,
     SourceRightsService,
+    WordDictionaryService,
+    LearningResourceReadService,
+    LearningReportService,
     KnowledgeOutboxRepository,
     PrismaKnowledgeVectorRepository,
     PrismaCitationRepository,
@@ -294,6 +360,8 @@ import { PrismaPronunciationSummaryInvalidation } from './knowledge/summaries/pr
     PronunciationLearningService,
     PronunciationContextService,
     PronunciationLearningDeletionService,
+    McpSubmitAnswerService,
+    LearningWriteEffectService,
   ],
 })
 export class LearningModule {}

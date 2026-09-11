@@ -96,6 +96,10 @@ import { CoachEnabledGuard } from './governance/coach-enabled.guard';
 import { resolveRagRuntimeConfig } from './governance/coach-config.schema';
 import { resolvePronunciationRuntimeConfig } from '../pronunciation/governance/pronunciation-config.schema';
 import { KnowledgeModule } from '../knowledge/knowledge.module';
+import { McpLearningBridge } from './mcp/mcp-learning.bridge';
+import { McpCostMeter } from '../mcp/governance/mcp-cost-meter';
+import { CoachConversationService } from './conversation/coach-conversation.service';
+import { McpOperationEnvelopeFactory } from './mcp/mcp-operation-envelope.factory';
 
 @Module({
   imports: [
@@ -109,6 +113,8 @@ import { KnowledgeModule } from '../knowledge/knowledge.module';
   providers: [
     AuthGuard,
     CoachEnabledGuard,
+    CoachConversationService,
+    McpOperationEnvelopeFactory,
     CoachRequestRepository,
     RedisCoachEventStore,
     { provide: COACH_EVENT_STORE, useExisting: RedisCoachEventStore },
@@ -270,6 +276,59 @@ import { KnowledgeModule } from '../knowledge/knowledge.module';
         );
       },
     },
+    {
+      provide: McpLearningBridge,
+      inject: [
+        LearningMaterialService,
+        RAG_LEARNING_MATERIAL_SEARCH,
+        McpCostMeter,
+        LearnerProfileService,
+        ReviewScheduleService,
+        ExerciseTargetingService,
+        CreateExerciseTool,
+        McpOperationEnvelopeFactory,
+        CoachConversationService,
+        OwnedGradingService,
+        CoachModelGateway,
+      ],
+      useFactory: (
+        materials: LearningMaterialService,
+        ragSearch: RagLearningMaterialSearchPort,
+        costMeter: McpCostMeter,
+        profiles: LearnerProfileService,
+        schedules: ReviewScheduleService,
+        targeting: ExerciseTargetingService,
+        exercises: CreateExerciseTool,
+        envelopes: McpOperationEnvelopeFactory,
+        conversations: CoachConversationService,
+        grading: OwnedGradingService,
+        model: CoachModelGateway,
+      ) =>
+        new McpLearningBridge(
+          materials,
+          ragSearch,
+          costMeter,
+          undefined,
+          {
+            profiles,
+            schedules,
+            targeting,
+            exercises,
+            envelopes,
+            conversations,
+          },
+          {
+            grading,
+            envelopes,
+            conversations,
+            model,
+          },
+        ),
+    },
+    {
+      provide: McpCostMeter,
+      useFactory: () => new McpCostMeter(),
+    },
     SaveAttemptTool,
     ConfiguredCoachStructuredModel,
     {
@@ -391,6 +450,13 @@ import { KnowledgeModule } from '../knowledge/knowledge.module';
     CoachProcessor,
     CoachApiService,
   ],
-  exports: [CoachRequestRepository, CoachRequestService, CoachQueueService],
+  exports: [
+    CoachRequestRepository,
+    CoachRequestService,
+    CoachQueueService,
+    CoachConversationService,
+    McpOperationEnvelopeFactory,
+    McpLearningBridge,
+  ],
 })
 export class CoachModule {}

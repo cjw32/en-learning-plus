@@ -1,0 +1,2133 @@
+{
+  "$defs": {
+    "__schema0": {
+      "const": "en-learning.mcp.v1",
+      "type": "string"
+    },
+    "__schema1": {
+      "additionalProperties": false,
+      "properties": {
+        "confirmation": {
+          "enum": [
+            "none",
+            "url_elicitation_required"
+          ],
+          "type": "string"
+        },
+        "deadlineMs": {
+          "maximum": 30000,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "description": {
+          "maxLength": 500,
+          "minLength": 1,
+          "type": "string"
+        },
+        "effect": {
+          "enum": [
+            "read",
+            "create_exercise",
+            "write_learning_progress",
+            "prompt_only"
+          ],
+          "type": "string"
+        },
+        "idempotency": {
+          "enum": [
+            "safe_repeat",
+            "required",
+            "not_applicable"
+          ],
+          "type": "string"
+        },
+        "maxResultBytes": {
+          "maximum": 262144,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "name": {
+          "maxLength": 256,
+          "minLength": 1,
+          "type": "string"
+        },
+        "requiredScopes": {
+          "items": {
+            "$ref": "#/$defs/__schema2"
+          },
+          "maxItems": 3,
+          "minItems": 1,
+          "type": "array"
+        },
+        "type": {
+          "enum": [
+            "resource",
+            "resourceTemplate",
+            "tool",
+            "prompt"
+          ],
+          "type": "string"
+        },
+        "version": {
+          "$ref": "#/$defs/__schema0"
+        }
+      },
+      "required": [
+        "type",
+        "name",
+        "version",
+        "description",
+        "requiredScopes",
+        "effect",
+        "idempotency",
+        "confirmation"
+      ],
+      "type": "object"
+    },
+    "__schema10": {
+      "maxLength": 100,
+      "minLength": 1,
+      "type": "string"
+    },
+    "__schema11": {
+      "maxLength": 1000,
+      "minLength": 1,
+      "type": "string"
+    },
+    "__schema12": {
+      "additionalProperties": false,
+      "properties": {
+        "accessScope": {
+          "enum": [
+            "PUBLIC",
+            "OWNED_COURSE",
+            "PRIVATE_OWNER"
+          ],
+          "type": "string"
+        },
+        "citationId": {
+          "pattern": "^cit_[A-Za-z0-9_-]{10,48}$",
+          "type": "string"
+        },
+        "contentVersion": {
+          "maxLength": 128,
+          "minLength": 1,
+          "type": "string"
+        },
+        "excerpt": {
+          "maxLength": 2000,
+          "type": "string"
+        },
+        "source": {
+          "maxLength": 128,
+          "minLength": 1,
+          "type": "string"
+        },
+        "status": {
+          "const": "active",
+          "type": "string"
+        },
+        "title": {
+          "maxLength": 300,
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "citationId",
+        "source",
+        "title",
+        "contentVersion",
+        "accessScope",
+        "status"
+      ],
+      "type": "object"
+    },
+    "__schema13": {
+      "format": "date",
+      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
+      "type": "string"
+    },
+    "__schema14": {
+      "additionalProperties": false,
+      "properties": {
+        "dueAt": {
+          "$ref": "#/$defs/__schema5"
+        },
+        "priority": {
+          "maximum": 100,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "reason": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "type": "string"
+        },
+        "reviewState": {
+          "enum": [
+            "LEARNING",
+            "REVIEW",
+            "MASTERED"
+          ],
+          "type": "string"
+        },
+        "word": {
+          "maxLength": 100,
+          "minLength": 1,
+          "type": "string"
+        },
+        "wordId": {
+          "$ref": "#/$defs/__schema8",
+          "maxLength": 64
+        }
+      },
+      "required": [
+        "wordId",
+        "word",
+        "reviewState",
+        "dueAt",
+        "priority",
+        "reason"
+      ],
+      "type": "object"
+    },
+    "__schema15": {
+      "additionalProperties": false,
+      "properties": {
+        "attemptCount": {
+          "maximum": 9007199254740991,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "averageScore": {
+          "anyOf": [
+            {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "dataCompleteness": {
+          "enum": [
+            "complete",
+            "partial",
+            "insufficient"
+          ],
+          "type": "string"
+        },
+        "learnedWordCount": {
+          "maximum": 9007199254740991,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "policyVersion": {
+          "maxLength": 128,
+          "minLength": 1,
+          "type": "string"
+        },
+        "reviewsCompleted": {
+          "maximum": 9007199254740991,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "reviewsDue": {
+          "maximum": 9007199254740991,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "windowEnd": {
+          "$ref": "#/$defs/__schema13"
+        },
+        "windowStart": {
+          "$ref": "#/$defs/__schema13"
+        }
+      },
+      "required": [
+        "windowStart",
+        "windowEnd",
+        "attemptCount",
+        "averageScore",
+        "reviewsDue",
+        "reviewsCompleted",
+        "dataCompleteness",
+        "policyVersion"
+      ],
+      "type": "object"
+    },
+    "__schema16": {
+      "additionalProperties": false,
+      "properties": {
+        "count": {
+          "maximum": 9007199254740991,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "evidenceStatus": {
+          "enum": [
+            "current",
+            "stale",
+            "insufficient"
+          ],
+          "type": "string"
+        },
+        "key": {
+          "maxLength": 128,
+          "minLength": 1,
+          "type": "string"
+        },
+        "label": {
+          "maxLength": 300,
+          "minLength": 1,
+          "type": "string"
+        },
+        "lastSeenAt": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/__schema5"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "type": {
+          "enum": [
+            "word",
+            "error_type"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "key",
+        "label",
+        "evidenceStatus"
+      ],
+      "type": "object"
+    },
+    "__schema17": {
+      "enum": [
+        "WORD_MEANING",
+        "WORD_TRANSLATION",
+        "WORD_PRONUNCIATION",
+        "WORD_FORM",
+        "WORD_USAGE",
+        "COLLOCATION",
+        "EXAMPLE_SENTENCE",
+        "GRAMMAR_RULE",
+        "GRAMMAR_EXCEPTION",
+        "COURSE_LESSON",
+        "EXERCISE_KNOWLEDGE",
+        "USER_ERROR",
+        "LEARNING_SUMMARY"
+      ],
+      "type": "string"
+    },
+    "__schema18": {
+      "$ref": "#/$defs/__schema8",
+      "maxLength": 64
+    },
+    "__schema19": {
+      "$ref": "#/$defs/__schema8",
+      "maxLength": 64
+    },
+    "__schema2": {
+      "enum": [
+        "learning:read",
+        "quiz:create",
+        "answer:submit"
+      ],
+      "type": "string"
+    },
+    "__schema20": {
+      "enum": [
+        "MULTIPLE_CHOICE",
+        "FILL_IN_BLANK",
+        "TRANSLATION",
+        "SHORT_ANSWER"
+      ],
+      "type": "string"
+    },
+    "__schema21": {
+      "enum": [
+        "EASY",
+        "MEDIUM",
+        "HARD"
+      ],
+      "type": "string"
+    },
+    "__schema22": {
+      "$ref": "#/$defs/__schema8",
+      "maxLength": 64
+    },
+    "__schema23": {
+      "additionalProperties": false,
+      "properties": {
+        "itemId": {
+          "$ref": "#/$defs/__schema8",
+          "maxLength": 64
+        },
+        "value": {
+          "anyOf": [
+            {
+              "maxLength": 4000,
+              "type": "string"
+            },
+            {
+              "items": {
+                "$ref": "#/$defs/__schema24"
+              },
+              "maxItems": 20,
+              "minItems": 1,
+              "type": "array"
+            }
+          ]
+        }
+      },
+      "required": [
+        "itemId",
+        "value"
+      ],
+      "type": "object"
+    },
+    "__schema24": {
+      "maxLength": 1000,
+      "type": "string"
+    },
+    "__schema25": {
+      "enum": [
+        "progress",
+        "review",
+        "performance",
+        "weaknesses",
+        "errors"
+      ],
+      "type": "string"
+    },
+    "__schema26": {
+      "additionalProperties": false,
+      "properties": {
+        "category": {
+          "maxLength": 64,
+          "minLength": 1,
+          "type": "string"
+        },
+        "citation": {
+          "$ref": "#/$defs/__schema12"
+        },
+        "contentVersion": {
+          "maxLength": 128,
+          "minLength": 1,
+          "type": "string"
+        },
+        "excerpt": {
+          "maxLength": 2000,
+          "minLength": 1,
+          "type": "string"
+        },
+        "rank": {
+          "maximum": 20,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "relevanceScore": {
+          "maximum": 1,
+          "minimum": 0,
+          "type": "number"
+        },
+        "resultId": {
+          "maxLength": 64,
+          "minLength": 10,
+          "type": "string"
+        },
+        "title": {
+          "maxLength": 300,
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "resultId",
+        "title",
+        "category",
+        "excerpt",
+        "rank",
+        "relevanceScore",
+        "contentVersion",
+        "citation"
+      ],
+      "type": "object"
+    },
+    "__schema27": {
+      "additionalProperties": false,
+      "properties": {
+        "resolution": {
+          "enum": [
+            "resolved_by_version",
+            "resolved_by_authority",
+            "unresolved"
+          ],
+          "type": "string"
+        },
+        "topic": {
+          "maxLength": 300,
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "topic",
+        "resolution"
+      ],
+      "type": "object"
+    },
+    "__schema28": {
+      "additionalProperties": false,
+      "properties": {
+        "choices": {
+          "items": {
+            "$ref": "#/$defs/__schema29"
+          },
+          "maxItems": 8,
+          "type": "array"
+        },
+        "itemId": {
+          "$ref": "#/$defs/__schema8",
+          "maxLength": 64
+        },
+        "maxScore": {
+          "maximum": 100,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "position": {
+          "maximum": 20,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "prompt": {
+          "maxLength": 4000,
+          "minLength": 1,
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/$defs/__schema20"
+        }
+      },
+      "required": [
+        "itemId",
+        "position",
+        "type",
+        "prompt",
+        "maxScore"
+      ],
+      "type": "object"
+    },
+    "__schema29": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "maxLength": 32,
+          "minLength": 1,
+          "type": "string"
+        },
+        "text": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "text"
+      ],
+      "type": "object"
+    },
+    "__schema3": {
+      "maxLength": 128,
+      "minLength": 10,
+      "type": "string"
+    },
+    "__schema30": {
+      "const": true,
+      "type": "boolean"
+    },
+    "__schema31": {
+      "anyOf": [
+        {
+          "maxLength": 64,
+          "minLength": 10,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "__schema32": {
+      "anyOf": [
+        {
+          "maxLength": 64,
+          "minLength": 10,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "__schema33": {
+      "enum": [
+        "saved",
+        "replayed",
+        "not_saved"
+      ],
+      "type": "string"
+    },
+    "__schema34": {
+      "maximum": 100,
+      "minimum": 0,
+      "type": "integer"
+    },
+    "__schema35": {
+      "items": {
+        "$ref": "#/$defs/__schema36"
+      },
+      "maxItems": 50,
+      "minItems": 1,
+      "type": "array"
+    },
+    "__schema36": {
+      "additionalProperties": false,
+      "properties": {
+        "correction": {
+          "maxLength": 4000,
+          "type": "string"
+        },
+        "errorTypes": {
+          "items": {
+            "$ref": "#/$defs/__schema37"
+          },
+          "maxItems": 11,
+          "minItems": 0,
+          "type": "array"
+        },
+        "explanation": {
+          "maxLength": 4000,
+          "minLength": 1,
+          "type": "string"
+        },
+        "itemId": {
+          "$ref": "#/$defs/__schema8",
+          "maxLength": 64
+        },
+        "score": {
+          "maximum": 100,
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "itemId",
+        "score",
+        "correction",
+        "explanation",
+        "errorTypes"
+      ],
+      "type": "object"
+    },
+    "__schema37": {
+      "maxLength": 64,
+      "type": "string"
+    },
+    "__schema38": {
+      "items": {
+        "$ref": "#/$defs/__schema39"
+      },
+      "maxItems": 50,
+      "type": "array"
+    },
+    "__schema39": {
+      "additionalProperties": false,
+      "properties": {
+        "nextReviewAt": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/__schema5"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "nextState": {
+          "maxLength": 64,
+          "type": "string"
+        },
+        "previousState": {
+          "maxLength": 64,
+          "type": "string"
+        },
+        "targetKey": {
+          "maxLength": 128,
+          "minLength": 1,
+          "type": "string"
+        },
+        "targetType": {
+          "maxLength": 64,
+          "type": "string"
+        }
+      },
+      "required": [
+        "targetType",
+        "targetKey",
+        "previousState",
+        "nextState",
+        "nextReviewAt"
+      ],
+      "type": "object"
+    },
+    "__schema4": {
+      "additionalProperties": false,
+      "properties": {
+        "contentVersion": {
+          "maxLength": 128,
+          "minLength": 1,
+          "type": "string"
+        },
+        "nextCursor": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/__schema6"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "schemaVersion": {
+          "$ref": "#/$defs/__schema0"
+        },
+        "traceId": {
+          "$ref": "#/$defs/__schema3"
+        },
+        "truncated": {
+          "type": "boolean"
+        },
+        "updatedAt": {
+          "$ref": "#/$defs/__schema5"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "contentVersion",
+        "updatedAt",
+        "truncated",
+        "traceId"
+      ],
+      "type": "object"
+    },
+    "__schema40": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "enum": [
+            "CANCELLED",
+            "TIMEOUT",
+            "DEPENDENCY_UNAVAILABLE",
+            "INTERNAL_ERROR"
+          ],
+          "type": "string"
+        },
+        "message": {
+          "maxLength": 500,
+          "minLength": 1,
+          "type": "string"
+        },
+        "retryable": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "code",
+        "message",
+        "retryable"
+      ],
+      "type": "object"
+    },
+    "__schema41": {
+      "additionalProperties": false,
+      "properties": {
+        "content": {
+          "maxLength": 12000,
+          "minLength": 1,
+          "type": "string"
+        },
+        "role": {
+          "const": "user",
+          "type": "string"
+        }
+      },
+      "required": [
+        "role",
+        "content"
+      ],
+      "type": "object"
+    },
+    "__schema42": {
+      "enum": [
+        "search_words",
+        "get_due_words",
+        "search_learning_materials",
+        "get_learning_report"
+      ],
+      "type": "string"
+    },
+    "__schema5": {
+      "format": "date-time",
+      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+      "type": "string"
+    },
+    "__schema6": {
+      "maxLength": 512,
+      "minLength": 24,
+      "pattern": "^[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+$",
+      "type": "string"
+    },
+    "__schema7": {
+      "additionalProperties": false,
+      "properties": {
+        "availability": {
+          "enum": [
+            "available",
+            "partially_available"
+          ],
+          "type": "string"
+        },
+        "cefr": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/__schema9"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "contentVersion": {
+          "maxLength": 128,
+          "minLength": 1,
+          "type": "string"
+        },
+        "definition": {
+          "anyOf": [
+            {
+              "maxLength": 4000,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "partOfSpeech": {
+          "anyOf": [
+            {
+              "maxLength": 64,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "phonetic": {
+          "anyOf": [
+            {
+              "maxLength": 128,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "translation": {
+          "anyOf": [
+            {
+              "maxLength": 4000,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "word": {
+          "maxLength": 100,
+          "minLength": 1,
+          "type": "string"
+        },
+        "wordId": {
+          "$ref": "#/$defs/__schema8",
+          "maxLength": 64
+        }
+      },
+      "required": [
+        "wordId",
+        "word",
+        "availability",
+        "contentVersion"
+      ],
+      "type": "object"
+    },
+    "__schema8": {
+      "maxLength": 128,
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9_-]+$",
+      "type": "string"
+    },
+    "__schema9": {
+      "enum": [
+        "A1",
+        "A2",
+        "B1",
+        "B2",
+        "C1",
+        "C2"
+      ],
+      "type": "string"
+    }
+  },
+  "$id": "https://en-learning-plus.invalid/contracts/en-learning-mcp-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "anyOf": [
+    {
+      "additionalProperties": false,
+      "properties": {
+        "capabilities": {
+          "items": {
+            "$ref": "#/$defs/__schema1"
+          },
+          "maxItems": 14,
+          "type": "array"
+        },
+        "manifestVersion": {
+          "maxLength": 128,
+          "minLength": 1,
+          "type": "string"
+        },
+        "protocolVersion": {
+          "enum": [
+            "2026-07-28",
+            "2025-11-25"
+          ],
+          "type": "string"
+        },
+        "schemaVersion": {
+          "$ref": "#/$defs/__schema0"
+        },
+        "traceId": {
+          "$ref": "#/$defs/__schema3"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "protocolVersion",
+        "manifestVersion",
+        "capabilities",
+        "traceId"
+      ],
+      "type": "object"
+    },
+    {
+      "anyOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "examples": {
+              "items": {
+                "$ref": "#/$defs/__schema11"
+              },
+              "maxItems": 10,
+              "type": "array"
+            },
+            "forms": {
+              "items": {
+                "$ref": "#/$defs/__schema10"
+              },
+              "maxItems": 20,
+              "type": "array"
+            },
+            "kind": {
+              "const": "word",
+              "type": "string"
+            },
+            "meta": {
+              "$ref": "#/$defs/__schema4"
+            },
+            "source": {
+              "$ref": "#/$defs/__schema12"
+            },
+            "uri": {
+              "pattern": "^en-learning:\\/\\/words\\/[A-Za-z0-9_-]{1,64}$",
+              "type": "string"
+            },
+            "word": {
+              "$ref": "#/$defs/__schema7"
+            }
+          },
+          "required": [
+            "kind",
+            "uri",
+            "meta",
+            "word",
+            "examples",
+            "source"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "courseId": {
+              "$ref": "#/$defs/__schema8",
+              "maxLength": 64
+            },
+            "kind": {
+              "const": "course_material",
+              "type": "string"
+            },
+            "locator": {
+              "anyOf": [
+                {
+                  "maxLength": 500,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "materialId": {
+              "$ref": "#/$defs/__schema8"
+            },
+            "meta": {
+              "$ref": "#/$defs/__schema4"
+            },
+            "source": {
+              "$ref": "#/$defs/__schema12"
+            },
+            "summary": {
+              "maxLength": 8000,
+              "minLength": 1,
+              "type": "string"
+            },
+            "title": {
+              "maxLength": 300,
+              "minLength": 1,
+              "type": "string"
+            },
+            "uri": {
+              "pattern": "^en-learning:\\/\\/courses\\/[A-Za-z0-9_-]{1,64}\\/materials\\/[A-Za-z0-9_-]{1,128}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "uri",
+            "meta",
+            "courseId",
+            "materialId",
+            "title",
+            "summary",
+            "locator",
+            "source"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "items": {
+              "items": {
+                "$ref": "#/$defs/__schema14"
+              },
+              "maxItems": 50,
+              "type": "array"
+            },
+            "kind": {
+              "const": "today_reviews",
+              "type": "string"
+            },
+            "learningDate": {
+              "$ref": "#/$defs/__schema13"
+            },
+            "meta": {
+              "$ref": "#/$defs/__schema4"
+            },
+            "timezone": {
+              "maxLength": 64,
+              "minLength": 1,
+              "type": "string"
+            },
+            "totalDue": {
+              "maximum": 9007199254740991,
+              "minimum": 0,
+              "type": "integer"
+            },
+            "uri": {
+              "const": "en-learning://me/reviews/today",
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "uri",
+            "meta",
+            "learningDate",
+            "timezone",
+            "totalDue",
+            "items"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "learning_report",
+              "type": "string"
+            },
+            "meta": {
+              "$ref": "#/$defs/__schema4"
+            },
+            "report": {
+              "$ref": "#/$defs/__schema15"
+            },
+            "uri": {
+              "const": "en-learning://me/reports/summary",
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "uri",
+            "meta",
+            "report"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "dataCompleteness": {
+              "enum": [
+                "complete",
+                "partial",
+                "insufficient"
+              ],
+              "type": "string"
+            },
+            "items": {
+              "items": {
+                "$ref": "#/$defs/__schema16"
+              },
+              "maxItems": 50,
+              "type": "array"
+            },
+            "kind": {
+              "const": "weaknesses",
+              "type": "string"
+            },
+            "meta": {
+              "$ref": "#/$defs/__schema4"
+            },
+            "uri": {
+              "const": "en-learning://me/weaknesses",
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "uri",
+            "meta",
+            "dataCompleteness",
+            "items"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    {
+      "anyOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "input": {
+              "additionalProperties": false,
+              "properties": {
+                "cefr": {
+                  "$ref": "#/$defs/__schema9"
+                },
+                "courseId": {
+                  "$ref": "#/$defs/__schema8",
+                  "maxLength": 64
+                },
+                "cursor": {
+                  "$ref": "#/$defs/__schema6"
+                },
+                "limit": {
+                  "default": 10,
+                  "maximum": 50,
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "query": {
+                  "maxLength": 200,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "schemaVersion": {
+                  "$ref": "#/$defs/__schema0"
+                }
+              },
+              "required": [
+                "schemaVersion",
+                "query",
+                "limit"
+              ],
+              "type": "object"
+            },
+            "name": {
+              "const": "search_words",
+              "type": "string"
+            }
+          },
+          "required": [
+            "name",
+            "input"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "input": {
+              "additionalProperties": false,
+              "properties": {
+                "courseId": {
+                  "$ref": "#/$defs/__schema8",
+                  "maxLength": 64
+                },
+                "cursor": {
+                  "$ref": "#/$defs/__schema6"
+                },
+                "learningDate": {
+                  "$ref": "#/$defs/__schema13"
+                },
+                "limit": {
+                  "default": 20,
+                  "maximum": 100,
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "schemaVersion": {
+                  "$ref": "#/$defs/__schema0"
+                },
+                "timezone": {
+                  "maxLength": 64,
+                  "minLength": 1,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "schemaVersion",
+                "learningDate",
+                "timezone",
+                "limit"
+              ],
+              "type": "object"
+            },
+            "name": {
+              "const": "get_due_words",
+              "type": "string"
+            }
+          },
+          "required": [
+            "name",
+            "input"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "input": {
+              "additionalProperties": false,
+              "properties": {
+                "categories": {
+                  "items": {
+                    "$ref": "#/$defs/__schema17"
+                  },
+                  "maxItems": 13,
+                  "minItems": 1,
+                  "type": "array"
+                },
+                "courseIds": {
+                  "items": {
+                    "$ref": "#/$defs/__schema18"
+                  },
+                  "maxItems": 20,
+                  "minItems": 0,
+                  "type": "array"
+                },
+                "levels": {
+                  "items": {
+                    "$ref": "#/$defs/__schema9"
+                  },
+                  "maxItems": 6,
+                  "minItems": 0,
+                  "type": "array"
+                },
+                "minimumRelevance": {
+                  "maximum": 1,
+                  "minimum": 0,
+                  "type": "number"
+                },
+                "query": {
+                  "maxLength": 1000,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "schemaVersion": {
+                  "$ref": "#/$defs/__schema0"
+                },
+                "topK": {
+                  "default": 8,
+                  "maximum": 20,
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "wordIds": {
+                  "items": {
+                    "$ref": "#/$defs/__schema19"
+                  },
+                  "maxItems": 50,
+                  "minItems": 0,
+                  "type": "array"
+                }
+              },
+              "required": [
+                "schemaVersion",
+                "query",
+                "categories",
+                "topK"
+              ],
+              "type": "object"
+            },
+            "name": {
+              "const": "search_learning_materials",
+              "type": "string"
+            }
+          },
+          "required": [
+            "name",
+            "input"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "input": {
+              "additionalProperties": false,
+              "properties": {
+                "count": {
+                  "maximum": 20,
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "difficulty": {
+                  "$ref": "#/$defs/__schema21"
+                },
+                "idempotencyKey": {
+                  "maxLength": 128,
+                  "minLength": 16,
+                  "type": "string"
+                },
+                "knowledgeCategories": {
+                  "items": {
+                    "$ref": "#/$defs/__schema17"
+                  },
+                  "maxItems": 13,
+                  "minItems": 0,
+                  "type": "array"
+                },
+                "scenario": {
+                  "maxLength": 1000,
+                  "type": "string"
+                },
+                "schemaVersion": {
+                  "$ref": "#/$defs/__schema0"
+                },
+                "types": {
+                  "items": {
+                    "$ref": "#/$defs/__schema20"
+                  },
+                  "maxItems": 4,
+                  "minItems": 1,
+                  "type": "array"
+                },
+                "wordIds": {
+                  "items": {
+                    "$ref": "#/$defs/__schema22"
+                  },
+                  "maxItems": 50,
+                  "minItems": 0,
+                  "type": "array"
+                }
+              },
+              "required": [
+                "schemaVersion",
+                "types",
+                "count",
+                "difficulty",
+                "idempotencyKey"
+              ],
+              "type": "object"
+            },
+            "name": {
+              "const": "create_quiz",
+              "type": "string"
+            }
+          },
+          "required": [
+            "name",
+            "input"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "input": {
+              "additionalProperties": false,
+              "properties": {
+                "answers": {
+                  "items": {
+                    "$ref": "#/$defs/__schema23"
+                  },
+                  "maxItems": 50,
+                  "minItems": 1,
+                  "type": "array"
+                },
+                "exerciseId": {
+                  "$ref": "#/$defs/__schema8",
+                  "maxLength": 64,
+                  "minLength": 10,
+                  "pattern": "^[A-Za-z0-9_-]+$",
+                  "type": "string"
+                },
+                "exerciseVersion": {
+                  "maxLength": 128,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "idempotencyKey": {
+                  "maxLength": 128,
+                  "minLength": 16,
+                  "type": "string"
+                },
+                "schemaVersion": {
+                  "$ref": "#/$defs/__schema0"
+                }
+              },
+              "required": [
+                "schemaVersion",
+                "exerciseId",
+                "exerciseVersion",
+                "answers",
+                "idempotencyKey"
+              ],
+              "type": "object"
+            },
+            "name": {
+              "const": "submit_answer",
+              "type": "string"
+            }
+          },
+          "required": [
+            "name",
+            "input"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "input": {
+              "additionalProperties": false,
+              "properties": {
+                "dimensions": {
+                  "items": {
+                    "$ref": "#/$defs/__schema25"
+                  },
+                  "maxItems": 5,
+                  "minItems": 1,
+                  "type": "array"
+                },
+                "from": {
+                  "$ref": "#/$defs/__schema13"
+                },
+                "limit": {
+                  "default": 20,
+                  "maximum": 50,
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "schemaVersion": {
+                  "$ref": "#/$defs/__schema0"
+                },
+                "to": {
+                  "$ref": "#/$defs/__schema13"
+                }
+              },
+              "required": [
+                "schemaVersion",
+                "limit"
+              ],
+              "type": "object"
+            },
+            "name": {
+              "const": "get_learning_report",
+              "type": "string"
+            }
+          },
+          "required": [
+            "name",
+            "input"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    {
+      "anyOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "items": {
+              "items": {
+                "$ref": "#/$defs/__schema7"
+              },
+              "maxItems": 50,
+              "type": "array"
+            },
+            "nextCursor": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/__schema6"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "ok": {
+              "const": true,
+              "type": "boolean"
+            },
+            "query": {
+              "maxLength": 200,
+              "minLength": 1,
+              "type": "string"
+            },
+            "schemaVersion": {
+              "$ref": "#/$defs/__schema0"
+            },
+            "traceId": {
+              "$ref": "#/$defs/__schema3"
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "ok",
+            "query",
+            "items",
+            "nextCursor",
+            "traceId"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "asOf": {
+              "$ref": "#/$defs/__schema5"
+            },
+            "items": {
+              "items": {
+                "$ref": "#/$defs/__schema14"
+              },
+              "maxItems": 100,
+              "type": "array"
+            },
+            "nextCursor": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/__schema6"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "ok": {
+              "const": true,
+              "type": "boolean"
+            },
+            "schemaVersion": {
+              "$ref": "#/$defs/__schema0"
+            },
+            "totalDue": {
+              "maximum": 9007199254740991,
+              "minimum": 0,
+              "type": "integer"
+            },
+            "traceId": {
+              "$ref": "#/$defs/__schema3"
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "ok",
+            "asOf",
+            "totalDue",
+            "items",
+            "nextCursor",
+            "traceId"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "conflicts": {
+              "items": {
+                "$ref": "#/$defs/__schema27"
+              },
+              "maxItems": 20,
+              "type": "array"
+            },
+            "ok": {
+              "const": true,
+              "type": "boolean"
+            },
+            "results": {
+              "items": {
+                "$ref": "#/$defs/__schema26"
+              },
+              "maxItems": 20,
+              "type": "array"
+            },
+            "retrievalStatus": {
+              "enum": [
+                "success",
+                "insufficient"
+              ],
+              "type": "string"
+            },
+            "schemaVersion": {
+              "$ref": "#/$defs/__schema0"
+            },
+            "traceId": {
+              "$ref": "#/$defs/__schema3"
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "ok",
+            "retrievalStatus",
+            "results",
+            "conflicts",
+            "traceId"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "citations": {
+              "items": {
+                "$ref": "#/$defs/__schema12"
+              },
+              "maxItems": 20,
+              "minItems": 1,
+              "type": "array"
+            },
+            "exerciseId": {
+              "$ref": "#/$defs/__schema8",
+              "maxLength": 64,
+              "minLength": 10,
+              "pattern": "^[A-Za-z0-9_-]+$",
+              "type": "string"
+            },
+            "exerciseVersion": {
+              "maxLength": 128,
+              "minLength": 1,
+              "type": "string"
+            },
+            "instructions": {
+              "maxLength": 2000,
+              "minLength": 1,
+              "type": "string"
+            },
+            "items": {
+              "items": {
+                "$ref": "#/$defs/__schema28"
+              },
+              "maxItems": 20,
+              "minItems": 1,
+              "type": "array"
+            },
+            "ok": {
+              "const": true,
+              "type": "boolean"
+            },
+            "personalizationReason": {
+              "maxLength": 2000,
+              "minLength": 1,
+              "type": "string"
+            },
+            "replayed": {
+              "type": "boolean"
+            },
+            "schemaVersion": {
+              "$ref": "#/$defs/__schema0"
+            },
+            "status": {
+              "const": "ready",
+              "type": "string"
+            },
+            "traceId": {
+              "$ref": "#/$defs/__schema3"
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "ok",
+            "exerciseId",
+            "exerciseVersion",
+            "status",
+            "instructions",
+            "personalizationReason",
+            "items",
+            "citations",
+            "replayed",
+            "traceId"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "expiresAt": {
+              "$ref": "#/$defs/__schema5"
+            },
+            "ok": {
+              "const": false,
+              "type": "boolean"
+            },
+            "operationSummary": {
+              "maxLength": 1000,
+              "minLength": 1,
+              "type": "string"
+            },
+            "schemaVersion": {
+              "$ref": "#/$defs/__schema0"
+            },
+            "status": {
+              "enum": [
+                "confirmation_required",
+                "confirmation_pending"
+              ],
+              "type": "string"
+            },
+            "traceId": {
+              "$ref": "#/$defs/__schema3"
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "ok",
+            "status",
+            "expiresAt",
+            "operationSummary",
+            "traceId"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "attemptId": {
+              "$ref": "#/$defs/__schema32"
+            },
+            "items": {
+              "$ref": "#/$defs/__schema35"
+            },
+            "learningChanges": {
+              "$ref": "#/$defs/__schema38"
+            },
+            "ok": {
+              "$ref": "#/$defs/__schema30"
+            },
+            "saveFailure": {
+              "$ref": "#/$defs/__schema40"
+            },
+            "saveStatus": {
+              "$ref": "#/$defs/__schema33"
+            },
+            "schemaVersion": {
+              "$ref": "#/$defs/__schema0"
+            },
+            "score": {
+              "$ref": "#/$defs/__schema34"
+            },
+            "submissionId": {
+              "$ref": "#/$defs/__schema31"
+            },
+            "traceId": {
+              "$ref": "#/$defs/__schema3"
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "ok",
+            "submissionId",
+            "attemptId",
+            "saveStatus",
+            "score",
+            "items",
+            "learningChanges",
+            "traceId"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "ok": {
+              "const": true,
+              "type": "boolean"
+            },
+            "report": {
+              "$ref": "#/$defs/__schema15"
+            },
+            "schemaVersion": {
+              "$ref": "#/$defs/__schema0"
+            },
+            "traceId": {
+              "$ref": "#/$defs/__schema3"
+            },
+            "weaknesses": {
+              "items": {
+                "$ref": "#/$defs/__schema16"
+              },
+              "maxItems": 50,
+              "type": "array"
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "ok",
+            "report",
+            "weaknesses",
+            "traceId"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "code": {
+              "enum": [
+                "UNAUTHENTICATED",
+                "INSUFFICIENT_SCOPE",
+                "CAPABILITY_UNAVAILABLE",
+                "VALIDATION_FAILED",
+                "RESOURCE_NOT_FOUND",
+                "CURSOR_INVALID",
+                "DATA_NOT_AVAILABLE",
+                "SOURCE_RIGHTS_DENIED",
+                "IDEMPOTENCY_CONFLICT",
+                "IN_PROGRESS",
+                "CONFIRMATION_REQUIRED",
+                "CONFIRMATION_PENDING",
+                "CONFIRMATION_INVALID",
+                "RATE_LIMITED",
+                "BUDGET_EXCEEDED",
+                "CANCELLED",
+                "TIMEOUT",
+                "DEPENDENCY_UNAVAILABLE",
+                "INTERNAL_ERROR"
+              ],
+              "type": "string"
+            },
+            "message": {
+              "maxLength": 500,
+              "minLength": 1,
+              "type": "string"
+            },
+            "ok": {
+              "const": false,
+              "type": "boolean"
+            },
+            "retryable": {
+              "type": "boolean"
+            },
+            "retryAfterSeconds": {
+              "maximum": 3600,
+              "minimum": 1,
+              "type": "integer"
+            },
+            "schemaVersion": {
+              "const": "en-learning.mcp.v1",
+              "type": "string"
+            },
+            "traceId": {
+              "maxLength": 128,
+              "minLength": 10,
+              "type": "string"
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "ok",
+            "code",
+            "message",
+            "retryable",
+            "traceId"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    {
+      "anyOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "arguments": {
+              "additionalProperties": false,
+              "properties": {
+                "difficulty": {
+                  "$ref": "#/$defs/__schema21"
+                },
+                "durationMinutes": {
+                  "default": 20,
+                  "maximum": 60,
+                  "minimum": 5,
+                  "type": "integer"
+                },
+                "feedbackEachRound": {
+                  "default": true,
+                  "type": "boolean"
+                },
+                "level": {
+                  "$ref": "#/$defs/__schema9"
+                },
+                "role": {
+                  "maxLength": 120,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "rounds": {
+                  "default": 5,
+                  "maximum": 10,
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "role",
+                "rounds",
+                "durationMinutes",
+                "feedbackEachRound"
+              ],
+              "type": "object"
+            },
+            "name": {
+              "const": "english_interview",
+              "type": "string"
+            }
+          },
+          "required": [
+            "name",
+            "arguments"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "arguments": {
+              "additionalProperties": false,
+              "properties": {
+                "difficulty": {
+                  "$ref": "#/$defs/__schema21"
+                },
+                "level": {
+                  "$ref": "#/$defs/__schema9"
+                },
+                "scenario": {
+                  "enum": [
+                    "meeting",
+                    "email",
+                    "presentation",
+                    "negotiation"
+                  ],
+                  "type": "string"
+                },
+                "targetExpression": {
+                  "maxLength": 500,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "scenario"
+              ],
+              "type": "object"
+            },
+            "name": {
+              "const": "business_english",
+              "type": "string"
+            }
+          },
+          "required": [
+            "name",
+            "arguments"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "arguments": {
+              "additionalProperties": false,
+              "properties": {
+                "count": {
+                  "default": 10,
+                  "maximum": 20,
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "courseId": {
+                  "$ref": "#/$defs/__schema8",
+                  "maxLength": 64
+                },
+                "difficulty": {
+                  "$ref": "#/$defs/__schema21"
+                },
+                "scope": {
+                  "default": "due_today",
+                  "enum": [
+                    "due_today",
+                    "weak_words",
+                    "course"
+                  ],
+                  "type": "string"
+                },
+                "types": {
+                  "items": {
+                    "$ref": "#/$defs/__schema20"
+                  },
+                  "maxItems": 4,
+                  "minItems": 1,
+                  "type": "array"
+                }
+              },
+              "required": [
+                "scope",
+                "count"
+              ],
+              "type": "object"
+            },
+            "name": {
+              "const": "vocabulary_review",
+              "type": "string"
+            }
+          },
+          "required": [
+            "name",
+            "arguments"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    {
+      "additionalProperties": false,
+      "properties": {
+        "messages": {
+          "items": {
+            "$ref": "#/$defs/__schema41"
+          },
+          "maxItems": 4,
+          "minItems": 1,
+          "type": "array"
+        },
+        "name": {
+          "enum": [
+            "english_interview",
+            "business_english",
+            "vocabulary_review"
+          ],
+          "type": "string"
+        },
+        "promptVersion": {
+          "maxLength": 128,
+          "minLength": 1,
+          "type": "string"
+        },
+        "recommendedReadTools": {
+          "items": {
+            "$ref": "#/$defs/__schema42"
+          },
+          "maxItems": 4,
+          "minItems": 0,
+          "type": "array"
+        },
+        "schemaVersion": {
+          "$ref": "#/$defs/__schema0"
+        },
+        "traceId": {
+          "$ref": "#/$defs/__schema3"
+        },
+        "writesRequireSeparateConfirmation": {
+          "const": true,
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "name",
+        "promptVersion",
+        "messages",
+        "recommendedReadTools",
+        "writesRequireSeparateConfirmation",
+        "traceId"
+      ],
+      "type": "object"
+    }
+  ],
+  "description": "Generated strict public contract. Identity is injected by the server and never appears in public inputs.",
+  "title": "English Learning MCP v1 public capability content"
+}

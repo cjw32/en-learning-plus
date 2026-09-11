@@ -1,0 +1,15 @@
+{
+  "schemaVersion": "mcp-release-decision.v1",
+  "status": "NOT_READY",
+  "passed": false,
+  "blockers": [
+    "GATE_B_SOURCE_RIGHTS",
+    "GATE_D_RETENTION",
+    "GATE_E_BUDGET_AND_BASELINE",
+    "APPROVED_BASELINES_MISSING",
+    "CLIENT_MISSING:Codex",
+    "CLIENT_MISSING:Claude Desktop",
+    "CLIENT_MISSING:Visual Studio Code",
+    "CLIENT_MISSING:MCP Inspector"
+  ]
+}

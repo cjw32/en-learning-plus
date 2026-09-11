@@ -1,0 +1,33 @@
+{
+  "schemaVersion": "mcp-eval-report.v1",
+  "recordedAt": "2026-09-11T00:00:00.000Z",
+  "context": {
+    "commit": "3f3ad9f2004fec5a6b255efe70759b57489ab16a+working-tree",
+    "environment": "local-fake-provider",
+    "node": "v24.18.0",
+    "pnpm": "10.32.1",
+    "fixtureVersion": "mcp-eval-cases.v1",
+    "rubricVersion": "mcp-rubrics.v1",
+    "deterministicEvaluatorVersion": "mcp-deterministic.v1",
+    "judgePromptVersion": "mcp-eval-judge.v1"
+  },
+  "metrics": {
+    "caseCount": 18,
+    "positiveCount": 9,
+    "failureCount": 9,
+    "deterministicPassCount": 18,
+    "deterministicPassRate": 1,
+    "quality": {"sampleCount": 0, "mean": null, "missingReason": "real-provider/GATE-E not approved"},
+    "toolAccuracy": {"sampleCount": 18, "value": 1},
+    "schemaAccuracy": {"sampleCount": 18, "value": 1},
+    "citationValidity": {"sampleCount": 4, "value": 1},
+    "latencyMs": {"sampleCount": 0, "p50": null, "p95": null, "missingReason": "not a production load baseline"},
+    "tokens": {"input": 0, "output": 0},
+    "estimatedCostMicros": 0,
+    "unknownPriceCount": 0,
+    "cancellation": {"sampleCount": 2, "terminalCount": 2},
+    "zeroToleranceViolations": 0,
+    "sensitiveDataHits": 0,
+    "clientCompatibility": {"passed": 0, "required": 4, "status": "PENDING_APPROVAL"}
+  }
+}

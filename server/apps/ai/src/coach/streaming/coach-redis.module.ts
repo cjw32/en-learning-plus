@@ -1,5 +1,5 @@
 import { Global, Injectable, Module, OnModuleDestroy } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import Redis from 'ioredis';
 
 @Injectable()
@@ -27,6 +27,7 @@ export class CoachRedisConnection implements OnModuleDestroy {
 
 @Global()
 @Module({
+  imports: [ConfigModule],
   providers: [CoachRedisConnection],
   exports: [CoachRedisConnection],
 })
