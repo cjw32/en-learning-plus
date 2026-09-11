@@ -254,6 +254,14 @@ export type ValidGradingResult = GradingResult & {
   score: number;
 };
 
+export type PreparedOwnedGrading = Readonly<{
+  status: 'GRADED_VALID';
+  exerciseId: string;
+  exerciseVersion: string;
+  result: ValidGradingResult;
+  citations: readonly unknown[];
+}>;
+
 export type StoredValidSubmission = {
   id: string;
   subjectId: string;
@@ -392,8 +400,15 @@ export class PrismaGradingRepository implements GradingRepository {
         id: input.gradeRequestId,
         userId: input.subjectId,
         clientRequestKey: input.idempotencyKey,
-        inputType: 'EXERCISE_SUBMISSION',
         cancelRequestedAt: null,
+        OR: [
+          { inputType: 'EXERCISE_SUBMISSION' },
+          {
+            inputType: 'RECOMMENDATION',
+            intent: 'GRADE_ANSWER',
+            conversation: { origin: 'MCP' },
+          },
+        ],
       },
       select: { conversationId: true, exerciseId: true },
     });
@@ -438,9 +453,7 @@ export class PrismaGradingRepository implements GradingRepository {
       maxScore: item.maxScore,
       citations: z.array(storedCitationSchema).parse(item.citations),
       targets: item.targets.map((target) => ({
-        targetType: z
-          .enum(['WORD', 'ERROR_TYPE'])
-          .parse(target.targetType),
+        targetType: z.enum(['WORD', 'ERROR_TYPE']).parse(target.targetType),
         targetKey: target.targetKey,
         weight: Number(target.weight),
       })),
@@ -587,6 +600,66 @@ export class OwnedGradingService {
     private readonly createSubmissionId: () => string = () =>
       `submission_${randomUUID().replaceAll('-', '').slice(0, 24)}`,
   ) {}
+
+  /**
+   * Loads and grades an owned exercise without creating a submission or
+   * changing exercise, mastery, attempt, or review state. Persistence of this
+   * bounded preparation belongs to the caller's idempotency boundary.
+   */
+  async prepareOwned(input: {
+    subjectId: string;
+    gradeRequestId: string;
+    exerciseId: string;
+    exerciseVersion: string;
+    answers: Array<{ itemId: string; answer: string | string[] }>;
+    idempotencyKey: string;
+    subjective?: SubjectiveGrader;
+  }): Promise<PreparedOwnedGrading | { status: 'GRADING_FAILED' }> {
+    const parsedAnswers = z
+      .array(answerSchema)
+      .min(1)
+      .max(50)
+      .safeParse(input.answers);
+    if (!parsedAnswers.success) {
+      throw new LearningDomainError('VALIDATION_FAILED', '答案格式无效', 400);
+    }
+    const exercise = await this.repository.loadOwnedExercise({
+      subjectId: input.subjectId,
+      gradeRequestId: input.gradeRequestId,
+      exerciseId: input.exerciseId,
+      idempotencyKey: input.idempotencyKey,
+    });
+    if (!exercise) throw ownedResourceNotFound();
+    if (exercise.version !== input.exerciseVersion) {
+      throw new LearningDomainError('STATE_CONFLICT', '练习版本已变化', 409);
+    }
+    const result = await this.grading.grade({
+      exercise,
+      answers: parsedAnswers.data,
+      subjective: input.subjective,
+    });
+    if (
+      result.status !== 'GRADED_VALID' ||
+      result.answerVersion === null ||
+      result.gradingHash === null ||
+      result.score === null
+    ) {
+      return { status: 'GRADING_FAILED' };
+    }
+    return Object.freeze({
+      status: 'GRADED_VALID' as const,
+      exerciseId: exercise.id,
+      exerciseVersion: exercise.version,
+      result: Object.freeze({
+        ...result,
+        status: 'GRADED_VALID' as const,
+        answerVersion: result.answerVersion,
+        gradingHash: result.gradingHash,
+        score: result.score,
+      }),
+      citations: Object.freeze([...exercise.citations]),
+    });
+  }
 
   async gradeOwned(input: {
     subjectId: string;

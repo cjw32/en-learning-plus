@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { createHash } from 'node:crypto';
 import { PrismaService } from '@libs/shared';
+import type { LearningDataCleanupPort } from './learning-data-cleanup.port';
 
 export interface LearningDataDeletionRepository {
   hideImmediately(subjectId: string, requestedAt: Date): Promise<void>;
@@ -17,26 +18,73 @@ export interface PronunciationAccountDataCleanup {
 
 @Injectable()
 export class LearningDataDeletionService {
+  private readonly cleanups = new Map<string, LearningDataCleanupPort>();
+  private pronunciation?: PronunciationAccountDataCleanup;
+
   constructor(
     private readonly repository: LearningDataDeletionRepository,
-    private pronunciation?: PronunciationAccountDataCleanup,
-  ) {}
+    cleanupsOrPronunciation?:
+      | readonly LearningDataCleanupPort[]
+      | PronunciationAccountDataCleanup,
+  ) {
+    if (Array.isArray(cleanupsOrPronunciation)) {
+      for (const cleanup of cleanupsOrPronunciation) {
+        this.registerCleanup(cleanup);
+      }
+    } else if (cleanupsOrPronunciation) {
+      this.configurePronunciationCleanup(
+        cleanupsOrPronunciation as PronunciationAccountDataCleanup,
+      );
+    }
+  }
 
-  configurePronunciationCleanup(cleanup: PronunciationAccountDataCleanup): void {
+  registerCleanup(cleanup: LearningDataCleanupPort): void {
+    if (!/^[a-z][a-z0-9-]{0,63}$/.test(cleanup.cleanupKey)) {
+      throw new Error(
+        `Invalid learning-data cleanup key: ${cleanup.cleanupKey}`,
+      );
+    }
+    const registered = this.cleanups.get(cleanup.cleanupKey);
+    if (registered === cleanup) return;
+    if (registered) {
+      throw new Error(
+        `Duplicate learning-data cleanup key: ${cleanup.cleanupKey}`,
+      );
+    }
+    this.cleanups.set(cleanup.cleanupKey, cleanup);
+  }
+
+  configurePronunciationCleanup(
+    cleanup: PronunciationAccountDataCleanup,
+  ): void {
+    if (this.pronunciation === cleanup) return;
+    if (this.pronunciation) {
+      throw new Error('Duplicate learning-data cleanup key: pronunciation');
+    }
     this.pronunciation = cleanup;
+    this.registerCleanup({
+      cleanupKey: 'pronunciation',
+      hideImmediately: async (subjectId) => {
+        await cleanup.revokeAudioAccess(subjectId);
+        await cleanup.purgeCaches(subjectId);
+        await cleanup.revokeTemporaryLinks(subjectId);
+        await cleanup.unlinkTraceSubject(subjectId);
+      },
+      purgeOwnedData: (subjectId) => cleanup.purgeAudioObjects(subjectId),
+    });
   }
 
   async hideImmediately(subjectId: string, requestedAt: Date): Promise<void> {
     await this.repository.hideImmediately(subjectId, requestedAt);
-    if (!this.pronunciation) return;
-    await this.pronunciation.revokeAudioAccess(subjectId);
-    await this.pronunciation.purgeCaches(subjectId);
-    await this.pronunciation.revokeTemporaryLinks(subjectId);
-    await this.pronunciation.unlinkTraceSubject(subjectId);
+    for (const cleanup of this.cleanups.values()) {
+      await cleanup.hideImmediately(subjectId, requestedAt);
+    }
   }
 
   async purgeOwnedData(subjectId: string): Promise<void> {
-    await this.pronunciation?.purgeAudioObjects(subjectId);
+    for (const cleanup of this.cleanups.values()) {
+      await cleanup.purgeOwnedData(subjectId);
+    }
     await this.repository.purgeOwnedData(subjectId);
   }
 }

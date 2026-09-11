@@ -412,6 +412,13 @@ export const ModelName = {
   PronunciationDeletionTombstone: 'PronunciationDeletionTombstone',
   LearningStateRecalculationEvent: 'LearningStateRecalculationEvent',
   CoachTrace: 'CoachTrace',
+  McpSubjectMapping: 'McpSubjectMapping',
+  McpClientAuthorization: 'McpClientAuthorization',
+  McpInvocation: 'McpInvocation',
+  McpIdempotencyIntent: 'McpIdempotencyIntent',
+  McpWriteConfirmation: 'McpWriteConfirmation',
+  McpTrace: 'McpTrace',
+  McpTraceStep: 'McpTraceStep',
   CoachDeletionTombstone: 'CoachDeletionTombstone',
   CoachStepTrace: 'CoachStepTrace',
   CoachFeedback: 'CoachFeedback',
@@ -445,7 +452,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "wordBookRecord" | "wordBook" | "paymentRecord" | "courseRecord" | "course" | "learnerProfile" | "learningItemState" | "learningReviewEvent" | "coachConversation" | "coachMessage" | "coachRequest" | "exercise" | "exerciseItem" | "exerciseItemTarget" | "exerciseSubmission" | "exerciseSubmissionItem" | "learningAttempt" | "pronunciationAssessment" | "pronunciationTarget" | "pronunciationAudioAsset" | "pronunciationWordAssessment" | "pronunciationProviderCall" | "pronunciationTrace" | "pronunciationTraceStep" | "pronunciationDeletionTombstone" | "learningStateRecalculationEvent" | "coachTrace" | "coachDeletionTombstone" | "coachStepTrace" | "coachFeedback" | "traceSubjectMapping" | "knowledgeSource" | "knowledgeSourceFieldPolicy" | "knowledgeRelease" | "knowledgeDocument" | "knowledgeChunk" | "knowledgeEmbedding" | "knowledgeIngestionJob" | "privateLearningSummary" | "knowledgeCitation" | "visitor" | "pageView" | "trackEvent" | "performanceEntry" | "errorEntry"
+    modelProps: "user" | "wordBookRecord" | "wordBook" | "paymentRecord" | "courseRecord" | "course" | "learnerProfile" | "learningItemState" | "learningReviewEvent" | "coachConversation" | "coachMessage" | "coachRequest" | "exercise" | "exerciseItem" | "exerciseItemTarget" | "exerciseSubmission" | "exerciseSubmissionItem" | "learningAttempt" | "pronunciationAssessment" | "pronunciationTarget" | "pronunciationAudioAsset" | "pronunciationWordAssessment" | "pronunciationProviderCall" | "pronunciationTrace" | "pronunciationTraceStep" | "pronunciationDeletionTombstone" | "learningStateRecalculationEvent" | "coachTrace" | "mcpSubjectMapping" | "mcpClientAuthorization" | "mcpInvocation" | "mcpIdempotencyIntent" | "mcpWriteConfirmation" | "mcpTrace" | "mcpTraceStep" | "coachDeletionTombstone" | "coachStepTrace" | "coachFeedback" | "traceSubjectMapping" | "knowledgeSource" | "knowledgeSourceFieldPolicy" | "knowledgeRelease" | "knowledgeDocument" | "knowledgeChunk" | "knowledgeEmbedding" | "knowledgeIngestionJob" | "privateLearningSummary" | "knowledgeCitation" | "visitor" | "pageView" | "trackEvent" | "performanceEntry" | "errorEntry"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2521,6 +2528,524 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    McpSubjectMapping: {
+      payload: Prisma.$McpSubjectMappingPayload<ExtArgs>
+      fields: Prisma.McpSubjectMappingFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.McpSubjectMappingFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpSubjectMappingPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.McpSubjectMappingFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpSubjectMappingPayload>
+        }
+        findFirst: {
+          args: Prisma.McpSubjectMappingFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpSubjectMappingPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.McpSubjectMappingFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpSubjectMappingPayload>
+        }
+        findMany: {
+          args: Prisma.McpSubjectMappingFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpSubjectMappingPayload>[]
+        }
+        create: {
+          args: Prisma.McpSubjectMappingCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpSubjectMappingPayload>
+        }
+        createMany: {
+          args: Prisma.McpSubjectMappingCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.McpSubjectMappingCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpSubjectMappingPayload>[]
+        }
+        delete: {
+          args: Prisma.McpSubjectMappingDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpSubjectMappingPayload>
+        }
+        update: {
+          args: Prisma.McpSubjectMappingUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpSubjectMappingPayload>
+        }
+        deleteMany: {
+          args: Prisma.McpSubjectMappingDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.McpSubjectMappingUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.McpSubjectMappingUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpSubjectMappingPayload>[]
+        }
+        upsert: {
+          args: Prisma.McpSubjectMappingUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpSubjectMappingPayload>
+        }
+        aggregate: {
+          args: Prisma.McpSubjectMappingAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateMcpSubjectMapping>
+        }
+        groupBy: {
+          args: Prisma.McpSubjectMappingGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.McpSubjectMappingGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.McpSubjectMappingCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.McpSubjectMappingCountAggregateOutputType> | number
+        }
+      }
+    }
+    McpClientAuthorization: {
+      payload: Prisma.$McpClientAuthorizationPayload<ExtArgs>
+      fields: Prisma.McpClientAuthorizationFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.McpClientAuthorizationFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpClientAuthorizationPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.McpClientAuthorizationFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpClientAuthorizationPayload>
+        }
+        findFirst: {
+          args: Prisma.McpClientAuthorizationFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpClientAuthorizationPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.McpClientAuthorizationFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpClientAuthorizationPayload>
+        }
+        findMany: {
+          args: Prisma.McpClientAuthorizationFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpClientAuthorizationPayload>[]
+        }
+        create: {
+          args: Prisma.McpClientAuthorizationCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpClientAuthorizationPayload>
+        }
+        createMany: {
+          args: Prisma.McpClientAuthorizationCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.McpClientAuthorizationCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpClientAuthorizationPayload>[]
+        }
+        delete: {
+          args: Prisma.McpClientAuthorizationDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpClientAuthorizationPayload>
+        }
+        update: {
+          args: Prisma.McpClientAuthorizationUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpClientAuthorizationPayload>
+        }
+        deleteMany: {
+          args: Prisma.McpClientAuthorizationDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.McpClientAuthorizationUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.McpClientAuthorizationUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpClientAuthorizationPayload>[]
+        }
+        upsert: {
+          args: Prisma.McpClientAuthorizationUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpClientAuthorizationPayload>
+        }
+        aggregate: {
+          args: Prisma.McpClientAuthorizationAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateMcpClientAuthorization>
+        }
+        groupBy: {
+          args: Prisma.McpClientAuthorizationGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.McpClientAuthorizationGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.McpClientAuthorizationCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.McpClientAuthorizationCountAggregateOutputType> | number
+        }
+      }
+    }
+    McpInvocation: {
+      payload: Prisma.$McpInvocationPayload<ExtArgs>
+      fields: Prisma.McpInvocationFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.McpInvocationFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpInvocationPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.McpInvocationFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpInvocationPayload>
+        }
+        findFirst: {
+          args: Prisma.McpInvocationFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpInvocationPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.McpInvocationFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpInvocationPayload>
+        }
+        findMany: {
+          args: Prisma.McpInvocationFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpInvocationPayload>[]
+        }
+        create: {
+          args: Prisma.McpInvocationCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpInvocationPayload>
+        }
+        createMany: {
+          args: Prisma.McpInvocationCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.McpInvocationCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpInvocationPayload>[]
+        }
+        delete: {
+          args: Prisma.McpInvocationDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpInvocationPayload>
+        }
+        update: {
+          args: Prisma.McpInvocationUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpInvocationPayload>
+        }
+        deleteMany: {
+          args: Prisma.McpInvocationDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.McpInvocationUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.McpInvocationUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpInvocationPayload>[]
+        }
+        upsert: {
+          args: Prisma.McpInvocationUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpInvocationPayload>
+        }
+        aggregate: {
+          args: Prisma.McpInvocationAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateMcpInvocation>
+        }
+        groupBy: {
+          args: Prisma.McpInvocationGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.McpInvocationGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.McpInvocationCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.McpInvocationCountAggregateOutputType> | number
+        }
+      }
+    }
+    McpIdempotencyIntent: {
+      payload: Prisma.$McpIdempotencyIntentPayload<ExtArgs>
+      fields: Prisma.McpIdempotencyIntentFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.McpIdempotencyIntentFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpIdempotencyIntentPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.McpIdempotencyIntentFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpIdempotencyIntentPayload>
+        }
+        findFirst: {
+          args: Prisma.McpIdempotencyIntentFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpIdempotencyIntentPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.McpIdempotencyIntentFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpIdempotencyIntentPayload>
+        }
+        findMany: {
+          args: Prisma.McpIdempotencyIntentFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpIdempotencyIntentPayload>[]
+        }
+        create: {
+          args: Prisma.McpIdempotencyIntentCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpIdempotencyIntentPayload>
+        }
+        createMany: {
+          args: Prisma.McpIdempotencyIntentCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.McpIdempotencyIntentCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpIdempotencyIntentPayload>[]
+        }
+        delete: {
+          args: Prisma.McpIdempotencyIntentDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpIdempotencyIntentPayload>
+        }
+        update: {
+          args: Prisma.McpIdempotencyIntentUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpIdempotencyIntentPayload>
+        }
+        deleteMany: {
+          args: Prisma.McpIdempotencyIntentDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.McpIdempotencyIntentUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.McpIdempotencyIntentUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpIdempotencyIntentPayload>[]
+        }
+        upsert: {
+          args: Prisma.McpIdempotencyIntentUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpIdempotencyIntentPayload>
+        }
+        aggregate: {
+          args: Prisma.McpIdempotencyIntentAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateMcpIdempotencyIntent>
+        }
+        groupBy: {
+          args: Prisma.McpIdempotencyIntentGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.McpIdempotencyIntentGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.McpIdempotencyIntentCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.McpIdempotencyIntentCountAggregateOutputType> | number
+        }
+      }
+    }
+    McpWriteConfirmation: {
+      payload: Prisma.$McpWriteConfirmationPayload<ExtArgs>
+      fields: Prisma.McpWriteConfirmationFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.McpWriteConfirmationFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpWriteConfirmationPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.McpWriteConfirmationFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpWriteConfirmationPayload>
+        }
+        findFirst: {
+          args: Prisma.McpWriteConfirmationFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpWriteConfirmationPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.McpWriteConfirmationFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpWriteConfirmationPayload>
+        }
+        findMany: {
+          args: Prisma.McpWriteConfirmationFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpWriteConfirmationPayload>[]
+        }
+        create: {
+          args: Prisma.McpWriteConfirmationCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpWriteConfirmationPayload>
+        }
+        createMany: {
+          args: Prisma.McpWriteConfirmationCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.McpWriteConfirmationCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpWriteConfirmationPayload>[]
+        }
+        delete: {
+          args: Prisma.McpWriteConfirmationDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpWriteConfirmationPayload>
+        }
+        update: {
+          args: Prisma.McpWriteConfirmationUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpWriteConfirmationPayload>
+        }
+        deleteMany: {
+          args: Prisma.McpWriteConfirmationDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.McpWriteConfirmationUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.McpWriteConfirmationUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpWriteConfirmationPayload>[]
+        }
+        upsert: {
+          args: Prisma.McpWriteConfirmationUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpWriteConfirmationPayload>
+        }
+        aggregate: {
+          args: Prisma.McpWriteConfirmationAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateMcpWriteConfirmation>
+        }
+        groupBy: {
+          args: Prisma.McpWriteConfirmationGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.McpWriteConfirmationGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.McpWriteConfirmationCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.McpWriteConfirmationCountAggregateOutputType> | number
+        }
+      }
+    }
+    McpTrace: {
+      payload: Prisma.$McpTracePayload<ExtArgs>
+      fields: Prisma.McpTraceFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.McpTraceFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpTracePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.McpTraceFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpTracePayload>
+        }
+        findFirst: {
+          args: Prisma.McpTraceFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpTracePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.McpTraceFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpTracePayload>
+        }
+        findMany: {
+          args: Prisma.McpTraceFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpTracePayload>[]
+        }
+        create: {
+          args: Prisma.McpTraceCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpTracePayload>
+        }
+        createMany: {
+          args: Prisma.McpTraceCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.McpTraceCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpTracePayload>[]
+        }
+        delete: {
+          args: Prisma.McpTraceDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpTracePayload>
+        }
+        update: {
+          args: Prisma.McpTraceUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpTracePayload>
+        }
+        deleteMany: {
+          args: Prisma.McpTraceDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.McpTraceUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.McpTraceUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpTracePayload>[]
+        }
+        upsert: {
+          args: Prisma.McpTraceUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpTracePayload>
+        }
+        aggregate: {
+          args: Prisma.McpTraceAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateMcpTrace>
+        }
+        groupBy: {
+          args: Prisma.McpTraceGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.McpTraceGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.McpTraceCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.McpTraceCountAggregateOutputType> | number
+        }
+      }
+    }
+    McpTraceStep: {
+      payload: Prisma.$McpTraceStepPayload<ExtArgs>
+      fields: Prisma.McpTraceStepFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.McpTraceStepFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpTraceStepPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.McpTraceStepFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpTraceStepPayload>
+        }
+        findFirst: {
+          args: Prisma.McpTraceStepFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpTraceStepPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.McpTraceStepFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpTraceStepPayload>
+        }
+        findMany: {
+          args: Prisma.McpTraceStepFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpTraceStepPayload>[]
+        }
+        create: {
+          args: Prisma.McpTraceStepCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpTraceStepPayload>
+        }
+        createMany: {
+          args: Prisma.McpTraceStepCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.McpTraceStepCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpTraceStepPayload>[]
+        }
+        delete: {
+          args: Prisma.McpTraceStepDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpTraceStepPayload>
+        }
+        update: {
+          args: Prisma.McpTraceStepUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpTraceStepPayload>
+        }
+        deleteMany: {
+          args: Prisma.McpTraceStepDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.McpTraceStepUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.McpTraceStepUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpTraceStepPayload>[]
+        }
+        upsert: {
+          args: Prisma.McpTraceStepUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$McpTraceStepPayload>
+        }
+        aggregate: {
+          args: Prisma.McpTraceStepAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateMcpTraceStep>
+        }
+        groupBy: {
+          args: Prisma.McpTraceStepGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.McpTraceStepGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.McpTraceStepCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.McpTraceStepCountAggregateOutputType> | number
+        }
+      }
+    }
     CoachDeletionTombstone: {
       payload: Prisma.$CoachDeletionTombstonePayload<ExtArgs>
       fields: Prisma.CoachDeletionTombstoneFieldRefs
@@ -4061,6 +4586,7 @@ export const CoachConversationScalarFieldEnum = {
   userId: 'userId',
   title: 'title',
   status: 'status',
+  origin: 'origin',
   checkpointThreadId: 'checkpointThreadId',
   lastActivityAt: 'lastActivityAt',
   expiresAt: 'expiresAt',
@@ -4511,6 +5037,209 @@ export const CoachTraceScalarFieldEnum = {
 } as const
 
 export type CoachTraceScalarFieldEnum = (typeof CoachTraceScalarFieldEnum)[keyof typeof CoachTraceScalarFieldEnum]
+
+
+export const McpSubjectMappingScalarFieldEnum = {
+  id: 'id',
+  issuer: 'issuer',
+  subjectHmac: 'subjectHmac',
+  hmacKeyVersion: 'hmacKeyVersion',
+  userId: 'userId',
+  status: 'status',
+  linkedAt: 'linkedAt',
+  revokedAt: 'revokedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type McpSubjectMappingScalarFieldEnum = (typeof McpSubjectMappingScalarFieldEnum)[keyof typeof McpSubjectMappingScalarFieldEnum]
+
+
+export const McpClientAuthorizationScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  subjectMappingId: 'subjectMappingId',
+  issuer: 'issuer',
+  audience: 'audience',
+  clientId: 'clientId',
+  clientDisplayName: 'clientDisplayName',
+  scopes: 'scopes',
+  authorizationVersion: 'authorizationVersion',
+  status: 'status',
+  grantedAt: 'grantedAt',
+  lastSeenAt: 'lastSeenAt',
+  revokedAt: 'revokedAt',
+  retentionExpiresAt: 'retentionExpiresAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type McpClientAuthorizationScalarFieldEnum = (typeof McpClientAuthorizationScalarFieldEnum)[keyof typeof McpClientAuthorizationScalarFieldEnum]
+
+
+export const McpInvocationScalarFieldEnum = {
+  id: 'id',
+  authorizationId: 'authorizationId',
+  userId: 'userId',
+  traceId: 'traceId',
+  protocolEra: 'protocolEra',
+  transport: 'transport',
+  sessionIdHmac: 'sessionIdHmac',
+  protocolRequestIdHmac: 'protocolRequestIdHmac',
+  capabilityType: 'capabilityType',
+  capabilityName: 'capabilityName',
+  capabilityVersion: 'capabilityVersion',
+  inputSchemaVersion: 'inputSchemaVersion',
+  inputFingerprint: 'inputFingerprint',
+  status: 'status',
+  deadlineAt: 'deadlineAt',
+  cancelRequestedAt: 'cancelRequestedAt',
+  coachRequestId: 'coachRequestId',
+  idempotencyIntentId: 'idempotencyIntentId',
+  resultType: 'resultType',
+  safeErrorCode: 'safeErrorCode',
+  businessResultType: 'businessResultType',
+  businessResultIdHmac: 'businessResultIdHmac',
+  startedAt: 'startedAt',
+  finishedAt: 'finishedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type McpInvocationScalarFieldEnum = (typeof McpInvocationScalarFieldEnum)[keyof typeof McpInvocationScalarFieldEnum]
+
+
+export const McpIdempotencyIntentScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  authorizationId: 'authorizationId',
+  issuer: 'issuer',
+  clientId: 'clientId',
+  toolName: 'toolName',
+  clientKeyDigest: 'clientKeyDigest',
+  requestFingerprint: 'requestFingerprint',
+  logicalResource: 'logicalResource',
+  status: 'status',
+  leaseOwnerHmac: 'leaseOwnerHmac',
+  leaseExpiresAt: 'leaseExpiresAt',
+  attemptCount: 'attemptCount',
+  exerciseId: 'exerciseId',
+  submissionId: 'submissionId',
+  learningAttemptId: 'learningAttemptId',
+  gradingResult: 'gradingResult',
+  gradingResultHash: 'gradingResultHash',
+  safeTerminalProjection: 'safeTerminalProjection',
+  safeErrorCode: 'safeErrorCode',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  finishedAt: 'finishedAt'
+} as const
+
+export type McpIdempotencyIntentScalarFieldEnum = (typeof McpIdempotencyIntentScalarFieldEnum)[keyof typeof McpIdempotencyIntentScalarFieldEnum]
+
+
+export const McpWriteConfirmationScalarFieldEnum = {
+  id: 'id',
+  selectorHmac: 'selectorHmac',
+  idempotencyIntentId: 'idempotencyIntentId',
+  userId: 'userId',
+  authorizationId: 'authorizationId',
+  issuer: 'issuer',
+  clientId: 'clientId',
+  requiredScope: 'requiredScope',
+  scopeSnapshotDigest: 'scopeSnapshotDigest',
+  toolVersion: 'toolVersion',
+  exerciseId: 'exerciseId',
+  exerciseVersion: 'exerciseVersion',
+  answerDigest: 'answerDigest',
+  operationSummary: 'operationSummary',
+  operationSummaryVersion: 'operationSummaryVersion',
+  operationSummaryDigest: 'operationSummaryDigest',
+  state: 'state',
+  expiresAt: 'expiresAt',
+  confirmedAt: 'confirmedAt',
+  claimedAt: 'claimedAt',
+  consumedAt: 'consumedAt',
+  confirmingWebUserIdHmac: 'confirmingWebUserIdHmac',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type McpWriteConfirmationScalarFieldEnum = (typeof McpWriteConfirmationScalarFieldEnum)[keyof typeof McpWriteConfirmationScalarFieldEnum]
+
+
+export const McpTraceScalarFieldEnum = {
+  id: 'id',
+  traceId: 'traceId',
+  invocationId: 'invocationId',
+  authorizationId: 'authorizationId',
+  parentCoachTraceId: 'parentCoachTraceId',
+  subjectHmac: 'subjectHmac',
+  clientHmac: 'clientHmac',
+  authorizationVersion: 'authorizationVersion',
+  protocolEra: 'protocolEra',
+  protocolVersion: 'protocolVersion',
+  transport: 'transport',
+  protocolMethod: 'protocolMethod',
+  protocolRequestIdHmac: 'protocolRequestIdHmac',
+  sessionIdHmac: 'sessionIdHmac',
+  negotiatedCapabilitiesDigest: 'negotiatedCapabilitiesDigest',
+  clientDisplayName: 'clientDisplayName',
+  clientDisplayVersion: 'clientDisplayVersion',
+  capabilityType: 'capabilityType',
+  capabilityName: 'capabilityName',
+  capabilityVersion: 'capabilityVersion',
+  capabilityEffect: 'capabilityEffect',
+  requiredScopes: 'requiredScopes',
+  inputSchemaVersion: 'inputSchemaVersion',
+  outputSchemaVersion: 'outputSchemaVersion',
+  discoveryDecision: 'discoveryDecision',
+  executionDecision: 'executionDecision',
+  governancePolicyVersion: 'governancePolicyVersion',
+  rateLimitResult: 'rateLimitResult',
+  concurrencyResult: 'concurrencyResult',
+  budgetResult: 'budgetResult',
+  retryCount: 'retryCount',
+  deadlineAt: 'deadlineAt',
+  cancelled: 'cancelled',
+  timedOut: 'timedOut',
+  downstreamVersions: 'downstreamVersions',
+  inputTokens: 'inputTokens',
+  outputTokens: 'outputTokens',
+  estimatedCostMicros: 'estimatedCostMicros',
+  writeOutcome: 'writeOutcome',
+  idempotencyIntentIdHmac: 'idempotencyIntentIdHmac',
+  confirmationIdHmac: 'confirmationIdHmac',
+  businessResultIdHmac: 'businessResultIdHmac',
+  terminalStatus: 'terminalStatus',
+  safeErrorCode: 'safeErrorCode',
+  outputBytes: 'outputBytes',
+  startedAt: 'startedAt',
+  finishedAt: 'finishedAt',
+  retentionExpiresAt: 'retentionExpiresAt',
+  createdAt: 'createdAt'
+} as const
+
+export type McpTraceScalarFieldEnum = (typeof McpTraceScalarFieldEnum)[keyof typeof McpTraceScalarFieldEnum]
+
+
+export const McpTraceStepScalarFieldEnum = {
+  id: 'id',
+  traceId: 'traceId',
+  sequence: 'sequence',
+  stepType: 'stepType',
+  component: 'component',
+  operation: 'operation',
+  status: 'status',
+  startedAt: 'startedAt',
+  finishedAt: 'finishedAt',
+  durationMs: 'durationMs',
+  safeErrorCode: 'safeErrorCode',
+  approvedMetadata: 'approvedMetadata',
+  createdAt: 'createdAt'
+} as const
+
+export type McpTraceStepScalarFieldEnum = (typeof McpTraceStepScalarFieldEnum)[keyof typeof McpTraceStepScalarFieldEnum]
 
 
 export const CoachDeletionTombstoneScalarFieldEnum = {
@@ -5082,6 +5811,20 @@ export type ListEnumCoachConversationStatusFieldRefInput<$PrismaModel> = FieldRe
 
 
 /**
+ * Reference to a field of type 'CoachConversationOrigin'
+ */
+export type EnumCoachConversationOriginFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CoachConversationOrigin'>
+
+
+
+/**
+ * Reference to a field of type 'CoachConversationOrigin[]'
+ */
+export type ListEnumCoachConversationOriginFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CoachConversationOrigin[]'>
+
+
+
+/**
  * Reference to a field of type 'CoachMessageRole'
  */
 export type EnumCoachMessageRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CoachMessageRole'>
@@ -5442,6 +6185,160 @@ export type EnumCoachResponseTypeFieldRefInput<$PrismaModel> = FieldRefInputType
  * Reference to a field of type 'CoachResponseType[]'
  */
 export type ListEnumCoachResponseTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CoachResponseType[]'>
+
+
+
+/**
+ * Reference to a field of type 'McpAuthorizationStatus'
+ */
+export type EnumMcpAuthorizationStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'McpAuthorizationStatus'>
+
+
+
+/**
+ * Reference to a field of type 'McpAuthorizationStatus[]'
+ */
+export type ListEnumMcpAuthorizationStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'McpAuthorizationStatus[]'>
+
+
+
+/**
+ * Reference to a field of type 'McpProtocolEra'
+ */
+export type EnumMcpProtocolEraFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'McpProtocolEra'>
+
+
+
+/**
+ * Reference to a field of type 'McpProtocolEra[]'
+ */
+export type ListEnumMcpProtocolEraFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'McpProtocolEra[]'>
+
+
+
+/**
+ * Reference to a field of type 'McpTransport'
+ */
+export type EnumMcpTransportFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'McpTransport'>
+
+
+
+/**
+ * Reference to a field of type 'McpTransport[]'
+ */
+export type ListEnumMcpTransportFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'McpTransport[]'>
+
+
+
+/**
+ * Reference to a field of type 'McpCapabilityType'
+ */
+export type EnumMcpCapabilityTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'McpCapabilityType'>
+
+
+
+/**
+ * Reference to a field of type 'McpCapabilityType[]'
+ */
+export type ListEnumMcpCapabilityTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'McpCapabilityType[]'>
+
+
+
+/**
+ * Reference to a field of type 'McpInvocationStatus'
+ */
+export type EnumMcpInvocationStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'McpInvocationStatus'>
+
+
+
+/**
+ * Reference to a field of type 'McpInvocationStatus[]'
+ */
+export type ListEnumMcpInvocationStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'McpInvocationStatus[]'>
+
+
+
+/**
+ * Reference to a field of type 'McpInvocationResultType'
+ */
+export type EnumMcpInvocationResultTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'McpInvocationResultType'>
+
+
+
+/**
+ * Reference to a field of type 'McpInvocationResultType[]'
+ */
+export type ListEnumMcpInvocationResultTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'McpInvocationResultType[]'>
+
+
+
+/**
+ * Reference to a field of type 'McpIdempotencyToolName'
+ */
+export type EnumMcpIdempotencyToolNameFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'McpIdempotencyToolName'>
+
+
+
+/**
+ * Reference to a field of type 'McpIdempotencyToolName[]'
+ */
+export type ListEnumMcpIdempotencyToolNameFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'McpIdempotencyToolName[]'>
+
+
+
+/**
+ * Reference to a field of type 'McpIdempotencyStatus'
+ */
+export type EnumMcpIdempotencyStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'McpIdempotencyStatus'>
+
+
+
+/**
+ * Reference to a field of type 'McpIdempotencyStatus[]'
+ */
+export type ListEnumMcpIdempotencyStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'McpIdempotencyStatus[]'>
+
+
+
+/**
+ * Reference to a field of type 'McpWriteConfirmationState'
+ */
+export type EnumMcpWriteConfirmationStateFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'McpWriteConfirmationState'>
+
+
+
+/**
+ * Reference to a field of type 'McpWriteConfirmationState[]'
+ */
+export type ListEnumMcpWriteConfirmationStateFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'McpWriteConfirmationState[]'>
+
+
+
+/**
+ * Reference to a field of type 'McpTraceStepType'
+ */
+export type EnumMcpTraceStepTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'McpTraceStepType'>
+
+
+
+/**
+ * Reference to a field of type 'McpTraceStepType[]'
+ */
+export type ListEnumMcpTraceStepTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'McpTraceStepType[]'>
+
+
+
+/**
+ * Reference to a field of type 'McpTraceStepStatus'
+ */
+export type EnumMcpTraceStepStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'McpTraceStepStatus'>
+
+
+
+/**
+ * Reference to a field of type 'McpTraceStepStatus[]'
+ */
+export type ListEnumMcpTraceStepStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'McpTraceStepStatus[]'>
 
 
 
@@ -5847,6 +6744,13 @@ export type GlobalOmitConfig = {
   pronunciationDeletionTombstone?: Prisma.PronunciationDeletionTombstoneOmit
   learningStateRecalculationEvent?: Prisma.LearningStateRecalculationEventOmit
   coachTrace?: Prisma.CoachTraceOmit
+  mcpSubjectMapping?: Prisma.McpSubjectMappingOmit
+  mcpClientAuthorization?: Prisma.McpClientAuthorizationOmit
+  mcpInvocation?: Prisma.McpInvocationOmit
+  mcpIdempotencyIntent?: Prisma.McpIdempotencyIntentOmit
+  mcpWriteConfirmation?: Prisma.McpWriteConfirmationOmit
+  mcpTrace?: Prisma.McpTraceOmit
+  mcpTraceStep?: Prisma.McpTraceStepOmit
   coachDeletionTombstone?: Prisma.CoachDeletionTombstoneOmit
   coachStepTrace?: Prisma.CoachStepTraceOmit
   coachFeedback?: Prisma.CoachFeedbackOmit

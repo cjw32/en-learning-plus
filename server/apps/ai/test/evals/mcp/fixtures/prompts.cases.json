@@ -1,0 +1,10 @@
+{
+  "fixtureVersion": "mcp-prompts.cases.v1",
+  "rubricVersion": "mcp-prompts-rubric.v1",
+  "cases": [
+    { "id": "interview-complete", "kind": "positive", "prompt": "english_interview", "expectedTool": "get_learning_report" },
+    { "id": "business-partial", "kind": "positive", "prompt": "business_english", "expectedTool": "search_learning_materials" },
+    { "id": "vocabulary-empty", "kind": "failure", "prompt": "vocabulary_review", "expectedTool": "get_due_words" },
+    { "id": "injection-blocked", "kind": "failure", "prompt": "english_interview", "expectedTool": "search_words" }
+  ]
+}

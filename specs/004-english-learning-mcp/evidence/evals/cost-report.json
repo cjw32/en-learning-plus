@@ -1,0 +1,9 @@
+{
+  "schemaVersion": "mcp-cost-report.v1",
+  "invocationCount": 18,
+  "chargedInvocationCount": 0,
+  "knownEstimatedCostMicros": 0,
+  "unknownPriceCount": 0,
+  "replayIncrementalCostZero": true,
+  "basis": "fake-provider estimate; not billed amount"
+}

@@ -158,6 +158,41 @@ export type LearningStateRecalculationEvent = Prisma.LearningStateRecalculationE
  */
 export type CoachTrace = Prisma.CoachTraceModel
 /**
+ * Model McpSubjectMapping
+ *
+ */
+export type McpSubjectMapping = Prisma.McpSubjectMappingModel
+/**
+ * Model McpClientAuthorization
+ *
+ */
+export type McpClientAuthorization = Prisma.McpClientAuthorizationModel
+/**
+ * Model McpInvocation
+ *
+ */
+export type McpInvocation = Prisma.McpInvocationModel
+/**
+ * Model McpIdempotencyIntent
+ *
+ */
+export type McpIdempotencyIntent = Prisma.McpIdempotencyIntentModel
+/**
+ * Model McpWriteConfirmation
+ *
+ */
+export type McpWriteConfirmation = Prisma.McpWriteConfirmationModel
+/**
+ * Model McpTrace
+ *
+ */
+export type McpTrace = Prisma.McpTraceModel
+/**
+ * Model McpTraceStep
+ *
+ */
+export type McpTraceStep = Prisma.McpTraceStepModel
+/**
  * Model CoachDeletionTombstone
  *
  */

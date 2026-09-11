@@ -1,0 +1,10 @@
+{
+  "schemaVersion": "mcp-observability-report.v1",
+  "evaluatedInvocationCount": 18,
+  "correlatedInvocationCount": 18,
+  "completeRequiredStageCount": 18,
+  "cancellationTerminalCount": 2,
+  "sensitiveDataHitCount": 0,
+  "passed": true,
+  "scope": "synthetic metadata-only fixtures"
+}

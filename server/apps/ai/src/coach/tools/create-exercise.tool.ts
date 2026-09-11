@@ -27,6 +27,7 @@ export type CreateExerciseToolScope = Readonly<{
   modelTelemetry?: CoachModelTelemetry;
   onSchemaFailure?: () => void;
   onRetry?: () => void;
+  maxModelAttempts?: 1 | 2;
 }>;
 
 export interface CoachExerciseGenerator {
@@ -101,7 +102,8 @@ export class CreateExerciseTool {
     });
     try {
       let definition: unknown;
-      for (let attempt = 0; attempt < 2; attempt += 1) {
+      const maximumAttempts = scope.maxModelAttempts ?? 2;
+      for (let attempt = 0; attempt < maximumAttempts; attempt += 1) {
         this.budget.assertCanGenerate();
         scope.beforeModelCall?.();
         definition = await this.generator.generateDefinition(
@@ -110,7 +112,11 @@ export class CreateExerciseTool {
           scope.modelTelemetry,
         );
         const validated = exerciseDefinitionSchema.safeParse(definition);
-        if (validated.success) {
+        if (
+          validated.success &&
+          validated.data.items.length === parsed.data.count &&
+          parsed.data.types.includes(validated.data.type)
+        ) {
           return createExerciseOutputSchema.parse(
             await this.exercises.createReady({
               subjectId: context.subjectId,
@@ -123,7 +129,7 @@ export class CreateExerciseTool {
           );
         }
         scope.onSchemaFailure?.();
-        if (attempt === 0) scope.onRetry?.();
+        if (attempt + 1 < maximumAttempts) scope.onRetry?.();
       }
       return this.failure('SCHEMA_INVALID', false);
     } catch (error) {
