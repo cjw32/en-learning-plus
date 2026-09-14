@@ -1,0 +1,33 @@
+{
+  "version": "unified-coverage.v1",
+  "scope": "development regression; real qualification requires approved independent coverage",
+  "requiredModules": ["coach", "rag", "pronunciation", "mcp"],
+  "primaryMinimums": {
+    "coach": 60,
+    "rag": 42,
+    "pronunciation": 3,
+    "mcp": 18
+  },
+  "qualificationModes": ["live"],
+  "qualificationEvidence": [
+    "approved_policy",
+    "approved_baseline",
+    "independent_validation",
+    "calibration",
+    "verified_isolation"
+  ],
+  "positiveAndNegativeRequired": true,
+  "approvalStatus": "pending_measurement",
+  "developmentSourceHashes": {
+    "server/apps/ai/test/evals/mcp/fixtures/mcp-eval-cases.v1.json": "8b8de76545c57bbbb67c966ebb9f8ac337c4f45d082ef80f2826d8f33cc24449",
+    "server/apps/ai/test/evals/mcp/fixtures/create-quiz.cases.json": "6b9e048680835ebbc49399a70956bddb57543b0ada7f8c0b284cbd94360707d5",
+    "server/apps/ai/test/evals/mcp/fixtures/prompts.cases.json": "f929c3af2fd615f6902d701042d61ef321280c02fa51bb494a244745e3087ecc",
+    "server/apps/ai/test/evals/fixtures/rag-cases.jsonl": "3c1c6d1f8a012d36f65097d96142bec189a9a34945fd8123fde6d0eaf3a21ce9",
+    "server/apps/ai/test/evals/fixtures/rag-lifecycle.cases.jsonl": "59ee2dcf3181bf2fe176cbdd19b2bc5ef2febe12f1032cae4b8973e0592a5372",
+    "server/apps/ai/test/evals/fixtures/rag-degradation.cases.jsonl": "946dcce8f3fc4a300136ed7d7e5ce97b9b872f61b4d94bd753ea79702e4dbf59",
+    "server/apps/ai/test/evals/fixtures/rag-personalization.cases.jsonl": "bf5e5debb9e03415b112a99b4cb24f68965e852abe5d460960aabb5f773480dc",
+    "server/apps/ai/test/evals/fixtures/cases.jsonl": "1dbc2113eaabeb49d480a03b1b521ad45f2e0741c05fea71a679c1bd13d23718",
+    "server/apps/ai/test/evals/pronunciation/fixtures/manifest.jsonl": "4f310ed0940292deb0c88466bece315e318490839c9ec46d6d8c445f42d410c2"
+  },
+  "provenanceBasis": "Inventory-reviewed synthetic/hand-authored development fixtures; source change requires explicit provenance review. Not live data or quality approval."
+}
