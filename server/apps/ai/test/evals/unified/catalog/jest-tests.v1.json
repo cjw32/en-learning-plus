@@ -1,0 +1,148 @@
+{
+  "version": "unified-jest-registry.v1",
+  "entries": [
+    {
+      "id": "coach-runtime",
+      "module": "coach",
+      "path": "apps/ai/test/integration/coach-runtime.e2e-spec.ts",
+      "config": "apps/ai/test/jest-e2e.json",
+      "mode": "mock",
+      "profile": "quick",
+      "requirements": ["FR-005", "FR-006"],
+      "tests": [
+        "Coach controlled runtime graph runs the owned answer path and captures actual model usage and cost",
+        "Coach controlled runtime graph propagates the cancellation signal to the model and does not run tools",
+        "Coach controlled runtime graph keeps issued citation IDs through the live RAG path and emits coach.result.v2"
+      ]
+    },
+    {
+      "id": "rag-database",
+      "module": "rag",
+      "path": "apps/ai/test/integration/rag-retrieval.e2e-spec.ts",
+      "config": "apps/ai/test/jest-e2e.json",
+      "mode": "mock",
+      "profile": "full",
+      "requirements": ["FR-005", "FR-006"],
+      "tests": [
+        "RAG exact retrieval applies status, rights, version, dimensions, threshold and filters before stable Top K",
+        "RAG exact retrieval does not mix incompatible embedding versions or expand invalid filters",
+        "RAG exact retrieval fails closed for an unapproved rights snapshot or explicit revocation marker"
+      ]
+    },
+    {
+      "id": "pronunciation-alignment",
+      "module": "pronunciation",
+      "path": "apps/ai/test/evals/pronunciation/alignment.eval.spec.ts",
+      "config": "package.json",
+      "mode": "deterministic",
+      "profile": "quick",
+      "requirements": ["FR-005", "FR-006"],
+      "tests": [
+        "pronunciation deterministic alignment evaluation normalizes Unicode/punctuation without losing target positions",
+        "pronunciation deterministic alignment evaluation normalizes Unicode/punctuation without losing target positions",
+        "pronunciation deterministic alignment evaluation normalizes Unicode/punctuation without losing target positions",
+        "pronunciation deterministic alignment evaluation normalizes Unicode/punctuation without losing target positions",
+        "pronunciation deterministic alignment evaluation normalizes Unicode/punctuation without losing target positions",
+        "pronunciation deterministic alignment evaluation keeps repeated occurrences stable while materializing omissions",
+        "pronunciation deterministic alignment evaluation does not let inserted words claim target positions",
+        "pronunciation deterministic alignment evaluation falls back to explicit uncertainty for reordered ambiguous words",
+        "pronunciation deterministic alignment evaluation nulls illegal timestamp offset=-1 duration=100 and disables seek",
+        "pronunciation deterministic alignment evaluation nulls illegal timestamp offset=100 duration=0 and disables seek",
+        "pronunciation deterministic alignment evaluation nulls illegal timestamp offset=2900 duration=200 and disables seek"
+      ]
+    },
+    {
+      "id": "mcp-protocol",
+      "module": "mcp",
+      "path": "apps/ai/test/contract/mcp-protocol-negotiator.contract.spec.ts",
+      "config": "package.json",
+      "mode": "deterministic",
+      "profile": "quick",
+      "requirements": ["FR-005", "FR-006"],
+      "tests": [
+        "MCP protocol-date negotiation contract accepts exactly modern discovery",
+        "MCP protocol-date negotiation contract accepts exactly modern request",
+        "MCP protocol-date negotiation contract accepts exactly legacy initialize",
+        "MCP protocol-date negotiation contract accepts exactly legacy session request",
+        "MCP protocol-date negotiation contract rejects missing all version evidence without silently downgrading",
+        "MCP protocol-date negotiation contract rejects modern header without body metadata without silently downgrading",
+        "MCP protocol-date negotiation contract rejects modern body metadata without header without silently downgrading",
+        "MCP protocol-date negotiation contract rejects mismatched modern header and body without silently downgrading",
+        "MCP protocol-date negotiation contract rejects ambiguous initialize evidence without silently downgrading",
+        "MCP protocol-date negotiation contract rejects legacy date without initialize or a session without silently downgrading",
+        "MCP protocol-date negotiation contract rejects legacy initialize with a session id without silently downgrading",
+        "MCP protocol-date negotiation contract rejects unknown future version without silently downgrading",
+        "MCP protocol-date negotiation contract rejects unsupported earlier version without silently downgrading"
+      ]
+    },
+    {
+      "id": "rag-search",
+      "module": "rag",
+      "path": "apps/ai/test/integration/rag-learning-material-search.spec.ts",
+      "config": "package.json",
+      "mode": "mock",
+      "profile": "quick",
+      "requirements": ["FR-005", "FR-006"],
+      "tests": [
+        "RAG learning material runtime orchestration orders only explicit versions and never infers recency from opaque hashes",
+        "RAG learning material runtime orchestration runs embedding \u2192 permission-first exact search \u2192 ranking \u2192 server citation issue",
+        "RAG learning material runtime orchestration fails closed before embedding when the internal request identity is absent"
+      ]
+    },
+    {
+      "id": "coach-executor",
+      "module": "coach",
+      "path": "apps/ai/test/integration/coach-executor.e2e-spec.ts",
+      "config": "apps/ai/test/jest-e2e.json",
+      "mode": "mock",
+      "profile": "quick",
+      "requirements": ["FR-005", "FR-006"],
+      "tests": [
+        "Coach production workflow executor uses only the server-recorded owner and persists before terminal SSE",
+        "Coach production workflow executor propagates cancellation, rejects the late result, and never persists it",
+        "Coach production workflow executor does nothing when another worker already claimed or completed the request",
+        "Coach production workflow executor validates, persists, and traces a grounded coach.result.v2"
+      ]
+    },
+    {
+      "id": "pronunciation-application",
+      "module": "pronunciation",
+      "path": "apps/ai/src/pronunciation/application/pronunciation-assessment.service.spec.ts",
+      "config": "package.json",
+      "mode": "mock",
+      "profile": "quick",
+      "requirements": ["FR-005", "FR-006"],
+      "tests": [
+        "PronunciationAssessmentService creates an owned immutable target and replays the same intent once",
+        "PronunciationAssessmentService orchestrates upload metadata without exposing the object key",
+        "PronunciationAssessmentService isolates get/list by authenticated owner",
+        "PronunciationAssessmentService revalidates source before submit and refuses a changed source",
+        "PronunciationAssessmentService queues exactly once after revalidation and admission",
+        "PronunciationAssessmentService replays a terminal submission without reopening admission checks",
+        "PronunciationAssessmentService projects a persisted public failure as a safe terminal diagnostic"
+      ]
+    },
+    {
+      "id": "mcp-pipeline",
+      "module": "mcp",
+      "path": "apps/ai/test/security/mcp-request-pipeline.security.spec.ts",
+      "config": "package.json",
+      "mode": "mock",
+      "profile": "quick",
+      "requirements": ["FR-005", "FR-006"],
+      "tests": [
+        "MCP authenticated request pipeline runs the security stages in order and always releases admission",
+        "MCP authenticated request pipeline stops after a authentication failure and emits only a safe error",
+        "MCP authenticated request pipeline stops after a authorization failure and emits only a safe error",
+        "MCP authenticated request pipeline stops after a negotiation failure and emits only a safe error",
+        "MCP authenticated request pipeline stops after a admission failure and emits only a safe error",
+        "MCP authenticated request pipeline stops after a dispatch failure and emits only a safe error",
+        "MCP authenticated request pipeline rejects missing Authorization before token verification",
+        "MCP authenticated request pipeline rejects wrong scheme Authorization before token verification",
+        "MCP authenticated request pipeline rejects whitespace in token Authorization before token verification",
+        "MCP authenticated request pipeline rejects combined duplicate Authorization before token verification",
+        "MCP authenticated request pipeline rejects query/cookie token channels and oversized bodies at the boundary"
+      ]
+    }
+  ]
+}

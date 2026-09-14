@@ -1,0 +1,31 @@
+{
+  "version": "unified-change-impact.v1",
+  "rules": [
+    {
+      "prefix": "server/apps/ai/src/coach/",
+      "modules": ["coach", "rag", "mcp"]
+    },
+    {
+      "prefix": "server/apps/ai/src/knowledge/",
+      "modules": ["coach", "rag", "mcp"]
+    },
+    {
+      "prefix": "server/apps/ai/src/pronunciation/",
+      "modules": ["coach", "pronunciation", "mcp"]
+    },
+    { "prefix": "server/apps/ai/src/mcp/", "modules": ["mcp"] },
+    {
+      "prefix": "packages/common/",
+      "modules": ["coach", "rag", "pronunciation", "mcp"]
+    },
+    {
+      "prefix": "server/libs/",
+      "modules": ["coach", "rag", "pronunciation", "mcp"]
+    },
+    {
+      "prefix": "server/apps/ai/test/evals/",
+      "modules": ["coach", "rag", "pronunciation", "mcp"]
+    }
+  ],
+  "unknown": ["coach", "rag", "pronunciation", "mcp"]
+}
