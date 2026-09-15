@@ -4,6 +4,7 @@ import {
   ExceptionFilter,
   HttpException,
 } from '@nestjs/common';
+import { pronunciationErrorResponseSchema } from '@en/common/pronunciation';
 
 @Catch(HttpException)
 export class InterceptorExceptionFilter implements ExceptionFilter {
@@ -11,6 +12,11 @@ export class InterceptorExceptionFilter implements ExceptionFilter {
     const ctx = host.switchToHttp();
     const request = ctx.getRequest();
     const response = ctx.getResponse();
+    const pronunciation = pronunciationErrorResponseSchema.safeParse(exception.getResponse());
+    if (pronunciation.success && pronunciation.data.code === exception.getStatus()) {
+      response.status(exception.getStatus()).json(pronunciation.data);
+      return;
+    }
     response.status(exception.getStatus()).json({
       timestamp: new Date().toISOString(),
       path: request.url,

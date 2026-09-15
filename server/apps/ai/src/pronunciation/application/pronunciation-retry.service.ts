@@ -70,7 +70,7 @@ export class PronunciationRetryService {
         retryOfAssessmentId: input.assessmentId,
       }),
       exerciseType: original.assessment.exerciseType,
-      deadlineAt: new Date(this.now().getTime() + 30_000),
+      deadlineAt: new Date(this.now().getTime() + 15 * 60_000),
       retryOfAssessmentId: input.assessmentId,
       target: {
         ...original.target,

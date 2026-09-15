@@ -16,6 +16,13 @@
 | FR-059–FR-068 | T015, T017, T020, T036, T044–T045, T050, T053–T054, T067, T070, T074–T084, T088 | `server/apps/ai/src/pronunciation/api/`; `privacy/`; `queue/pronunciation-cleanup.processor.ts`; Coach summary tool                                            | two-subject ownership, leakage, retention, deletion, compensation and account-cleanup suites                                                               | Disposable protocol fakes used; production storage/cache/trace deletion evidence remains pending.                              |
 | FR-069–FR-076 | T018–T022, T034–T035, T057, T079, T085–T093, T095, T101–T102                    | `server/apps/ai/src/pronunciation/governance/`; `provider/pronunciation-provider.executor.ts`; `observability/`; `queue/`                                      | admission/governance/cancel/recovery/Trace/cost/observability suites                                                                                       | Monetary caps in tests are fixtures, not approved production values.                                                           |
 | FR-077–FR-088 | T055, T066, T072, T083, T088, T093, T096–T108                                   | `server/apps/ai/test/evals/pronunciation/`; rollout policy in server/Web; `implementation-evidence.md`                                                         | schema/metrics/runner/release-gate/cost/observability/rollout/full-regression suites                                                                       | Authorized-human/live evaluation, Firefox/WebKit and production readiness remain blocked; synthetic results cannot substitute. |
+| FR-089 | T110, T112–T113 | `application/pronunciation-assessment.service.ts` | `application/pronunciation-deadline.spec.ts` |
+| FR-090 | T110, T114 | `api/pronunciation-capabilities.controller.ts`, `apps/web/src/views/Pronunciation/index.vue` | `apps/web/e2e/pronunciation-runtime.spec.ts` |
+| FR-091 | T111–T113, T115, T118 | `runtime/pronunciation-runtime.adapters.ts` | `docs/reviews/2026-09-15-pronunciation-live.md` |
+| FR-092 | T117 | `provider/azure-pronunciation.endpoint.ts` | `provider/azure-pronunciation.endpoint.spec.ts` |
+| FR-093 | T119 | `provider/azure-pronunciation.identity.ts` | `provider/azure-pronunciation.provider.spec.ts` |
+| FR-094 | T120 | `governance/pronunciation-usage.service.ts` | `server/apps/ai/test/integration/pronunciation-redis-runtime.integration.spec.ts` |
+| FR-095 | T121–T122 | `server/tools/check-pronunciation-live.ts` | `docs/reviews/2026-09-15-pronunciation-live.md`, `apps/web/e2e/pronunciation-live.spec.ts` |
 
 ## Success-criteria coverage
 

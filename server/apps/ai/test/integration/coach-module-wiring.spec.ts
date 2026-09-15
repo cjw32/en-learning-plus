@@ -1,3 +1,4 @@
+import { AuthGuard } from '@libs/shared';
 import { GUARDS_METADATA, PATH_METADATA } from '@nestjs/common/constants';
 import { MODULE_METADATA } from '@nestjs/common/constants';
 import { LearningModule } from '@libs/learning';
@@ -20,11 +21,11 @@ describe('Coach module wiring', () => {
     expect(serverImports).toEqual(expect.arrayContaining([LearningModule]));
   });
 
-  it('keeps the existing versioned Chat route and guard metadata unchanged', () => {
+  it('keeps the existing Chat route and requires authentication for all handlers', () => {
     expect(Reflect.getMetadata(PATH_METADATA, ChatController)).toBe('chat');
     expect(
       Reflect.getMetadata(GUARDS_METADATA, ChatController),
-    ).toBeUndefined();
+    ).toEqual(expect.arrayContaining([AuthGuard]));
     expect(
       Reflect.getMetadata(GUARDS_METADATA, ChatController.prototype.create),
     ).toBeUndefined();

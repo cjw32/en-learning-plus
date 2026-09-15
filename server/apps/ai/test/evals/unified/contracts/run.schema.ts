@@ -43,7 +43,7 @@ export const runRequestSchema = z
   .strictObject({
     schemaVersion: z.literal('ai-eval-request.v1'),
     purpose: purposeSchema,
-    profile: z.enum(['quick', 'full']),
+    profile: z.enum(['quick', 'synthetic', 'full']),
     modules: z
       .array(moduleSchema)
       .min(1)
@@ -75,7 +75,7 @@ export const runRequestSchema = z
   })
   .refine(
     (v) =>
-      v.profile !== 'quick' ||
+      v.profile === 'full' ||
       (!v.modes.includes('live') && v.limits.budgetMicros === 0),
     'quick cannot call live',
   );
@@ -102,6 +102,16 @@ export const itemResultSchema = executionItemSchema
     terminalState: terminalSchema,
     reasonCodes: stringsSchema,
     allAttempts: stringsSchema,
+    attemptLineage: z
+      .array(
+        z.strictObject({
+          attemptId: idSchema,
+          repeatIndex: nonnegative,
+          retryIndex: nonnegative,
+          parentAttemptId: idSchema.nullable(),
+        }),
+      )
+      .optional(),
     requirements: requirementsSchema,
     expectedRef: contentRefSchema.nullable(),
     actualRef: contentRefSchema.nullable(),
@@ -109,7 +119,14 @@ export const itemResultSchema = executionItemSchema
     steps: z.array(stepObservationSchema),
   })
   .refine(
-    (v) => v.terminalState === 'passed' || v.reasonCodes.length > 0,
+    (v) =>
+      (v.terminalState === 'passed' || v.reasonCodes.length > 0) &&
+      (!v.attemptLineage ||
+        (v.attemptLineage.length === v.allAttempts.length &&
+          v.attemptLineage.every((a, i) => a.attemptId === v.allAttempts[i]) &&
+          (v.terminalState !== 'passed' ||
+            new Set(v.attemptLineage.map((a) => a.repeatIndex)).size ===
+              v.expectedRepeatCount))),
     'reason required',
   );
 export const attemptSchema = z.strictObject({
@@ -247,7 +264,7 @@ export const runSchema = z.strictObject({
     'FINISHED',
   ]),
   purpose: purposeSchema,
-  profile: z.enum(['quick', 'full']),
+  profile: z.enum(['quick', 'synthetic', 'full']),
   executionCompleteness: z.enum(['complete', 'incomplete']),
   revisionOf: contentRefSchema.nullable(),
 });

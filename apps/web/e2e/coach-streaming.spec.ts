@@ -95,7 +95,7 @@ async function baseRoutes(
       body: JSON.stringify(envelope({ items: [conversation], nextCursor: null })),
     }),
   )
-  await page.route('**/ai/v1/coach/conversations/conversation-a', (route) =>
+  await page.route('**/ai/v1/coach/conversations/conversation-a?**', (route) =>
     route.fulfill({
       status: 200,
       contentType: 'application/json',

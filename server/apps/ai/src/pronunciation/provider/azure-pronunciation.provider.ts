@@ -7,6 +7,8 @@ import {
   pronunciationProviderResultSchema,
 } from '@en/common/pronunciation';
 import type { PronunciationAssessmentProvider } from './pronunciation-assessment.provider';
+import { resolveAzurePronunciationEndpoint } from './azure-pronunciation.endpoint';
+import { AZURE_MANAGED_MODEL_IDENTITY } from './azure-pronunciation.identity';
 
 const AZURE_PROVIDER = 'azure';
 const MAX_PROVIDER_DURATION_MS = 30_000;
@@ -62,12 +64,14 @@ const azureRecognitionSchema = z
 export type AzurePronunciationProviderConfig = Readonly<{
   enabled: boolean;
   providerApproved: boolean;
+  endpoint?: string | null;
   resourceName: string | null;
   subscriptionKey: string | null;
   region: string | null;
   approvedRegion: string | null;
   privacyEvidenceVersion: string | null;
   modelVersion: string | null;
+  modelIdentityMode?: 'AZURE_MANAGED' | 'VENDOR_ATTESTED';
   modelIdentityEvidenceVersion: string | null;
   modelIdentityVendorAttested: boolean;
   modelIdentityImmutable: boolean;
@@ -105,6 +109,7 @@ export interface AzurePronunciationCostGate {
   ): Promise<AzurePronunciationCostReservation>;
   settle(reservationId: string, actualCostMicros: number): Promise<void>;
   release(reservationId: string): Promise<void>;
+  complete?(reservationId: string): Promise<void>;
 }
 
 export class AzurePronunciationApprovalError extends Error {
@@ -126,7 +131,7 @@ export class AzurePronunciationAudioError extends Error {
 }
 
 type ApprovedAzureConfig = Readonly<{
-  resourceName: string;
+  recognitionEndpoint: string;
   region: string;
   privacyEvidenceVersion: string;
   modelVersion: string;
@@ -155,21 +160,28 @@ function approvedText(value: string | null): value is string {
 function approveConfig(
   config: AzurePronunciationProviderConfig,
 ): ApprovedAzureConfig {
+  const recognitionEndpoint = resolveAzurePronunciationEndpoint(config);
+  const identityApproved =
+    config.modelIdentityMode === 'AZURE_MANAGED'
+      ? config.modelVersion === AZURE_MANAGED_MODEL_IDENTITY
+      : (!config.modelIdentityMode ||
+          config.modelIdentityMode === 'VENDOR_ATTESTED') &&
+        approvedText(config.modelVersion) &&
+        approvedText(config.modelIdentityEvidenceVersion) &&
+        config.modelIdentityVendorAttested &&
+        config.modelIdentityImmutable &&
+        config.modelIdentityQueryable;
   if (
     !config.enabled ||
     !config.providerApproved ||
-    !approvedText(config.resourceName) ||
-    !/^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/.test(config.resourceName) ||
+    !recognitionEndpoint ||
+    (!config.endpoint?.trim() && !approvedText(config.resourceName)) ||
     !approvedText(config.subscriptionKey) ||
     !approvedText(config.region) ||
     !/^[a-z0-9-]+$/.test(config.region) ||
     config.region !== config.approvedRegion ||
     !approvedText(config.privacyEvidenceVersion) ||
-    !approvedText(config.modelVersion) ||
-    !approvedText(config.modelIdentityEvidenceVersion) ||
-    !config.modelIdentityVendorAttested ||
-    !config.modelIdentityImmutable ||
-    !config.modelIdentityQueryable ||
+    !identityApproved ||
     !approvedText(config.adapterVersion) ||
     !approvedText(config.apiContractVersion) ||
     !approvedText(config.capabilityVersion) ||
@@ -180,7 +192,7 @@ function approveConfig(
   ) {
     throw new AzurePronunciationApprovalError();
   }
-  return config as ApprovedAzureConfig;
+  return { ...config, recognitionEndpoint } as ApprovedAzureConfig;
 }
 
 function ascii(bytes: Uint8Array, start: number, length: number): string {
@@ -311,15 +323,29 @@ export class AzurePronunciationAssessmentProvider implements PronunciationAssess
       budgetPolicyVersion: this.config.budgetPolicyVersion,
     });
     this.assertReservation(reservation);
+    if (signal?.aborted || this.now() >= deadline) {
+      await this.costGate.release(reservation.reservationId);
+      return this.failure(
+        signal?.aborted ? 'CANCELLED' : 'TIMEOUT',
+        false,
+        null,
+        boundedLatency(startedAt, this.now),
+        0,
+        null,
+        false,
+        0,
+      );
+    }
 
     const controller = new AbortController();
     const abortFromCaller = () => controller.abort(signal?.reason);
     signal?.addEventListener('abort', abortFromCaller, { once: true });
     const timer = setTimeout(
       () => controller.abort(new Error('AZURE_PRONUNCIATION_TIMEOUT')),
-      deadline - startedAt,
+      Math.max(1, deadline - this.now()),
     );
     let requestSent = false;
+    let responseReceived = false;
     try {
       requestSent = true;
       const response = await this.fetchImplementation(
@@ -339,6 +365,7 @@ export class AzurePronunciationAssessmentProvider implements PronunciationAssess
           signal: controller.signal,
         },
       );
+      responseReceived = true;
       await this.costGate.settle(
         reservation.reservationId,
         reservation.estimatedCostMicros,
@@ -375,10 +402,11 @@ export class AzurePronunciationAssessmentProvider implements PronunciationAssess
       );
     } catch (error) {
       if (requestSent) {
-        await this.costGate.settle(
-          reservation.reservationId,
-          reservation.estimatedCostMicros,
-        );
+        // Retain the reservation when settlement storage is unavailable. The
+        // ledger still reports conservative cost and must not retry the call.
+        await this.costGate
+          .settle(reservation.reservationId, reservation.estimatedCostMicros)
+          .catch(() => undefined);
       } else {
         await this.costGate.release(reservation.reservationId);
       }
@@ -395,15 +423,18 @@ export class AzurePronunciationAssessmentProvider implements PronunciationAssess
         durationMs,
       );
     } finally {
+      // Unknown acceptance retains its short resource lease as well as usage.
+      if (responseReceived)
+        await this.costGate
+          .complete?.(reservation.reservationId)
+          .catch(() => undefined);
       clearTimeout(timer);
       signal?.removeEventListener('abort', abortFromCaller);
     }
   }
 
   private buildUrl(locale: string): string {
-    const url = new URL(
-      `https://${this.config.resourceName}.cognitiveservices.azure.com/stt/speech/recognition/conversation/cognitiveservices/v1`,
-    );
+    const url = new URL(this.config.recognitionEndpoint);
     url.searchParams.set('language', locale);
     url.searchParams.set('format', 'detailed');
     return url.toString();

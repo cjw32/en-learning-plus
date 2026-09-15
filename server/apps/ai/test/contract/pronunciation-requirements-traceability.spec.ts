@@ -121,9 +121,9 @@ describe('pronunciation requirements traceability', () => {
   it('maps every functional requirement to a real task and verification artifact', () => {
     expect(
       functionalRows.flatMap((row) => expandIds(row.ids, 'FR')).sort(),
-    ).toEqual(expectedIds('FR', 88));
+    ).toEqual(expectedIds('FR', 95));
     expect(new Set(expandIds(tasks, 'FR'))).toEqual(
-      new Set(expectedIds('FR', 88)),
+      new Set(expectedIds('FR', 95)),
     );
     assertRowsAreActionable(functionalRows);
   });

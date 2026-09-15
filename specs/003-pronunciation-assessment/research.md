@@ -62,9 +62,11 @@
 - Azure Speech SDK: not selected for v1 because its realtime/session features are unnecessary for upload-after-recording and would add a dependency.
 - Browser-to-Provider direct calls: rejected because it would expose credentials and bypass auth, budgets, retention and result validation.
 
-## Decision 4: Treat Provider model identity as a production gate
+## Decision 4: Provider model identity (original gate superseded by FR-093)
 
-**Decision**: `modelVersion` must mean a vendor-backed scoring model/revision identity. An API version, endpoint region or locally invented label cannot satisfy it. If the Provider cannot expose or contractually attest an immutable identity/change policy, production assessment remains disabled.
+**2026-09-15 update**: FR-093 replaces the original hard gate for Azure REST. Explicit `AZURE_MANAGED` mode records `azure-speech-managed:unversioned`, indicating that the vendor has not exposed the underlying revision. This is not a pinned model or a reproducibility guarantee. Vendor-attested mode remains available with real evidence; automatic learning write still requires a quality baseline. The original reasoning below is retained as history.
+
+**Original decision**: `modelVersion` must mean a vendor-backed scoring model/revision identity. An API version, endpoint region or locally invented label cannot satisfy it. If the Provider cannot expose or contractually attest an immutable identity/change policy, production assessment remains disabled.
 
 **Rationale**:
 
@@ -230,7 +232,7 @@ All architecture questions needed for Plan are resolved. The following are inten
 | -------------------------------- | -------------------------------------------------------------- | ---------------------------------------------------------- |
 | Audio runtime dependency         | User approval plus security/resource-limit review              | Reject upload before Provider; Provider call disabled      |
 | Private bucket/config            | User/ops approval, lifecycle and backup exclusion verification | Audio persistence and Provider call disabled               |
-| Provider model identity          | Vendor-backed immutable identity/change notice                 | Production adapter disabled                                |
+| Provider model identity          | Explicit managed/unversioned mode or actual vendor identity evidence | Invalid/missing identity mode disables adapter                                |
 | Region/privacy/subprocessors     | Approved region and current legal/security evidence            | Provider disabled                                          |
 | Third-party source-content right | Explicit rights version for pronunciation assessment           | Only manual/locally authoritative eligible targets proceed |
 | Prices and budgets               | Versioned regional catalog + 4 approved caps                   | New Provider calls rejected                                |

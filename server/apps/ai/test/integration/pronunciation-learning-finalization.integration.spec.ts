@@ -304,4 +304,17 @@ describe('pronunciation result-to-learning finalization', () => {
       'NOT_ELIGIBLE',
     );
   });
+  it('recovers completed learning writes after the provider deadline without reassessing audio', async () => {
+    const { service, repository, workflow } = fixture(true, true);
+    const finishedAt = new Date('2026-09-09T23:59:00.000Z');
+    repository.findOwnedWithTarget.mockResolvedValue({
+      ...owned, learningWriteStatus: 'FAILED',
+      assessment: { ...owned.assessment, status: 'COMPLETED', deadlineAt: new Date(0), finishedAt },
+    });
+    await service.recoverLearning('user-a', 'assessment_1');
+    expect(workflow.save).toHaveBeenCalledWith(expect.objectContaining({ reviewedAt: finishedAt, sourceValid: true }));
+    expect(repository.persistResult).not.toHaveBeenCalled();
+    expect(repository.setLearningWriteStatus).toHaveBeenCalledWith('user-a', 'assessment_1', 'SAVED');
+  });
+
 });

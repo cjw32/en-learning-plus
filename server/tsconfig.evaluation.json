@@ -1,0 +1,6 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": { "noEmit": true, "declaration": false, "incremental": false },
+  "include": ["apps/ai/test/evals/unified/**/*.ts"],
+  "exclude": ["node_modules", "dist", "apps/ai/test/evals/unified/tests"]
+}

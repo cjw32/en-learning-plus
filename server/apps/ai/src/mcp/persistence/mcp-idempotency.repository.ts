@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@libs/shared';
-import type { Prisma } from '@libs/shared/generated/prisma/client';
+import { Prisma } from '@libs/shared/generated/prisma/client';
 import type { McpPersistenceIdentity } from './mcp-subject.repository';
 
 export type McpIdempotencyToolName = 'CREATE_QUIZ' | 'SUBMIT_ANSWER';

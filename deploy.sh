@@ -24,7 +24,7 @@ echo "🔨 [3/4] 构建项目..."
 echo "  → 构建 tracker..."
 cd apps/tracker && pnpm build
 echo "  → 构建后端 server..."
-cd ../../server && npx prisma generate && npx nest build server
+cd ../../server && npx prisma generate && pnpm build server
 echo "  → 构建后端 ai..."
 npx nest build ai
 echo "  → 构建前端..."
@@ -34,6 +34,9 @@ cd ../apps/web && pnpm build
 echo ""
 echo "🔄 [4/4] 重启服务..."
 cd ../../server
+# Apply required schema changes before any new worker or API starts.
+# set -e keeps the running services intact when a migration fails.
+pnpm exec prisma migrate deploy
 # 删除旧进程（路径可能有变更），用最新构建产物重新启动
 pm2 delete all 2>/dev/null || true
 pm2 start dist/apps/server/apps/server/src/main.js --name en-server -i max

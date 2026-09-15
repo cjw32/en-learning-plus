@@ -350,3 +350,26 @@ T096 evaluation schema | T097 fixture manifest | T101 cost report | T102 observa
 - Every live Provider/audio-runtime/private-storage/human-dataset task is conditional on explicit approval and must have a fake/unavailable path.
 - Test commands use the repository's existing Jest, Vitest and Playwright dependencies.
 - This Tasks artifact does not modify implementation code, dependencies, production configuration or external systems.
+
+## 2026-09-14 实现收敛任务
+
+- [x] T110 运行配置与条件适配器工厂；认证能力接口和缺配置测试（FR-089–091）。
+- [x] T111 生产 Redis 预算/提交治理和 Provider 调用台账连接，验证并发及重复结算（FR-057、069、073–076）。
+- [x] T112 队列评测执行器、deadline/取消/来源检查、结果与学习保存；完整成功/失败/重投测试（FR-024–041、049–057、070、089）。
+- [x] T113 注册队列、outbox 调度、超时与学习保存恢复、过期音频/删除补偿调度（FR-067–070、089、091）。
+- [x] T114 独立发音页、导航、手动目标与服务状态，连接词库/Coach 入口；历史分页、结果、回放和删除（FR-008–016、042–048、060–068、090）。
+- [x] T115 修复真实转码/存储接线暴露的媒体边界；配置模板与本地检查/运行指南（FR-017–022、064、068、091）。
+- [x] T116 运行发音专项、模块集成、浏览器、质量评测和全量回归，记录真实环境限制与剩余依赖（FR-077–080）。
+
+本轮本地验收记录：`docs/reviews/2026-09-14-pronunciation-completion.md`。T110–T116 完成指代码接通和本地验证；真实 Azure / MinIO / ffmpeg 环境验收尚缺配置，未将此前 live 发布条件标记通过。
+
+- [x] T117 支持 Azure 门户区域基础终结点、保留资源名兼容，更新配置检查与指南，验证区域一致性和请求地址（FR-092）。专项 3 套测试共 37 项通过，AI TypeScript 检查通过；未调用真实 Azure。
+
+- [x] T118 完成本机 MinIO/Redis 与实体 ffmpeg 依赖验证，修复 MinIO 单条 lifecycle Rule 对象兼容（FR-018、064、068、091）。私有读写/删除、匿名拒绝、过期规则、WebM/MP4 转码、静音/损坏文件检查、Redis 持久化配置通过；相关 18 项测试及类型检查通过。Azure 仅认证成功，未执行真实评分或开启功能。
+
+- [x] T119 实现 Azure managed 模型身份与 F0 配置解析，移除不可实现的身份要求并保留真实可追溯语义（FR-093）。
+- [x] T120 接通时长配额和资源并发锁，验证原子预留、重复调用、取消退款、未知受理和 F0 零价格边界（FR-094）。
+- [x] T121 装配独立本地业务数据库、认证与队列，完成真实 Azure/存储/转码/历史回放删除的 HTTP 验证（FR-095）。
+- [x] T122 回归相关服务端、浏览器与质量测试，更新运行配置、检查工具和实际验收记录（FR-093–095）。
+
+T119–T122 实测记录：`docs/reviews/2026-09-15-pronunciation-live.md`。新增条款已统一编号为 FR-089–095，避免与原有质量、安全要求 FR-081–088 重号；原有要求不删除。

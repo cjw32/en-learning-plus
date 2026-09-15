@@ -70,3 +70,14 @@ A1–A7 为 plan 中架构章节；E1–E9 为 data-model 中实体；R-001–R-
 - 本计划未增加业务 API、数据库实体、生产配置或依赖；拟新增 CLI/Skill/工作流仅是设计。
 - 文档检查已通过：52/52 FR、18/18 SC 均有映射，130 个本地链接有效，8 段命令仅通过语法检查而未执行；8 份 Plan 产物无未解决技术占位符。无实现测试或付费评测的通过声明。
 - 未配置 before_plan/after_plan hook。设计门禁复核通过，可进入后续 Tasks；完整功能验收仍需实际证据。
+
+## 2026-09-15 合成流程实现追溯
+
+| 范围 | 代码/测试 | 证据与边界 |
+| --- | --- | --- |
+| FR-001–008/FR-050–052 | CLI、jest registry/adapter、run-coordinator、completion-regression | UE-01；162 项合成检查，不宣称真实模型质量。 |
+| FR-021–027 | baseline-store/comparability/group-metrics、baseline-comparison | UE-02；只读开发比较与分母；批准基线、正式成对统计仍待完成。 |
+| FR-028–039 | stop-controller/attempt-lineage/recovery/verify、recovery-verification | UE-03；四态、停止/尝试/恢复/独立重算；真实逐调用预算接线仍待完成。 |
+| FR-040–043 | ci-summary、ci-summary.spec | UE-03；可信期望清单下本地汇总；无远程 CI 配置/合并门禁声明。 |
+
+详细执行与未完成项见 [合成续接验收](evidence/2026-09-15-synthetic-completion.md) 和 [使用指南](../../docs/ai-evaluation.md)。原完整任务依赖及质量阈值未削减。

@@ -46,7 +46,11 @@ export class NodePronunciationAudioProcessRunner implements PronunciationAudioPr
   async run(
     request: PronunciationAudioProcessRequest,
   ): Promise<PronunciationAudioProcessResult> {
-    if (request.shell !== false || request.networkDisabled !== true) {
+    if (
+      request.signal?.aborted ||
+      request.shell !== false ||
+      request.networkDisabled !== true
+    ) {
       throw new PronunciationAudioProcessLimitError('ABORTED');
     }
     return new Promise((resolve, reject) => {
@@ -105,7 +109,11 @@ export class NodePronunciationAudioProcessRunner implements PronunciationAudioPr
           }),
         ),
       );
-      child.stdin.end(Buffer.from(request.stdin));
+      child.stdin.on('error', (error: NodeJS.ErrnoException) => {
+        if (error.code !== 'EPIPE') finish(() => reject(error), true);
+      });
+      if (request.signal?.aborted) onAbort();
+      else child.stdin.end(Buffer.from(request.stdin));
     });
   }
 }
@@ -124,7 +132,7 @@ type Probe = Readonly<{
   mediaType: 'audio/webm' | 'audio/mp4' | 'audio/wav';
   container: string;
   codec: string;
-  durationMs: number;
+  durationMs: number | null;
   sampleRate: number;
   channelCount: number;
 }>;
@@ -185,17 +193,23 @@ function parseProbe(bytes: Uint8Array): Probe {
       ? record.format.format_name
       : '';
   const codec = typeof stream.codec_name === 'string' ? stream.codec_name : '';
-  const durationMs = Number(record.format?.duration) * 1_000;
+  const durationMs =
+    record.format?.duration === undefined || record.format.duration === 'N/A'
+      ? null
+      : Number(record.format.duration) * 1_000;
   const sampleRate = Number(stream.sample_rate);
   const channelCount = Number(stream.channels);
   if (
-    !Number.isFinite(durationMs) ||
-    durationMs < MIN_DURATION_MS ||
-    durationMs > MAX_DURATION_MS ||
+    (durationMs !== null &&
+      (!Number.isFinite(durationMs) ||
+        durationMs <= 0 ||
+        durationMs > MAX_DURATION_MS + 100)) ||
     !Number.isSafeInteger(sampleRate) ||
-    sampleRate <= 0 ||
+    sampleRate < 8000 ||
+    sampleRate > 192000 ||
     !Number.isSafeInteger(channelCount) ||
-    channelCount <= 0
+    channelCount <= 0 ||
+    channelCount > 2
   ) {
     throw invalid();
   }
@@ -216,29 +230,43 @@ function parseProbe(bytes: Uint8Array): Probe {
     mediaType,
     container: format,
     codec,
-    durationMs: Math.round(durationMs),
+    durationMs: durationMs === null ? null : Math.round(durationMs),
     sampleRate,
     channelCount,
   });
 }
 
-function wavSamples(bytes: Uint8Array): Int16Array {
+/** ffmpeg's streaming WAV has unknown lengths. Decode raw PCM and own the WAV header. */
+function canonicalWav(pcm: Uint8Array): {
+  audio: Uint8Array;
+  samples: Int16Array;
+  durationMs: number;
+} {
+  const durationMs = pcm.byteLength / 32;
   if (
-    bytes.length < 44 ||
-    Buffer.from(bytes.slice(0, 4)).toString('ascii') !== 'RIFF' ||
-    Buffer.from(bytes.slice(8, 12)).toString('ascii') !== 'WAVE' ||
-    Buffer.from(bytes.slice(36, 40)).toString('ascii') !== 'data'
-  ) {
+    pcm.byteLength % 2 ||
+    durationMs < MIN_DURATION_MS ||
+    durationMs > MAX_DURATION_MS
+  )
     throw invalid();
-  }
-  const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
-  const dataSize = view.getUint32(40, true);
-  if (dataSize % 2 !== 0 || 44 + dataSize !== bytes.byteLength) throw invalid();
-  const samples = new Int16Array(dataSize / 2);
-  for (let index = 0; index < samples.length; index += 1) {
-    samples[index] = view.getInt16(44 + index * 2, true);
-  }
-  return samples;
+  const audio = Buffer.alloc(44 + pcm.byteLength);
+  audio.write('RIFF', 0);
+  audio.writeUInt32LE(audio.length - 8, 4);
+  audio.write('WAVEfmt ', 8);
+  audio.writeUInt32LE(16, 16);
+  audio.writeUInt16LE(1, 20);
+  audio.writeUInt16LE(1, 22);
+  audio.writeUInt32LE(16000, 24);
+  audio.writeUInt32LE(32000, 28);
+  audio.writeUInt16LE(2, 32);
+  audio.writeUInt16LE(16, 34);
+  audio.write('data', 36);
+  audio.writeUInt32LE(pcm.byteLength, 40);
+  audio.set(pcm, 44);
+  const samples = new Int16Array(pcm.byteLength / 2);
+  for (let index = 0; index < samples.length; index++)
+    samples[index] = audio.readInt16LE(44 + index * 2);
+  return { audio, samples, durationMs: Math.round(durationMs) };
 }
 
 export class FfmpegPronunciationAudioInspector implements PronunciationAudioInspector {
@@ -304,6 +332,13 @@ export class FfmpegPronunciationAudioInspector implements PronunciationAudioInsp
     }
     if (this.active >= this.config.maxConcurrent) throw invalid();
     this.active += 1;
+    const controller = new AbortController();
+    const abort = () => controller.abort();
+    input.signal?.addEventListener('abort', abort, { once: true });
+    const timeout = setTimeout(
+      abort,
+      Math.min(this.config.timeoutMs, input.deadlineAt.getTime() - Date.now()),
+    );
     try {
       const initial = parseProbe(
         (
@@ -312,7 +347,8 @@ export class FfmpegPronunciationAudioInspector implements PronunciationAudioInsp
             args: [
               '-v',
               'error',
-              '-nostdin',
+              '-max_alloc',
+              String(this.config.maxMemoryBytes),
               '-protocol_whitelist',
               'pipe',
               '-show_entries',
@@ -323,7 +359,7 @@ export class FfmpegPronunciationAudioInspector implements PronunciationAudioInsp
               'pipe:0',
             ],
             stdin: input.bytes,
-            signal: input.signal,
+            signal: controller.signal,
           })
         ).stdout,
       );
@@ -338,8 +374,14 @@ export class FfmpegPronunciationAudioInspector implements PronunciationAudioInsp
           'pipe',
           '-max_alloc',
           String(this.config.maxMemoryBytes),
+          '-threads',
+          '1',
           '-i',
           'pipe:0',
+          '-t',
+          '30.1',
+          '-map_metadata',
+          '-1',
           '-map',
           '0:a:0',
           '-vn',
@@ -356,61 +398,38 @@ export class FfmpegPronunciationAudioInspector implements PronunciationAudioInsp
           '-threads',
           '1',
           '-f',
-          'wav',
+          's16le',
           'pipe:1',
         ],
         stdin: input.bytes,
-        signal: input.signal,
+        signal: controller.signal,
       });
       if (converted.exitCode !== 0) throw invalid();
-      const post = parseProbe(
-        (
-          await this.run({
-            executable: paths.ffprobePath,
-            args: [
-              '-v',
-              'error',
-              '-nostdin',
-              '-protocol_whitelist',
-              'pipe',
-              '-show_entries',
-              'format=format_name,duration:stream=codec_type,codec_name,sample_rate,channels',
-              '-of',
-              'json',
-              '-i',
-              'pipe:0',
-            ],
-            stdin: converted.stdout,
-            signal: input.signal,
-          })
-        ).stdout,
-      );
+      const decoded = canonicalWav(converted.stdout);
       if (
-        post.mediaType !== 'audio/wav' ||
-        post.codec !== 'pcm_s16le' ||
-        post.sampleRate !== 16_000 ||
-        post.channelCount !== 1 ||
-        Math.abs(post.durationMs - initial.durationMs) > 100
-      ) {
+        initial.durationMs !== null &&
+        Math.abs(decoded.durationMs - initial.durationMs) > 150
+      )
         throw invalid();
-      }
       const quality = this.qualityPolicy.evaluate({
-        samples: wavSamples(converted.stdout),
+        samples: decoded.samples,
         sampleRate: 16_000,
       });
       return Object.freeze({
         detectedMediaType: initial.mediaType,
         container: initial.container,
         codec: initial.codec,
-        durationMs: post.durationMs,
-        sampleRate: post.sampleRate,
-        channelCount: post.channelCount,
+        durationMs: decoded.durationMs,
+        sampleRate: 16000,
+        channelCount: 1,
         qualityStatus: quality.status,
-        canonicalAudio: Uint8Array.from(converted.stdout),
+        canonicalAudio: decoded.audio,
       });
     } catch {
       throw invalid();
     } finally {
+      clearTimeout(timeout);
+      input.signal?.removeEventListener('abort', abort);
       this.active -= 1;
     }
   }

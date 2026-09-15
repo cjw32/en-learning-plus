@@ -1,9 +1,12 @@
+import { recordStudyDay } from '@libs/shared/study/study-day';
 import { createHash } from 'node:crypto';
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@libs/shared';
 import {
   pronunciationPublicErrorCodeSchema,
+  pronunciationLocaleSchema,
   pronunciationResultSchema,
+  pronunciationLearningItemChangeSchema,
   type PronunciationAssessmentStatus,
   type PronunciationPublicErrorCode,
   type PronunciationResult,
@@ -43,6 +46,7 @@ export type PronunciationAssessmentRecord = Readonly<{
   publicErrorCode?: PronunciationPublicErrorCode | null;
   createdAt: Date;
   updatedAt: Date;
+  finishedAt?: Date | null;
 }>;
 
 export type IdempotentAssessmentCreate = Readonly<{
@@ -57,7 +61,13 @@ export type PronunciationAudioIntentBinding =
   | 'STATE_CONFLICT';
 
 type PronunciationOwnedRowBase = Prisma.PronunciationAssessmentGetPayload<{
-  include: { target: true; audioAsset: true; words: true; trace: true };
+  include: {
+    target: true;
+    audioAsset: true;
+    words: true;
+    trace: true;
+    learningAttempt: { include: { reviewEvents: true } };
+  };
 }>;
 
 type PronunciationOwnedRow = PronunciationOwnedRowBase & {
@@ -187,6 +197,7 @@ function toRecord(row: {
   publicErrorCode?: string | null;
   createdAt: Date;
   updatedAt: Date;
+  finishedAt?: Date | null;
 }): PronunciationAssessmentRecord {
   return Object.freeze({
     id: row.id,
@@ -202,6 +213,7 @@ function toRecord(row: {
       null,
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
+    finishedAt: row.finishedAt,
   });
 }
 
@@ -306,9 +318,15 @@ export class PronunciationRepository {
   ): Promise<OwnedPronunciationAssessment | null> {
     const row = await this.prisma.pronunciationAssessment.findFirst({
       where: { id: assessmentId, userId: subjectId, hiddenAt: null },
-      include: { target: true, audioAsset: true, words: true, trace: true },
+      include: {
+        target: true,
+        audioAsset: true,
+        words: true,
+        trace: true,
+        learningAttempt: { include: { reviewEvents: true } },
+      },
     });
-    return row?.target ? this.toOwned(row) : null;
+    return row?.target ? this.toOwned({ ...row, target: row.target }) : null;
   }
 
   async listOwnedWithTargets(
@@ -325,12 +343,20 @@ export class PronunciationRepository {
   > {
     const rows = await this.prisma.pronunciationAssessment.findMany({
       where: { userId: input.subjectId, hiddenAt: null },
-      include: { target: true, audioAsset: true, words: true, trace: true },
+      include: {
+        target: true,
+        audioAsset: true,
+        words: true,
+        trace: true,
+        learningAttempt: { include: { reviewEvents: true } },
+      },
       orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
       take: input.limit + 1,
       ...(input.cursor ? { cursor: { id: input.cursor }, skip: 1 } : {}),
     });
-    const visible = rows.filter((row) => row.target).slice(0, input.limit);
+    const visible = rows
+      .filter((row): row is PronunciationOwnedRow => row.target !== null)
+      .slice(0, input.limit);
     return Object.freeze({
       items: Object.freeze(visible.map((row) => this.toOwned(row))),
       nextCursor:
@@ -565,6 +591,7 @@ export class PronunciationRepository {
           status: 'PROCESSING',
           cancelRequestedAt: null,
           hiddenAt: null,
+          deadlineAt: { gt: new Date() },
         },
         data: {
           status:
@@ -639,6 +666,7 @@ export class PronunciationRepository {
           })),
         });
       }
+      if (result.confidenceTier === 'RELIABLE') await recordStudyDay(transaction, input.subjectId);
       return true;
     });
   }
@@ -718,6 +746,7 @@ export class PronunciationRepository {
     from: readonly PronunciationAssessmentStatus[];
     to: PronunciationAssessmentStatus;
     at?: Date;
+    deadlineAt?: Date;
   }): Promise<boolean> {
     if (
       input.from.length === 0 ||
@@ -762,6 +791,9 @@ export class PronunciationRepository {
       data: {
         status: input.to,
         ...timestamp,
+        ...(input.to === 'QUEUED' && input.deadlineAt
+          ? { deadlineAt: input.deadlineAt }
+          : {}),
         ...(publicErrorCode ? { publicErrorCode } : {}),
       },
     });
@@ -840,7 +872,35 @@ export class PronunciationRepository {
           modelVersion: row.modelVersion,
           learningUpdate: {
             status: learningUpdateStatus,
-            changedItems: [],
+            changedItems:
+              learningUpdateStatus === 'SAVED'
+                ? (row.learningAttempt?.reviewEvents ?? []).flatMap((event) => {
+                    if (event.voidedAt || event.userId !== row.userId)
+                      return [];
+                    const word = row.words.find(
+                      (word) =>
+                        word.wordId === event.targetKey &&
+                        word.targetPosition !== null,
+                    );
+                    const previous = event.previousState as Record<
+                      string,
+                      unknown
+                    > | null;
+                    const next = event.nextState as Record<
+                      string,
+                      unknown
+                    > | null;
+                    const parsed =
+                      pronunciationLearningItemChangeSchema.safeParse({
+                        targetPosition: word?.targetPosition,
+                        word: word?.word,
+                        previousReviewState: previous?.reviewState,
+                        nextReviewState: next?.reviewState,
+                        nextReviewAt: next?.dueAt,
+                      });
+                    return parsed.success ? [parsed.data] : [];
+                  })
+                : [],
             ...(learningUpdateStatus === 'PROPOSED'
               ? {
                   message: '学习进度尚未写入，这是按当前规则计算的预览。',
@@ -872,7 +932,7 @@ export class PronunciationRepository {
       assessment: toRecord(row),
       target: Object.freeze({
         sourceType: row.target.sourceType,
-        languageTag: row.target.languageTag,
+        languageTag: pronunciationLocaleSchema.parse(row.target.languageTag),
         referenceText: row.target.referenceText,
         normalizedTokens: Object.freeze(
           Array.isArray(row.target.normalizedTokens)

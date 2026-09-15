@@ -34,22 +34,6 @@ function probe(
   );
 }
 
-function wavProbe(durationMs: number): Uint8Array {
-  return Buffer.from(
-    JSON.stringify({
-      format: { format_name: 'wav', duration: durationMs / 1_000 },
-      streams: [
-        {
-          codec_type: 'audio',
-          codec_name: 'pcm_s16le',
-          sample_rate: '16000',
-          channels: 1,
-        },
-      ],
-    }),
-  );
-}
-
 function canonicalWav(durationMs = 1_000, sample = 1_000): Uint8Array {
   const sampleCount = Math.round((durationMs / 1_000) * 16_000);
   const bytes = new Uint8Array(44 + sampleCount * 2);
@@ -168,10 +152,10 @@ describe('pronunciation audio attack and limit boundary', () => {
   });
 
   it.each([500, 30_000])(
-    'accepts the exact %d ms boundary after probe, decode, quality and post-probe checks',
+    'accepts the exact %d ms boundary after probe, PCM decode and quality checks',
     async (durationMs) => {
       const wav = canonicalWav(durationMs);
-      const runner = runnerWith([probe(durationMs), wav, wavProbe(durationMs)]);
+      const runner = runnerWith([probe(durationMs), wav.slice(44)]);
       await expect(
         inspector(runner).inspectAndCanonicalize({
           bytes: webm(),
@@ -179,7 +163,7 @@ describe('pronunciation audio attack and limit boundary', () => {
           deadlineAt: new Date(Date.now() + 5_000),
         }),
       ).resolves.toMatchObject({ durationMs, qualityStatus: 'READY' });
-      expect(runner.run).toHaveBeenCalledTimes(3);
+      expect(runner.run).toHaveBeenCalledTimes(2);
       for (const call of runner.run.mock.calls) {
         expect(call[0]).toMatchObject({
           shell: false,
@@ -192,6 +176,44 @@ describe('pronunciation audio attack and limit boundary', () => {
     },
   );
 
+  it('accepts browser WebM without container duration and writes a finite canonical WAV header', async () => {
+    const metadata = JSON.parse(Buffer.from(probe()).toString());
+    delete metadata.format.duration;
+    const runner = runnerWith([
+      Buffer.from(JSON.stringify(metadata)),
+      canonicalWav().slice(44),
+    ]);
+    const result = await inspector(runner).inspectAndCanonicalize({
+      bytes: webm(),
+      declaredMediaType: 'audio/webm',
+      deadlineAt: new Date(Date.now() + 5000),
+    });
+    const wav = Buffer.from(result.canonicalAudio);
+    expect(wav.toString('ascii', 0, 4)).toBe('RIFF');
+    expect(wav.readUInt32LE(4)).toBe(wav.length - 8);
+    expect(wav.readUInt32LE(40)).toBe(32000);
+    expect(result.durationMs).toBe(1000);
+    expect(runner.run.mock.calls[0]![0].args).not.toContain('-nostdin');
+    expect(runner.run.mock.calls[1]![0].args).toContain('s16le');
+  });
+  it.each([499, 30001])(
+    'rejects decoded %d ms even when container duration is missing',
+    async (durationMs) => {
+      const metadata = JSON.parse(Buffer.from(probe()).toString());
+      delete metadata.format.duration;
+      const runner = runnerWith([
+        Buffer.from(JSON.stringify(metadata)),
+        canonicalWav(durationMs).slice(44),
+      ]);
+      await expect(
+        inspector(runner).inspectAndCanonicalize({
+          bytes: webm(),
+          declaredMediaType: 'audio/webm',
+          deadlineAt: new Date(Date.now() + 5000),
+        }),
+      ).rejects.toMatchObject({ code: 'AUDIO_INVALID' });
+    },
+  );
   it.each([
     ['silence', new Int16Array(16_000), 'SILENT'],
     ['low volume', new Int16Array(16_000).fill(64), 'LOW_VOLUME'],

@@ -8,6 +8,7 @@ export function renderSummary(report: Summary) {
   return [
     `# ${report.gate.status} — ${cell(report.scopeClaim)}`,
     `Run: ${cell(report.runId)}`,
+    '说明：本报告只证明所选合成/受控检查的结果，不代表真实模型质量或上线资格。',
     `Planned: ${report.counts.planned}; completed: ${report.counts.completed}; passed: ${report.counts.passed}; failed: ${report.counts.failed}; review: ${report.counts.review}; skipped: ${report.counts.skipped}; error: ${report.counts.error}; not run: ${report.counts.notRun}.`,
     '',
     '| Case | Mode | State | Reasons |',
@@ -57,16 +58,25 @@ export function renderReport(input: z.infer<typeof reportSchema>) {
     ),
     '',
     r.metrics.length
-      ? '| Metric | Value | Independent N | Missing reason |\n|---|---|---|---|\n' +
+      ? '| Module | Check metric | Group | Value | Denominator | Independent test groups | Delta | Missing reason |\n|---|---|---|---|---|---|---|---|\n' +
         r.metrics
           .map(
             (m) =>
-              `| ${cell(m.metricId)} | ${cell(m.value ?? 'unknown')} | ${m.independentN} | ${cell(m.unavailableReason ?? '')} |`,
+              `| ${cell(m.module)} | ${cell(m.metricId)} | ${cell(
+                Object.entries(m.group)
+                  .map(([k, v]) => k + '=' + (v.value ?? 'unknown'))
+                  .join(', ') || 'all',
+              )} | ${cell(m.value ?? 'unknown')} | ${m.denominator} | ${m.independentN} | ${cell(m.comparisonDelta ?? 'not compared')} | ${cell(m.unavailableReason ?? '')} |`,
           )
           .join('\n')
       : 'Quality metrics: not measured; fixture and controlled business checks only.',
     `Budget micros: ${r.usage.budgetMicros}; reserved: ${r.usage.reservedMicros}; settled: ${r.usage.settledMicros}. Actual call records: ${r.usage.calls.length}.`,
-    `Baseline: ${cell(r.comparisonUnavailableReason ?? 'see comparison record')}.`,
+    `Baseline: ${cell(r.comparison ? r.comparison.baselineId + ' / ' + r.comparison.comparability : r.comparisonUnavailableReason)}.`,
+    ...(r.comparison
+      ? [
+          `Missing pairs: ${r.comparison.missingPairs.map(cell).join(', ') || 'none'}; mismatches: ${r.comparison.mismatches.map(cell).join(', ') || 'none'}.`,
+        ]
+      : []),
     '',
     'Reproduction arguments (JSON array, not a shell command):',
     '```json',

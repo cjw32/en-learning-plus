@@ -1,0 +1,49 @@
+# Local development only. Run from the repository root with --env-file server/.env.
+name: en-learning-plus-pronunciation
+services:
+  postgres:
+    image: pgvector/pgvector:pg17
+    environment:
+      POSTGRES_USER: enlocal
+      POSTGRES_DB: en_learning
+      POSTGRES_PASSWORD: ${LOCAL_POSTGRES_PASSWORD:?Missing local database password}
+    ports:
+      - "127.0.0.1:15432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    mem_limit: 1g
+    restart: unless-stopped
+  minio:
+    build:
+      context: ./infra/pronunciation
+      dockerfile: Minio.Dockerfile
+    image: en-learning-plus-minio:2025-10-15
+    command: ["server", "/data", "--console-address", ":9001"]
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY:?Missing local MinIO user}
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY:?Missing local MinIO password}
+    ports:
+      - "127.0.0.1:19000:9000"
+      - "127.0.0.1:19001:9001"
+    volumes:
+      - minio-data:/data
+    mem_limit: 1g
+    restart: unless-stopped
+  redis:
+    image: redis:7.4-alpine
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:?Missing local Redis password}
+    command:
+      - /bin/sh
+      - -c
+      - 'exec redis-server --appendonly yes --appendfsync always --maxmemory 256mb --maxmemory-policy noeviction --requirepass "$$REDIS_PASSWORD"'
+    ports:
+      - "127.0.0.1:16379:6379"
+    volumes:
+      - redis-data:/data
+    mem_limit: 512m
+    restart: unless-stopped
+volumes:
+  postgres-data:
+  minio-data:
+  redis-data:

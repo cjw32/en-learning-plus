@@ -419,7 +419,7 @@ export class CoachExerciseWorkflow {
   async run(
     input: CoachExerciseWorkflowInput,
     context: CoachExecutionContext,
-  ): Promise<CoachResult> {
+  ): Promise<AnyPublicCoachResult> {
     try {
       const intent = await this.dependencies.classifyIntent(input, context);
       if (intent !== 'CREATE_EXERCISE') {

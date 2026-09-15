@@ -1,4 +1,5 @@
 import { z } from '@en/common/coach/zod';
+import { AZURE_MANAGED_MODEL_IDENTITY } from '../provider/azure-pronunciation.identity';
 
 export const PRONUNCIATION_RUNTIME_CONFIG = Symbol(
   'PRONUNCIATION_RUNTIME_CONFIG',
@@ -29,6 +30,9 @@ const pronunciationEnvironmentSchema = z
     PRONUNCIATION_STORAGE_APPROVED: booleanTextSchema,
     PRONUNCIATION_PROVIDER_APPROVED: booleanTextSchema,
     PRONUNCIATION_PROVIDER_MODEL_VERSION: optionalTextSchema,
+    PRONUNCIATION_MODEL_IDENTITY_MODE: z
+      .enum(['AZURE_MANAGED', 'VENDOR_ATTESTED'])
+      .optional(),
     PRONUNCIATION_PROVIDER_REGION: optionalTextSchema,
     PRONUNCIATION_PRIVACY_EVIDENCE_VERSION: optionalTextSchema,
     PRONUNCIATION_PRICE_VERSION: optionalTextSchema,
@@ -114,9 +118,10 @@ export function resolvePronunciationRuntimeConfig(
     audioRuntimeApproved: enabled(parsed.PRONUNCIATION_AUDIO_RUNTIME_APPROVED),
     storageApproved: enabled(parsed.PRONUNCIATION_STORAGE_APPROVED),
     providerApproved: enabled(parsed.PRONUNCIATION_PROVIDER_APPROVED),
-    providerModelVersion: approvedText(
-      parsed.PRONUNCIATION_PROVIDER_MODEL_VERSION,
-    ),
+    providerModelVersion:
+      parsed.PRONUNCIATION_MODEL_IDENTITY_MODE === 'AZURE_MANAGED'
+        ? AZURE_MANAGED_MODEL_IDENTITY
+        : approvedText(parsed.PRONUNCIATION_PROVIDER_MODEL_VERSION),
     providerRegion: approvedText(parsed.PRONUNCIATION_PROVIDER_REGION),
     privacyEvidenceVersion: approvedText(
       parsed.PRONUNCIATION_PRIVACY_EVIDENCE_VERSION,

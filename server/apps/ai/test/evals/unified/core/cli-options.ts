@@ -26,6 +26,7 @@ const names = [
   'currency',
   'max-tokens',
   'run-dir',
+  'expected',
   'evidence',
   'artifact-root',
   'policy',
@@ -38,6 +39,7 @@ export function parseOptions(argv: readonly string[]) {
       'inspect',
       'run',
       'verify',
+      'summarize',
       'recover',
       'cleanup',
       'attach-client-evidence',
@@ -79,7 +81,7 @@ export function parseOptions(argv: readonly string[]) {
   const profile = one('profile', 'quick')!;
   const purpose = one('purpose', 'check')!;
   if (
-    !['quick', 'full'].includes(profile) ||
+    !['quick', 'synthetic', 'full'].includes(profile) ||
     !['check', 'qualification', 'measurement'].includes(purpose)
   )
     throw Error('INVALID_PROFILE');
@@ -92,7 +94,7 @@ export function parseOptions(argv: readonly string[]) {
     throw Error('INVALID_MODULE');
   const modes = many('mode').length
     ? many('mode')
-    : profile === 'quick'
+    : profile !== 'full'
       ? ['deterministic', 'mock', 'replay']
       : ['deterministic', 'mock', 'replay', 'live'];
   if (
@@ -124,6 +126,8 @@ export function parseOptions(argv: readonly string[]) {
     )
   )
     throw Error('INVALID_DIFFERENCE');
+  if (command === 'summarize' && !one('expected'))
+    throw Error('EXPECTED_MANIFEST_REQUIRED');
   const limits = limitsSchema.parse({
     concurrency: integer('concurrency', 1),
     caseTimeoutMs: integer('case-timeout-ms', 120000),
@@ -135,10 +139,7 @@ export function parseOptions(argv: readonly string[]) {
     currency: one('currency', 'USD'),
     maxTokens: integer('max-tokens', 0),
   });
-  if (
-    profile === 'quick' &&
-    (modes.includes('live') || limits.budgetMicros > 0)
-  )
+  if (profile !== 'full' && (modes.includes('live') || limits.budgetMicros > 0))
     throw Error('QUICK_COST_CONFLICT');
   if (['run', 'inspect'].includes(command) && !one('output'))
     throw Error('OUTPUT_REQUIRED');
@@ -151,7 +152,7 @@ export function parseOptions(argv: readonly string[]) {
     throw Error('RUN_DIR_REQUIRED');
   if (command === 'attach-client-evidence' && !one('evidence'))
     throw Error('EVIDENCE_REQUIRED');
-  if (['recover', 'cleanup', 'purge'].includes(command) && !one('config'))
+  if (['cleanup', 'purge'].includes(command) && !one('config'))
     throw Error('CONFIG_REQUIRED');
   if (command === 'purge' && (!one('artifact-root') || !one('policy')))
     throw Error('POLICY_REQUIRED');
@@ -177,6 +178,7 @@ export function parseOptions(argv: readonly string[]) {
     config: one('config'),
     output: one('output'),
     runDir: one('run-dir'),
+    expected: one('expected'),
     evidence: one('evidence'),
     artifactRoot: one('artifact-root'),
     policy: one('policy'),

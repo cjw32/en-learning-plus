@@ -1,5 +1,5 @@
 import { InjectQueue } from '@nestjs/bullmq';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Optional } from '@nestjs/common';
 import type { Queue } from 'bullmq';
 import { KnowledgeOutboxRepository } from '@libs/learning';
 
@@ -44,7 +44,7 @@ export class KnowledgeOutboxDispatcher {
     private readonly outbox: KnowledgeOutboxRepository,
     @InjectQueue(KNOWLEDGE_INGESTION_QUEUE)
     private readonly queue: Pick<Queue<KnowledgeQueuePayload>, 'add'>,
-    private readonly now: () => Date = () => new Date(),
+    @Optional() private readonly now: () => Date = () => new Date(),
   ) {}
 
   async dispatchBatch(

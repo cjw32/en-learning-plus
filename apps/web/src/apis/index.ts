@@ -1,3 +1,4 @@
+import { learningSessionVersion, assertLearningSession, isLearningSessionCurrent, onLearningSessionChange } from '@/session/learning-session'
 import axios, {
   type AxiosError,
   type AxiosInstance,
@@ -24,9 +25,11 @@ export const aiApi = axios.create({
 
 type RetriableRequestConfig = InternalAxiosRequestConfig & {
   _accessTokenRetried?: boolean
+  _sessionVersion?: number
 }
 
 let refreshPromise: Promise<string> | null = null
+onLearningSessionChange(() => { refreshPromise = null })
 
 function expireSession() {
   const userStore = useUserStore()
@@ -37,24 +40,34 @@ function expireSession() {
 
 export async function refreshCoachAccessToken(): Promise<string> {
   const userStore = useUserStore()
+  const version = learningSessionVersion()
   const refreshToken = userStore.getRefreshToken
   if (!refreshToken) throw new Error('Missing refresh token')
   const result = await refreshTokenApi({ refreshToken })
-  if (!result.success) throw new Error('Refresh token rejected')
+  assertLearningSession(version)
+  if (!result.success || !result.data?.accessToken || !result.data?.refreshToken) throw new Error('Refresh token rejected')
   userStore.updateToken(result.data)
   return result.data.accessToken
 }
 
 function installAuthenticatedInterceptors(instance: AxiosInstance) {
   instance.interceptors.request.use((config) => {
+    const request = config as RetriableRequestConfig
+    request._sessionVersion ??= learningSessionVersion()
+    assertLearningSession(request._sessionVersion)
     const accessToken = useUserStore().getAccessToken
     if (accessToken) config.headers.Authorization = `Bearer ${accessToken}`
     return config
   })
 
   instance.interceptors.response.use(
-    (response) => response.data,
+    (response) => {
+      assertLearningSession((response.config as RetriableRequestConfig)._sessionVersion!)
+      return response.data
+    },
     async (error: AxiosError) => {
+      const version = (error.config as RetriableRequestConfig | undefined)?._sessionVersion
+      if (version !== undefined) assertLearningSession(version)
       if (error.code === 'ERR_NETWORK') {
         ElMessage.error('网络连接失败,请重试')
         return Promise.reject(error)
@@ -85,10 +98,10 @@ function installAuthenticatedInterceptors(instance: AxiosInstance) {
         originalRequest.headers.Authorization = `Bearer ${accessToken}`
         return instance(originalRequest)
       } catch (refreshError) {
-        expireSession()
+        if (version === undefined || isLearningSessionCurrent(version)) expireSession()
         return Promise.reject(refreshError)
       } finally {
-        refreshPromise = null
+        if (version === undefined || isLearningSessionCurrent(version)) refreshPromise = null
       }
     },
   )

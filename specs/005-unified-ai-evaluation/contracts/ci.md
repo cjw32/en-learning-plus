@@ -50,3 +50,7 @@ qualification 的检查范围和 quick 独立。quick=PASS 表示快速范围通
 | approved runner and native tools | Node/pnpm、必要数据库/音频/客户端运行条件已存在且获准；没有工具不自动补装。 |
 
 本地可用 CLI 和工作流设计不等于这些远程配置已存在。该边界保持 spec FR-043。
+
+### 2026-09-15 当前可执行范围
+
+新增 synthetic 零付费全量离线检查；根目录入口、只读历史比较、verify/recover 与本地 CI 汇总的实际用法见 [使用指南](../../../docs/ai-evaluation.md)，执行证据见 [验收记录](../evidence/2026-09-15-synthetic-completion.md)。inspect 操作成功不代表评测通过；recover 无需凭证配置，仅生成不可覆盖的恢复快照，不执行业务、资源清理或预算释放。其余 full/真实质量/治理能力仍以待实现/待验收记录为准。

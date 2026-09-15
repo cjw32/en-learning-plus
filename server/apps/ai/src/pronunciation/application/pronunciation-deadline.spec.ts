@@ -9,7 +9,7 @@ import {
   type PronunciationExecutionBoundary,
 } from './pronunciation-assessment.service';
 
-describe('pronunciation 30-second durable deadline', () => {
+describe('pronunciation durable deadline enforcement', () => {
   it.each([
     'UPLOAD',
     'QUEUE',

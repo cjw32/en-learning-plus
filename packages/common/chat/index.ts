@@ -24,5 +24,4 @@ export type ChatDto = {
     webSearch:boolean; // 联网搜索
     role: ChatRoleType; // 角色
     content: string; // 内容
-    userId: string; // 用户id
 }

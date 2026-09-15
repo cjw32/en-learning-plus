@@ -13,6 +13,9 @@ import { useUserStore } from '@/stores/user'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+    { path: '/pronunciation', component: () => import('@/layout/index.vue'), meta: { requiresAuth: true }, children: [
+      { path: '', name: 'pronunciation', component: () => import('@/views/Pronunciation/index.vue') },
+    ] },
     ...home,//主页
     ...wordBook,//单词本
     ...setting,//设置

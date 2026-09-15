@@ -1,8 +1,10 @@
-import { ref, computed } from 'vue'
+import { invalidateLearningSession } from '@/session/learning-session'
+import { ref, computed, watch } from 'vue'
 import { defineStore } from 'pinia'
 import type { WebResultUser, Token, UserUpdate } from '@en/common/user'
 export const useUserStore = defineStore('user', () => {
   const user = ref<WebResultUser | null>(null)//用户信息
+  watch(() => user.value?.id, invalidateLearningSession, { flush: 'sync' })
   const setUser = (params: WebResultUser) => {
     user.value = params
   }
@@ -17,6 +19,11 @@ export const useUserStore = defineStore('user', () => {
   //更新用户单词数量
   const updateUserWordNumber = (wordNumber: number) => {
     user.value!.wordNumber = wordNumber
+  }
+  const updateStudyStats = (value: {dayNumber:number; wordNumber:number}) => {
+    if (!user.value) return
+    user.value.dayNumber = value.dayNumber
+    user.value.wordNumber = value.wordNumber
   }
   //点击完成保存之后更新用户信息
   const updateUser = (params: UserUpdate) => {
@@ -44,7 +51,7 @@ export const useUserStore = defineStore('user', () => {
   const logout = () => {//退出登录
     user.value = null
   }
-  return { user,setUser, getUser, logout, getAccessToken, getRefreshToken, updateToken, getUpdateUserInfo, updateUser, updateUserWordNumber }
+  return { updateStudyStats, user,setUser, getUser, logout, getAccessToken, getRefreshToken, updateToken, getUpdateUserInfo, updateUser, updateUserWordNumber }
 },{
   persist: true,//开启持久化
 })

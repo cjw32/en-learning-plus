@@ -50,7 +50,7 @@ Do not start the dependent work until each applicable owner explicitly approves 
 | --------------------------- | --------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
 | Audio decoder/runtime       | Explicit approval for `ffmpeg`/`ffprobe` or equivalent; fixed version and sandbox limits            | Server audio acceptance and real Provider calls |
 | Private object storage      | Private bucket exists, anonymous access absent, lifecycle ≤24h, backups excluded, delete SLA tested | Any server-side audio persistence               |
-| Provider model identity     | Vendor-backed immutable scoring model/revision or enforceable change notice                         | Production Provider adapter                     |
+| Provider model identity     | Explicit managed/unversioned mode (FR-093) or real vendor-attested model/revision                         | Production Provider adapter                     |
 | Privacy and region          | Region, subprocessors, zero retention/no training and minimum-data contract approved                | Provider calls                                  |
 | Source usage rights         | Explicit right to send selected course/RAG text for pronunciation assessment                        | Non-manual third-party targets                  |
 | Price and budgets           | Versioned regional price plus approved per-call, subject-day, system-day, system-month caps         | Provider admission                              |

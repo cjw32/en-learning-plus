@@ -27,6 +27,7 @@ import { BullModule } from '@nestjs/bullmq';
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
+      ignoreEnvFile: process.env.NODE_ENV === 'test',
     }),
     BullModule.forRootAsync({
       imports: [ConfigModule],
@@ -35,6 +36,7 @@ import { BullModule } from '@nestjs/bullmq';
         connection: {
           host: configService.get('REDIS_HOST'),
           port: Number(configService.get('REDIS_PORT')),
+          password: configService.get('REDIS_PASSWORD') || undefined,
         },
       }),
     }),

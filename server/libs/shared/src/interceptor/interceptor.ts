@@ -3,6 +3,7 @@ import {
   ExecutionContext,
   Injectable,
   NestInterceptor,
+  StreamableFile,
 } from '@nestjs/common';
 import { map, Observable } from 'rxjs';
 
@@ -32,6 +33,9 @@ export class InterceptorInterceptor implements NestInterceptor {
     const request = ctx.getRequest();
     return next.handle().pipe(
       map((data) => {
+        if (Buffer.isBuffer(data) || data instanceof StreamableFile) return data;
+        // Pronunciation already supplies its versioned, strictly validated envelope.
+        if (/^\/ai\/v1\/pronunciation(?:\/|\?|$)/.test(request.url)) return data;
         return {
           timestamp: new Date().toISOString(),
           path: request.url,

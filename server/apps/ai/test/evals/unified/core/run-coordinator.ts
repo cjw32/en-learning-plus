@@ -1,3 +1,10 @@
+import { executeAttempts } from './attempt-lineage';
+import { summarizeCi } from './ci-summary';
+import { recoverRun } from './recovery';
+import { loadHistoricalRun, historicalComparison } from './baseline-store';
+import { verifyBundle } from './verify';
+import { runBounded } from './stop-controller';
+import { groupMetrics } from './group-metrics';
 import { createHash, randomUUID } from 'node:crypto';
 import {
   readFileSync,
@@ -117,7 +124,7 @@ function sourceSnapshot(
       goldHash: datasetHash,
       splitHash: digest('development'),
       exposureHash: digest('development-visible'),
-      evaluatorHash: digest('actual-business-rules.v1'),
+      evaluatorHash: controlHash,
       rubricHash: digest('rule-only'),
       calibrationHash: null,
       aggregationVersion: 'unified.v1',
@@ -128,7 +135,7 @@ function sourceSnapshot(
       os: process.platform,
       arch: process.arch,
       workerVersion: 'unified-worker.v1',
-      limits: { ...limits, concurrency: 1 },
+      limits: { ...limits },
       seed: 0,
       cache: 'disabled',
       isolationFingerprint: 'sanitized-child-env-clean-cwd',
@@ -150,7 +157,10 @@ export async function runEvaluation(
   let detach = () => {};
   try {
     options = parseOptions(argv);
+    if (options.command === 'summarize')
+      return summarizeCi(JSON.parse(readFileSync(options.expected!, 'utf8')));
     if (options.command === 'verify') return verifyBundle(options.runDir!);
+    if (options.command === 'recover') return recoverRun(options.runDir!);
     if (!['run', 'inspect'].includes(options.command))
       return { exitCode: 2, diagnostic: 'OPERATION_NOT_YET_AVAILABLE' };
     const controlRoot = realpathSync(repositoryRoot);
@@ -185,7 +195,12 @@ export async function runEvaluation(
       .split('\n')
       .map((line) => JSON.parse(line));
     const fixtureHash = fileHash(safePath(controlRoot, fixturePath));
-    const suites = testRegistry.entries.filter((e) => e.profile === 'quick');
+    const suites = testRegistry.entries.filter(
+      (e) =>
+        e.profile === 'quick' ||
+        options!.profile === 'full' ||
+        (options!.profile === 'synthetic' && e.profile === 'synthetic'),
+    );
     const allCases = [
       ...loaded.cases,
       ...fixtures.map((f) =>
@@ -261,9 +276,13 @@ export async function runEvaluation(
         'CALIBRATION_MISSING',
         'ISOLATION_UNVERIFIED',
         'BASELINE_UNAPPROVED',
+        'REQUIRED_LIVE_NOT_EXECUTED',
       );
-    if (options.baseline || options.baselineCandidate)
-      missing.push('BASELINE_UNAPPROVED');
+    if (options.baselineCandidate)
+      missing.push('PAIRED_CHECKOUT_NOT_IMPLEMENTED');
+    const historical = options.baseline
+      ? loadHistoricalRun(options.baseline)
+      : null;
     if (
       options.config ||
       options.candidateConfig ||
@@ -271,7 +290,7 @@ export async function runEvaluation(
       options.baselineConfig
     )
       missing.push('CONFIG_PROFILE_NOT_IMPLEMENTED');
-    if (options.limits.retryLimit) missing.push('RETRY_POLICY_NOT_IMPLEMENTED');
+
     const items: ExecutionItem[] = selected.selected.map((c) => ({
       itemId: digest(c.caseId),
       caseId: c.caseId,
@@ -287,7 +306,13 @@ export async function runEvaluation(
     const snapshot = sourceSnapshot(
       candidateRoot,
       controlHash,
-      loaded.hash,
+      digest(
+        allCases.map((c) => ({
+          id: c.caseId,
+          input: c.inputRef,
+          expected: c.expectedRef,
+        })),
+      ),
       options.limits,
     );
     const createdAt = new Date().toISOString();
@@ -318,7 +343,9 @@ export async function runEvaluation(
         runId,
         selectedCaseIds: items.map((i) => i.caseId),
         missingRequirements: [...new Set(missing)],
-        liveQualityEvidenceMissing: loaded.missingMetadata,
+        liveQualityEvidenceMissing: loaded.missingMetadata.filter((m) =>
+          items.some((i) => i.caseId === m.caseId),
+        ),
       };
       store.write('preflight.json', preflight);
       return { exitCode: missing.length ? 2 : 0, runDir, ...preflight };
@@ -357,157 +384,190 @@ export async function runEvaluation(
         throw Error('BUDGET_STOPPED');
       },
     });
-    for (const item of items) {
-      if (controller.signal.aborted) break;
-      const c = selected.selected.find((c) => c.caseId === item.caseId)!;
-      let observed: ItemResult;
-      const attempts: ItemResult[] = [];
-      try {
-        if (
-          options.profile !== 'quick' ||
-          missing.some((m) => m.includes('NOT_IMPLEMENTED'))
-        )
-          throw Error('DEPENDENCY_UNAVAILABLE');
-        if (!options.modes.includes(item.declaredMode))
-          throw Error('REQUIRED_LIVE_NOT_EXECUTED');
-        for (let repeat = 0; repeat < options.limits.repeatCount; repeat++) {
-          if (controller.signal.aborted) throw Error('CANCELLED');
-          log.append('ITEM_STARTED', { itemId: item.itemId, repeat });
-          const timeoutMs = Math.max(
-            1,
-            Math.min(options.limits.caseTimeoutMs, deadline - Date.now()),
-          );
-          let current: ItemResult;
-          if (item.caseId.startsWith('suite:')) {
-            const actual = await runRegisteredJest(
-              item.caseId.slice(6),
-              join(candidateRoot, 'server'),
-              runDir,
-              timeoutMs,
-              controller.signal,
-            );
-            const suiteEvidencePath = `observations/jest-${item.itemId}-${repeat}.json`;
-            const suiteEvidence = store.write(suiteEvidencePath, actual);
-            const bad = actual.results.some((r) => r.state === 'failed');
-            const incomplete =
-              actual.missingOrSkipped.length > 0 ||
-              (actual.exitCode !== 0 && !bad);
-            current = {
-              ...item,
-              terminalState: bad ? 'failed' : incomplete ? 'error' : 'passed',
-              reasonCodes: bad
-                ? ['CONTRACT_BREAK']
-                : incomplete
-                  ? ['REQUIRED_ITEM_MISSING']
-                  : [],
-              allAttempts: [`${item.itemId}-repeat-${repeat}`],
-              requirements: c.requirements,
-              expectedRef: c.expectedRef,
-              actualRef: null,
-              evidenceRefs: [
-                { path: suiteEvidencePath, hash: fileHash(suiteEvidence) },
-              ],
-              steps: [
-                collectObservation({
-                  stage: 'rule',
-                  actualMode: item.declaredMode,
-                  dependencyKind:
-                    item.declaredMode === 'mock' ? 'mock' : 'none',
-                  input: { suite: item.caseId },
-                  output: actual,
-                  version: testRegistry.version,
-                }),
-              ],
-            };
-          } else
-            current = await host.execute(
-              'rules',
-              { ...item, expectedRepeatCount: 1 },
-              { timeoutMs, signal: controller.signal },
-            );
-          current.requirements = c.requirements;
-          current.allAttempts = [`attempt-${item.itemId}-${repeat}`];
-          attempts.push(current);
-          if (current.terminalState === 'failed') knownFailure = true;
-          store.write(`attempts/attempt-${item.itemId}-${repeat}.json`, {
-            ...current,
-            repeatIndex: repeat,
-            retryIndex: 0,
-          });
-          log.append('ATTEMPT_FINISHED', {
+    await runBounded(
+      items,
+      options!.limits.concurrency,
+      controller.signal,
+      async (item) => {
+        if (controller.signal.aborted) return;
+        const c = selected.selected.find((c) => c.caseId === item.caseId)!;
+        const observed: ItemResult = {
+          ...(await executeAttempts({
             itemId: item.itemId,
-            repeat,
-            terminalState: current.terminalState,
-          });
-        }
-        const chosen =
-          attempts.find((a) => a.terminalState === 'failed') ??
-          attempts.find((a) => a.terminalState !== 'passed') ??
-          attempts[0];
-        observed = {
-          ...chosen,
+            repeatCount: options!.limits.repeatCount,
+            retryLimit: options!.limits.retryLimit,
+            signal: controller.signal,
+            execute: async (repeat, retry) => {
+              if (missing.some((m) => m.includes('NOT_IMPLEMENTED')))
+                throw Error('DEPENDENCY_UNAVAILABLE');
+              if (!options!.modes.includes(item.declaredMode))
+                throw Error('REQUIRED_LIVE_NOT_EXECUTED');
+              log.append('ITEM_STARTED', {
+                itemId: item.itemId,
+                repeat,
+                retry,
+              });
+              const timeoutMs = Math.max(
+                1,
+                Math.min(options!.limits.caseTimeoutMs, deadline - Date.now()),
+              );
+              let current: ItemResult;
+              if (item.caseId.startsWith('suite:')) {
+                const actual = await runRegisteredJest(
+                  item.caseId.slice(6),
+                  join(candidateRoot, 'server'),
+                  runDir!,
+                  timeoutMs,
+                  controller.signal,
+                  {
+                    sourceHash: c.inputRef.hash,
+                    configHash: fileHash(
+                      safePath(
+                        controlRoot,
+                        'server/' +
+                          suites.find((s) => 'suite:' + s.id === item.caseId)!
+                            .config,
+                      ),
+                    ),
+                  },
+                );
+                const suiteEvidencePath = `observations/jest-${item.itemId}-${repeat}-${retry}.json`;
+                const suiteEvidence = store.write(suiteEvidencePath, actual);
+                const bad = actual.results.some((r) => r.state === 'failed');
+                const incomplete =
+                  actual.missingOrSkipped.length > 0 ||
+                  (actual.exitCode !== 0 && !bad);
+                current = {
+                  ...item,
+                  terminalState: bad
+                    ? 'failed'
+                    : incomplete
+                      ? 'error'
+                      : 'passed',
+                  reasonCodes: bad
+                    ? ['CONTRACT_BREAK']
+                    : incomplete
+                      ? ['REQUIRED_ITEM_MISSING']
+                      : [],
+                  allAttempts: [`${item.itemId}-repeat-${repeat}`],
+                  requirements: c.requirements,
+                  expectedRef: c.expectedRef,
+                  actualRef: null,
+                  evidenceRefs: [
+                    { path: suiteEvidencePath, hash: fileHash(suiteEvidence) },
+                  ],
+                  steps: [
+                    collectObservation({
+                      stage: 'rule',
+                      actualMode: item.declaredMode,
+                      dependencyKind:
+                        item.declaredMode === 'mock' ? 'mock' : 'none',
+                      input: { suite: item.caseId },
+                      output: actual,
+                      version: testRegistry.version,
+                    }),
+                  ],
+                };
+              } else
+                current = await host.execute(
+                  'rules',
+                  { ...item, expectedRepeatCount: 1 },
+                  { timeoutMs, signal: controller.signal },
+                );
+
+              return { ...current, ...item, requirements: c.requirements };
+            },
+            failure: (error) => {
+              const reason = controller.signal.aborted
+                ? 'CANCELLED'
+                : /TIMEOUT/.test(String(error))
+                  ? 'TIMEOUT'
+                  : /REQUIRED_LIVE_NOT_EXECUTED/.test(String(error))
+                    ? 'REQUIRED_LIVE_NOT_EXECUTED'
+                    : 'DEPENDENCY_UNAVAILABLE';
+              return {
+                ...item,
+                terminalState: 'error',
+                reasonCodes: [reason],
+                allAttempts: [],
+                requirements: c.requirements,
+                expectedRef: c.expectedRef,
+                actualRef: null,
+                evidenceRefs: [],
+                steps: [],
+              };
+            },
+            record: (current, lineage) => {
+              if (current.terminalState === 'failed') knownFailure = true;
+              store.write(`attempts/${lineage.attemptId}.json`, {
+                ...current,
+                repeatIndex: lineage.repeatIndex,
+                retryIndex: lineage.retryIndex,
+                parentAttemptId: lineage.parentAttemptId,
+              });
+              log.append('ATTEMPT_FINISHED', {
+                itemId: item.itemId,
+                attemptId: lineage.attemptId,
+                repeat: lineage.repeatIndex,
+                retry: lineage.retryIndex,
+                terminalState: current.terminalState,
+              });
+            },
+          })),
           ...item,
-          allAttempts: attempts.flatMap((a) => a.allAttempts),
-          steps: attempts.flatMap((a) => a.steps),
         };
-      } catch (error) {
-        const failed = attempts.find((a) => a.terminalState === 'failed');
-        const reason = /TIMEOUT/.test(String(error))
-          ? 'TIMEOUT'
-          : controller.signal.aborted
-            ? 'CANCELLED'
-            : 'DEPENDENCY_UNAVAILABLE';
-        const errorId = `attempt-${item.itemId}-${attempts.length}`;
-        const interrupted = {
-          ...item,
-          terminalState: 'error' as const,
-          reasonCodes: [reason],
-          allAttempts: [errorId],
-          requirements: c.requirements,
-          expectedRef: c.expectedRef,
-          actualRef: null,
-          evidenceRefs: [],
-          steps: [],
-        };
-        store.write(`attempts/${errorId}.json`, {
-          ...interrupted,
-          repeatIndex: attempts.length,
-          retryIndex: 0,
+        const actualPath = `observations/${item.itemId}.json`;
+        store.write(actualPath, {
+          terminalState: observed.terminalState,
+          steps: observed.steps,
+          reasonCodes: observed.reasonCodes,
+          attempts: observed.allAttempts,
         });
-        attempts.push(interrupted);
-        observed = {
-          ...(failed ?? interrupted),
-          ...item,
-          allAttempts: attempts.flatMap((a) => a.allAttempts),
-          steps: attempts.flatMap((a) => a.steps),
-          reasonCodes: [...new Set([...(failed?.reasonCodes ?? []), reason])],
+        observed.actualRef = {
+          path: actualPath,
+          hash: fileHash(join(runDir!, actualPath)),
         };
-        missing.push(`${item.itemId}:${reason}`);
-      }
-      const actualPath = `observations/${item.itemId}.json`;
-      store.write(actualPath, {
-        terminalState: observed.terminalState,
-        steps: observed.steps,
-        reasonCodes: observed.reasonCodes,
-        attempts: observed.allAttempts,
-      });
-      observed.actualRef = {
-        path: actualPath,
-        hash: fileHash(join(runDir, actualPath)),
-      };
-      log.append('ITEM_FINISHED', {
-        itemId: item.itemId,
-        terminalState: observed.terminalState,
-        actualRef: observed.actualRef,
-      });
-      state.finish(observed);
-    }
+        log.append('ITEM_FINISHED', {
+          itemId: item.itemId,
+          terminalState: observed.terminalState,
+          actualRef: observed.actualRef,
+        });
+        state.finish(observed);
+      },
+    );
     const results = state.finalize();
     if (controller.signal.aborted) missing.push('CANCELLED');
     try {
       assertCandidateUnchanged(candidateRoot, snapshot.code);
     } catch {
       missing.push('CANDIDATE_CHANGED_DURING_RUN');
+    }
+    const comparison = historical
+      ? historicalComparison(
+          runId,
+          snapshot,
+          results,
+          historical.report,
+          options.intentionalDifferences,
+        )
+      : null;
+    if (comparison?.comparability === 'incomparable')
+      missing.push('COMPARISON_MISMATCH');
+    if (historical) store.write('baseline/report.json', historical.report);
+    const metrics = groupMetrics(results, selected.selected);
+    if (historical && comparison?.comparability === 'comparable') {
+      for (const metric of metrics) {
+        const prior = historical.report.metrics.find(
+          (m) =>
+            m.side === 'candidate' &&
+            m.metricId === metric.metricId &&
+            m.module === metric.module &&
+            m.mode === metric.mode &&
+            JSON.stringify(m.group) === JSON.stringify(metric.group),
+        );
+        if (prior?.value != null && metric.value != null)
+          metric.comparisonDelta = metric.value - prior.value;
+      }
     }
     const summary = summarize(results, {
       scopeClaim: manifest.scopeClaim,
@@ -527,6 +587,7 @@ export async function runEvaluation(
       entries: [],
     });
     const policyPath = store.write('control/coverage.json', coverage);
+    store.write('control/cases.json', selected.selected);
     store.write('control/catalog-mapping.json', {
       missingMetadata: loaded.missingMetadata,
       mappings: Object.fromEntries(loaded.mappings),
@@ -571,7 +632,10 @@ export async function runEvaluation(
         selectedItems: items,
         requiredItems: requiredIds,
         requiredGroups: [],
-        requiredModes: options.purpose === 'qualification' ? ['live'] : [],
+        requiredModes:
+          options.profile === 'full' || options.purpose === 'qualification'
+            ? ['live']
+            : [],
         excludedCases: selected.excluded,
         notApplicable: [],
         missingRequirements: [...new Set(missing)],
@@ -586,12 +650,17 @@ export async function runEvaluation(
         ],
         scopeClaim: manifest.scopeClaim,
       },
-      versions: { candidate: snapshot, baseline: null },
-      comparison: null,
-      comparisonUnavailableReason: 'NOT_A_BASELINE_COMPARISON',
+      versions: {
+        candidate: snapshot,
+        baseline: historical?.report.versions.candidate ?? null,
+      },
+      comparison,
+      comparisonUnavailableReason: historical
+        ? null
+        : 'NOT_A_BASELINE_COMPARISON',
       counts: summary.counts,
       cases: results,
-      metrics: [],
+      metrics,
       usage: {
         calls: [],
         budgetMicros: options.limits.budgetMicros,
@@ -610,6 +679,11 @@ export async function runEvaluation(
           'Rule/mock checks do not establish real model quality',
           'No Provider call accounting is fabricated',
           'Real resource identity not verified',
+          ...(historical
+            ? [
+                'Historical comparison is development evidence; no baseline approval is granted',
+              ]
+            : []),
         ],
         configHash: digest(options.limits),
       },
@@ -672,151 +746,5 @@ export async function runEvaluation(
     };
   } finally {
     detach();
-  }
-}
-
-function verifyBundle(root: string) {
-  try {
-    const bundle = JSON.parse(
-      readFileSync(safePath(root, 'bundle.json'), 'utf8'),
-    );
-    for (const name of [
-      ...new Set([
-        'manifest.json',
-        'events.jsonl',
-        'results.jsonl',
-        'report.json',
-        'report.md',
-        'evidence/index.json',
-        ...Object.keys(bundle.hashes ?? {}),
-      ]),
-    ])
-      if (fileHash(safePath(root, name)) !== bundle.hashes?.[name])
-        throw Error('BUNDLE_HASH_MISMATCH');
-    const report = reportSchema.parse(
-      JSON.parse(readFileSync(safePath(root, 'report.json'), 'utf8')),
-    );
-    const manifest = JSON.parse(
-      readFileSync(safePath(root, 'manifest.json'), 'utf8'),
-    );
-    const results = readFileSync(safePath(root, 'results.jsonl'), 'utf8')
-      .trim()
-      .split('\n')
-      .filter(Boolean)
-      .map((line) => JSON.parse(line));
-    if (
-      report.run.id !== bundle.runId ||
-      manifest.runId !== bundle.runId ||
-      report.control.controlHash !== manifest.controlHash ||
-      report.control.policyHash !== manifest.policyHash ||
-      report.run.purpose !== manifest.purpose ||
-      report.scope.scopeClaim !== manifest.scopeClaim ||
-      !manifest.missingRequirements.every((reason: string) =>
-        report.gate.missingRequirements.includes(reason),
-      ) ||
-      !readJournal(root, bundle.runId).complete
-    )
-      throw Error('BUNDLE_IDENTITY_MISMATCH');
-    const frozenItems = manifest.items.map((item: unknown) =>
-      executionItemSchema.parse(item),
-    );
-    if (
-      JSON.stringify(frozenItems) !== JSON.stringify(report.scope.selectedItems)
-    )
-      throw Error('FROZEN_PLAN_MISMATCH');
-    if (
-      JSON.stringify(manifest.items.map((i) => i.itemId)) !==
-        JSON.stringify(report.cases.map((i) => i.itemId)) ||
-      JSON.stringify(report.cases) !== JSON.stringify(results)
-    )
-      throw Error('AGGREGATE_MISMATCH');
-    for (const reference of [
-      report.control.baselineRegistryRef,
-      report.control.approvalRegistryRef,
-      report.scope.policyRef,
-    ]) {
-      if (fileHash(safePath(root, reference.path)) !== reference.hash)
-        throw Error('CONTROL_EVIDENCE_MISMATCH');
-    }
-    const journal = readJournal(root, bundle.runId);
-    const completion = journal.events.filter((e) => e.type === 'RUN_FINISHED');
-    if (
-      completion.length !== 1 ||
-      completion[0].payload.gate !== report.gate.status ||
-      completion[0].payload.exitCode !== report.gate.exitCode
-    )
-      throw Error('JOURNAL_RESULT_MISMATCH');
-    for (const item of report.cases) {
-      const frozen = frozenItems.find(
-        (planned) => planned.itemId === item.itemId,
-      );
-      if (
-        !frozen ||
-        Object.entries(frozen).some(([key, value]) => item[key] !== value)
-      )
-        throw Error('FROZEN_PLAN_MISMATCH');
-      const terminalEvents = journal.events.filter(
-        (e) => e.type === 'ITEM_FINISHED' && e.payload.itemId === item.itemId,
-      );
-      if (
-        item.terminalState !== 'not_run' &&
-        (terminalEvents.length !== 1 ||
-          terminalEvents[0].payload.terminalState !== item.terminalState)
-      )
-        throw Error('JOURNAL_RESULT_MISMATCH');
-      if (
-        item.actualRef &&
-        fileHash(safePath(root, item.actualRef.path)) !== item.actualRef.hash
-      )
-        throw Error('EVIDENCE_HASH_MISMATCH');
-      for (const attemptId of item.allAttempts) {
-        const path = `attempts/${attemptId}.json`;
-        if (
-          !bundle.hashes[path] ||
-          fileHash(safePath(root, path)) !== bundle.hashes[path]
-        )
-          throw Error('ATTEMPT_EVIDENCE_MISSING');
-        const attempt = JSON.parse(readFileSync(safePath(root, path), 'utf8'));
-        if (
-          attempt.itemId !== item.itemId ||
-          attempt.caseId !== item.caseId ||
-          Object.entries(frozen).some(
-            ([key, value]) =>
-              key !== 'expectedRepeatCount' && attempt[key] !== value,
-          )
-        )
-          throw Error('ATTEMPT_IDENTITY_MISMATCH');
-        if (
-          attempt.terminalState === 'failed' &&
-          item.terminalState !== 'failed'
-        )
-          throw Error('FIRST_FAILURE_HIDDEN');
-      }
-    }
-    const summary = summarize(report.cases, {
-      scopeClaim: report.gate.scopeClaim,
-      policyHash: report.gate.policyHash,
-      runId: bundle.runId,
-      missingRequirements: report.gate.missingRequirements,
-      purpose: report.run.purpose,
-    });
-    if (
-      JSON.stringify(summary.counts) !== JSON.stringify(report.counts) ||
-      summary.gate.status !== report.gate.status
-    )
-      throw Error('AGGREGATE_MISMATCH');
-    return {
-      exitCode: summary.gate.exitCode,
-      gate: summary.gate.status,
-      runId: bundle.runId,
-      runDir: root,
-    };
-  } catch {
-    return {
-      exitCode: 2,
-      gate: 'INCOMPLETE',
-      diagnostic: 'BUNDLE_VERIFICATION_FAILED',
-      runDir: root,
-    };
   }
 }

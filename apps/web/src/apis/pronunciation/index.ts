@@ -1,5 +1,6 @@
 import { aiApi } from "@/apis";
 import {
+  pronunciationCapabilitiesSchema,
   pronunciationAssessmentIdSchema,
   pronunciationIdempotencyKeySchema,
 } from "@en/common/pronunciation";
@@ -21,7 +22,7 @@ const ACTIVE_STATUSES = new Set([
 ]);
 
 const DEFAULT_POLL_INTERVAL_MS = 750;
-const DEFAULT_MAX_WAIT_MS = 45_000;
+const DEFAULT_MAX_WAIT_MS = 65_000;
 export const PRONUNCIATION_MIN_AUDIO_DURATION_MS = 500;
 export const PRONUNCIATION_MAX_AUDIO_DURATION_MS = 30_000;
 export const PRONUNCIATION_MAX_AUDIO_BYTES = 8 * 1024 * 1024;
@@ -100,15 +101,9 @@ function sleep(milliseconds: number, signal?: AbortSignal): Promise<void> {
       reject(new PronunciationPollingError("CANCELLED"));
       return;
     }
-    const timer = setTimeout(resolve, milliseconds);
-    signal?.addEventListener(
-      "abort",
-      () => {
-        clearTimeout(timer);
-        reject(new PronunciationPollingError("CANCELLED"));
-      },
-      { once: true },
-    );
+    const onAbort = () => { clearTimeout(timer); reject(new PronunciationPollingError("CANCELLED")); };
+    const timer = setTimeout(() => { signal?.removeEventListener('abort', onAbort); resolve(); }, milliseconds);
+    signal?.addEventListener('abort', onAbort, { once: true });
   });
 }
 
@@ -320,3 +315,8 @@ export async function submitAndPollPronunciationAssessment(
 }
 
 export type * from "./contracts";
+
+export async function getPronunciationCapabilities() {
+  const response = await aiApi.get('/pronunciation/capabilities') as unknown as { data: unknown };
+  return pronunciationCapabilitiesSchema.parse(response.data);
+}

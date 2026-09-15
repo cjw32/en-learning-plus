@@ -19,6 +19,12 @@ export class LearnController {
   constructor(private readonly learnService: LearnService) {}
 
   @UseGuards(AuthGuard)
+  @Get('stats')
+  getStudyStats(@Req() req: Request) {
+    return this.learnService.getStudyStats(req.user.userId);
+  }
+
+  @UseGuards(AuthGuard)
   @Post('word/master')
   saveWordMaster(
     @Body() { wordIds }: { wordIds: string[] },

@@ -7,7 +7,7 @@ import {
 import type { CoachExecutionContext } from '@libs/shared';
 import { pronunciationIdempotencyKeySchema } from '@en/common/pronunciation';
 import { PronunciationAssessmentRuleError } from '../application/pronunciation-assessment.service';
-import type { PronunciationAssessmentService } from '../application/pronunciation-assessment.service';
+import { PronunciationAssessmentService } from '../application/pronunciation-assessment.service';
 import {
   PRONUNCIATION_RUNTIME_CONFIG,
   type PronunciationRuntimeConfig,

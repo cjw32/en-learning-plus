@@ -2,7 +2,7 @@
   "name": "@en/common",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "./dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -12,5 +12,148 @@
   "packageManager": "pnpm@10.14.0",
   "dependencies": {
     "zod": "^4.3.6"
-  }
+  },
+  "exports": {
+    ".": {
+      "types": "./index.ts",
+      "browser": "./index.ts",
+      "default": "./dist/index.js"
+    },
+    "./learn": {
+      "types": "./learn/index.ts",
+      "browser": "./learn/index.ts",
+      "default": "./dist/learn/index.js"
+    },
+    "./course": {
+      "types": "./course/index.ts",
+      "browser": "./course/index.ts",
+      "default": "./dist/course/index.js"
+    },
+    "./chat": {
+      "types": "./chat/index.ts",
+      "browser": "./chat/index.ts",
+      "default": "./dist/chat/index.js"
+    },
+    "./pay": {
+      "types": "./pay/index.ts",
+      "browser": "./pay/index.ts",
+      "default": "./dist/pay/index.js"
+    },
+    "./tracker": {
+      "types": "./tracker/index.ts",
+      "browser": "./tracker/index.ts",
+      "default": "./dist/tracker/index.js"
+    },
+    "./user": {
+      "types": "./user/index.ts",
+      "browser": "./user/index.ts",
+      "default": "./dist/user/index.js"
+    },
+    "./mcp/errors": {
+      "types": "./mcp/errors.ts",
+      "browser": "./mcp/errors.ts",
+      "default": "./dist/mcp/errors.js"
+    },
+    "./mcp/schemas": {
+      "types": "./mcp/schemas.ts",
+      "browser": "./mcp/schemas.ts",
+      "default": "./dist/mcp/schemas.js"
+    },
+    "./mcp/confirmation": {
+      "types": "./mcp/confirmation.ts",
+      "browser": "./mcp/confirmation.ts",
+      "default": "./dist/mcp/confirmation.js"
+    },
+    "./mcp/protocol-versions": {
+      "types": "./mcp/protocol-versions.ts",
+      "browser": "./mcp/protocol-versions.ts",
+      "default": "./dist/mcp/protocol-versions.js"
+    },
+    "./mcp": {
+      "types": "./mcp/index.ts",
+      "browser": "./mcp/index.ts",
+      "default": "./dist/mcp/index.js"
+    },
+    "./mcp/generate-json-schema": {
+      "types": "./mcp/generate-json-schema.ts",
+      "browser": "./mcp/generate-json-schema.ts",
+      "default": "./dist/mcp/generate-json-schema.js"
+    },
+    "./coach/result.schemas": {
+      "types": "./coach/result.schemas.ts",
+      "browser": "./coach/result.schemas.ts",
+      "default": "./dist/coach/result.schemas.js"
+    },
+    "./coach/generate-contracts": {
+      "types": "./coach/generate-contracts.ts",
+      "browser": "./coach/generate-contracts.ts",
+      "default": "./dist/coach/generate-contracts.js"
+    },
+    "./coach/tool.schemas": {
+      "types": "./coach/tool.schemas.ts",
+      "browser": "./coach/tool.schemas.ts",
+      "default": "./dist/coach/tool.schemas.js"
+    },
+    "./coach/event.schemas": {
+      "types": "./coach/event.schemas.ts",
+      "browser": "./coach/event.schemas.ts",
+      "default": "./dist/coach/event.schemas.js"
+    },
+    "./coach/api.schemas": {
+      "types": "./coach/api.schemas.ts",
+      "browser": "./coach/api.schemas.ts",
+      "default": "./dist/coach/api.schemas.js"
+    },
+    "./coach": {
+      "types": "./coach/index.ts",
+      "browser": "./coach/index.ts",
+      "default": "./dist/coach/index.js"
+    },
+    "./coach/zod": {
+      "types": "./coach/zod.ts",
+      "browser": "./coach/zod.ts",
+      "default": "./dist/coach/zod.js"
+    },
+    "./pronunciation/resource.schemas": {
+      "types": "./pronunciation/resource.schemas.ts",
+      "browser": "./pronunciation/resource.schemas.ts",
+      "default": "./dist/pronunciation/resource.schemas.js"
+    },
+    "./pronunciation/versions": {
+      "types": "./pronunciation/versions.ts",
+      "browser": "./pronunciation/versions.ts",
+      "default": "./dist/pronunciation/versions.js"
+    },
+    "./pronunciation/result.schemas": {
+      "types": "./pronunciation/result.schemas.ts",
+      "browser": "./pronunciation/result.schemas.ts",
+      "default": "./dist/pronunciation/result.schemas.js"
+    },
+    "./pronunciation/generate-contracts": {
+      "types": "./pronunciation/generate-contracts.ts",
+      "browser": "./pronunciation/generate-contracts.ts",
+      "default": "./dist/pronunciation/generate-contracts.js"
+    },
+    "./pronunciation/provider.schemas": {
+      "types": "./pronunciation/provider.schemas.ts",
+      "browser": "./pronunciation/provider.schemas.ts",
+      "default": "./dist/pronunciation/provider.schemas.js"
+    },
+    "./pronunciation/api.schemas": {
+      "types": "./pronunciation/api.schemas.ts",
+      "browser": "./pronunciation/api.schemas.ts",
+      "default": "./dist/pronunciation/api.schemas.js"
+    },
+    "./pronunciation": {
+      "types": "./pronunciation/index.ts",
+      "browser": "./pronunciation/index.ts",
+      "default": "./dist/pronunciation/index.js"
+    },
+    "./word": {
+      "types": "./word/index.ts",
+      "browser": "./word/index.ts",
+      "default": "./dist/word/index.js"
+    }
+  },
+  "types": "./index.ts"
 }

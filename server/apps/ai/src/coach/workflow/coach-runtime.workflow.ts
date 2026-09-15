@@ -33,7 +33,7 @@ import {
   CoachGradingWorkflow,
   runControlledCoachRuntimeGraph,
 } from './coach.graph';
-import { CoachModelGateway } from './coach-model.gateway';
+import { CoachModelGateway, type CoachAnswerModelOutput, type GroundedCoachAnswerModelOutput } from './coach-model.gateway';
 import type {
   CoachRuntimeIntent,
   CoachRuntimeWorkflow,
@@ -315,7 +315,7 @@ export class CoachRuntimeWorkflowService implements CoachRuntimeWorkflow {
         if (generationAttempt > 1) input.trace.recordRetry();
         try {
           await this.assertKnowledgeResultCurrent(input);
-          return await this.modelStep(
+          return await this.modelStep<CoachAnswerModelOutput | GroundedCoachAnswerModelOutput>(
             input,
             budget,
             'generate_answer',
@@ -898,7 +898,7 @@ export class CoachRuntimeWorkflowService implements CoachRuntimeWorkflow {
           limit: 20,
         };
         if (!rag.enabled && !rag.shadowEnabled) {
-          return this.materials.execute(input.context, legacyInput);
+          return this.materials.executeLegacy(input.context, legacyInput);
         }
         const ragOutput = await this.materials.execute(
           input.context,
@@ -943,7 +943,7 @@ export class CoachRuntimeWorkflowService implements CoachRuntimeWorkflow {
           );
         }
         return {
-          schemaVersion: COACH_TOOL_SCHEMA_VERSION,
+          schemaVersion: COACH_TOOL_SCHEMA_VERSION as typeof COACH_TOOL_SCHEMA_VERSION,
           ok: true as const,
           query: ragOutput.query,
           materials: ragOutput.results.map((result) => ({
@@ -1170,7 +1170,7 @@ export class CoachRuntimeWorkflowService implements CoachRuntimeWorkflow {
           sourceCategory: result.source,
           rank: result.rank,
           relevanceScore: result.relevanceScore,
-          decision: 'unused',
+          decision: 'unused' as const,
         };
       }),
       conflictCount: output.conflicts.length,

@@ -51,6 +51,24 @@ function storage(minio: PronunciationMinioClient) {
 }
 
 describe('private pronunciation audio storage contract', () => {
+  it('accepts the single-rule object returned by the real MinIO XML parser', async () => {
+    const minio = client({ getBucketLifecycle: jest.fn().mockResolvedValue({
+      Rule: { Status: 'Enabled', Filter: { Prefix: 'pronunciation/' }, Expiration: { Days: 1 } },
+    }) });
+    await expect(storage(minio).assertPrivateLifecycleReady()).resolves.toBeUndefined();
+    expect(minio.setBucketLifecycle).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    { Status: 'Enabled', Filter: { Prefix: 'unrelated/' }, Expiration: { Days: 1 } },
+    { Status: 'Enabled', Filter: { Prefix: 'pronunciation/' }, Expiration: { Days: 2 } },
+    { Status: 'Disabled', Filter: { Prefix: 'pronunciation/' }, Expiration: { Days: 1 } },
+    null,
+  ])('rejects an inapplicable single-rule object: %j', async (rule) => {
+    const minio = client({ getBucketLifecycle: jest.fn().mockResolvedValue({ Rule: rule }) });
+    await expect(storage(minio).assertPrivateLifecycleReady()).rejects.toMatchObject({ code: 'STORAGE_NOT_APPROVED' });
+  });
+
   it('validates an existing private, lifecycle-bounded bucket without mutating it', async () => {
     const minio = client();
     await expect(
@@ -61,6 +79,16 @@ describe('private pronunciation audio storage contract', () => {
     expect(minio.setBucketLifecycle).not.toHaveBeenCalled();
   });
 
+
+  it('accepts an existing private bucket with no bucket policy but requires readable lifecycle', async () => {
+    const minio = client({ getBucketPolicy: jest.fn().mockRejectedValue(Object.assign(new Error(), { code: 'NoSuchBucketPolicy' })) });
+    await expect(storage(minio).assertPrivateLifecycleReady()).resolves.toBeUndefined();
+    expect(minio.getBucketLifecycle).toHaveBeenCalled();
+  });
+  it('does not interpret permission failures as private access', async () => {
+    const minio = client({ getBucketPolicy: jest.fn().mockRejectedValue(Object.assign(new Error(), { code: 'AccessDenied' })) });
+    await expect(storage(minio).assertPrivateLifecycleReady()).rejects.toMatchObject({ code: 'STORAGE_NOT_APPROVED' });
+  });
   it.each([
     [
       'anonymous read',

@@ -12,9 +12,13 @@
                 <el-tab-pane v-if="userStore.user?.id" name="my" label="我的课程"></el-tab-pane>
 
             </el-tabs>
+            <div v-if="citationStatus" role="status" class="mb-4 rounded-xl bg-blue-50 p-3 text-sm text-blue-800">
+                <p>{{ citationStatus }}</p>
+                <button v-if="loadFailed" type="button" class="mt-2 underline" @click="getList">重新加载</button>
+            </div>
             <!-- 课程卡片 3 列 -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                <article v-for="item in list" :key="item.id"
+                <article v-for="item in list" :key="item.id" :data-course-id="item.id" :tabindex="item.id === citationId ? -1 : undefined" :class="item.id === citationId ? 'ring-2 ring-blue-500' : ''"
                     class="group bg-white rounded-2xl overflow-hidden border border-zinc-100 shadow-sm hover:shadow-lg hover:shadow-indigo-500/5 hover:border-indigo-100 transition-all duration-300 flex flex-col">
                     <div class="relative aspect-4/3 bg-zinc-100 overflow-hidden">
                         <img :src="imageSrc(item.url)" :alt="item.name"
@@ -48,11 +52,21 @@
 import { uploadUrl } from '@/apis';
 import { getCourseList, getMyCourse } from '@/apis/course';
 import type { Course, CourseList } from '@en/common/course';
-import { onMounted, ref } from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import CoursePay from './components/Pay.vue';
 import { useLogin } from '@/hooks/useLogin';
 import { useUserStore } from '@/stores/user';
 import router from '@/router';
+import { useRoute } from 'vue-router';
+import { onLearningSessionChange } from '@/session/learning-session';
+const route = useRoute();
+const citationId = computed(() => typeof route.query.citation === 'string' && /^[A-Za-z0-9_-]{1,128}$/.test(route.query.citation) ? route.query.citation : null);
+const citationStatus = ref('');
+const loadFailed = ref(false);
+let generation = 0;
+let active = true;
+const unsubscribe = onLearningSessionChange(() => { generation++; list.value = []; citationStatus.value = ''; });
+onBeforeUnmount(() => {active = false; generation++; unsubscribe()});
 
 const currentTab = ref('list')
 const { login } = useLogin()
@@ -61,15 +75,26 @@ const selectedCourse = ref<Course | null>(null)//选中的课程
 const list = ref<CourseList>([]) 
 const userStore =  useUserStore()
 const getList = async () => {
-    if(currentTab.value === 'list') {
-        const res = await getCourseList()
-        list.value = res.data
-    }
-    else{
-        const res = await getMyCourse()
-        list.value = res.data
-    }
+    const epoch = ++generation;
+    loadFailed.value = false;
+    citationStatus.value = route.query.citation == null ? '' : '正在定位引用课程…';
+    try {
+        const res = currentTab.value === 'list' ? await getCourseList() : await getMyCourse();
+        if (!active || epoch !== generation) return;
+        if (!Array.isArray(res.data)) throw new Error('Unavailable');
+        list.value = res.data;
+        if (route.query.citation != null) {
+            const found = citationId.value && list.value.some(item => item.id === citationId.value);
+            citationStatus.value = found ? '已定位引用课程，蓝色边框标出了对应内容。' : '引用课程不存在，或当前列表中不可访问。';
+            await nextTick();
+            if (active && epoch === generation && found) {
+                const element = document.querySelector<HTMLElement>(`[data-course-id="${citationId.value}"]`);
+                element?.scrollIntoView?.({block:'center'}); element?.focus();
+            }
+        }
+    } catch { if (active && epoch === generation) { loadFailed.value = true; citationStatus.value = '课程读取失败，请重试。'; } }
 }
+watch(() => route.query.citation, () => { currentTab.value = 'list'; void getList(); });
 //打开支付弹窗
 const openPay = async (course: Course) => {
     await login()
@@ -77,7 +102,7 @@ const openPay = async (course: Course) => {
         payVisible.value = true
         selectedCourse.value = course
     }else{
-        router.push(`/courses/learn/${course.id}/${course.name}`)
+        router.push(`/courses/learn/${encodeURIComponent(course.id)}/${encodeURIComponent(course.name)}`)
     }
 }
 const imageSrc = (url: string) => { 

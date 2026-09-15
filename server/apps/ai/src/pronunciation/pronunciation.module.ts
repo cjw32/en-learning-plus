@@ -1,3 +1,20 @@
+import { PronunciationCapabilitiesController } from './api/pronunciation-capabilities.controller';
+import { BullModule } from '@nestjs/bullmq';
+import { ConfigService } from '@nestjs/config';
+import { PronunciationRedisConnection } from './governance/pronunciation-redis.module';
+import { PronunciationRuntimeAdapters } from './runtime/pronunciation-runtime.adapters';
+import { PronunciationAssessmentWorkerExecutor } from './runtime/pronunciation-assessment.executor';
+import { PronunciationLifecycleService } from './runtime/pronunciation-lifecycle.service';
+import { PronunciationSubmitAdmissionService } from './governance/pronunciation-submit-admission';
+import {
+  PronunciationQueueService,
+  PRONUNCIATION_QUEUE_NAME,
+} from './queue/pronunciation.queue';
+import {
+  PronunciationProcessor,
+  PRONUNCIATION_ASSESSMENT_EXECUTOR,
+} from './queue/pronunciation.processor';
+import { PronunciationOutboxDispatcher } from './queue/pronunciation-outbox.dispatcher';
 import { Module } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
 import { LearningModule } from '@libs/learning';
@@ -17,10 +34,7 @@ import {
   PronunciationController,
   UnavailablePronunciationAudioUploadWorkflow,
 } from './api/pronunciation.controller';
-import {
-  PRONUNCIATION_AUDIO_INSPECTOR,
-  UnavailablePronunciationAudioInspector,
-} from './audio/pronunciation-audio-inspector';
+import { PRONUNCIATION_AUDIO_INSPECTOR } from './audio/pronunciation-audio-inspector';
 import {
   PRONUNCIATION_CANCELLATION_REPOSITORY,
   PRONUNCIATION_CANCELLATION_SIGNAL_STORE,
@@ -43,13 +57,10 @@ import {
   PrismaPronunciationTraceRepository,
   PronunciationTraceService,
 } from './observability/pronunciation-trace.service';
-import {
-  PRONUNCIATION_ASSESSMENT_PROVIDER,
-  UnavailablePronunciationAssessmentProvider,
-} from './provider/pronunciation-assessment.provider';
+import { PRONUNCIATION_ASSESSMENT_PROVIDER } from './provider/pronunciation-assessment.provider';
 import {
   PRONUNCIATION_AUDIO_STORAGE,
-  UnavailablePronunciationAudioStorage,
+  type PronunciationAudioStorage,
 } from './storage/pronunciation-audio.storage';
 import {
   PrismaPronunciationAudioAccessRepository,
@@ -76,10 +87,40 @@ import { PronunciationRetryService } from './application/pronunciation-retry.ser
 export { PRONUNCIATION_RUNTIME_CONFIG } from './governance/pronunciation-config.schema';
 
 @Module({
-  imports: [SharedModule, LearningModule, PronunciationRedisModule],
-  controllers: [PronunciationController, PronunciationAudioController],
+  imports: [
+    SharedModule,
+    LearningModule,
+    PronunciationRedisModule,
+    BullModule.registerQueueAsync({
+      name: PRONUNCIATION_QUEUE_NAME,
+      inject: [PronunciationRedisConnection, ConfigService],
+      useFactory: (
+        redis: PronunciationRedisConnection,
+        config: ConfigService,
+      ) =>
+        config.get('PRONUNCIATION_PROVIDER_ENABLED') === 'true'
+          ? { connection: redis.getBullConnectionOptions() }
+          : {},
+    }),
+  ],
+  controllers: [
+    PronunciationController,
+    PronunciationAudioController,
+    PronunciationCapabilitiesController,
+  ],
   providers: [
     AuthGuard,
+    PronunciationRuntimeAdapters,
+    PronunciationSubmitAdmissionService,
+    PronunciationQueueService,
+    PronunciationOutboxDispatcher,
+    PronunciationAssessmentWorkerExecutor,
+    {
+      provide: PRONUNCIATION_ASSESSMENT_EXECUTOR,
+      useExisting: PronunciationAssessmentWorkerExecutor,
+    },
+    PronunciationProcessor,
+    PronunciationLifecycleService,
     PronunciationRepository,
     PronunciationUploadAdmissionService,
     PronunciationUploadGuard,
@@ -90,15 +131,19 @@ export { PRONUNCIATION_RUNTIME_CONFIG } from './governance/pronunciation-config.
     },
     {
       provide: PRONUNCIATION_AUDIO_STORAGE,
-      useClass: UnavailablePronunciationAudioStorage,
+      inject: [PronunciationRuntimeAdapters],
+      useFactory: (adapters: PronunciationRuntimeAdapters) => adapters.storage,
     },
     {
       provide: PRONUNCIATION_AUDIO_INSPECTOR,
-      useClass: UnavailablePronunciationAudioInspector,
+      inject: [PronunciationRuntimeAdapters],
+      useFactory: (adapters: PronunciationRuntimeAdapters) =>
+        adapters.inspector,
     },
     {
       provide: PRONUNCIATION_ASSESSMENT_PROVIDER,
-      useClass: UnavailablePronunciationAssessmentProvider,
+      inject: [PronunciationRuntimeAdapters],
+      useFactory: (adapters: PronunciationRuntimeAdapters) => adapters.provider,
     },
     UnavailablePronunciationAudioUploadWorkflow,
     PronunciationAudioService,
@@ -111,7 +156,7 @@ export { PRONUNCIATION_RUNTIME_CONFIG } from './governance/pronunciation-config.
       ],
       useFactory: (
         repository: PrismaPronunciationAudioAccessRepository,
-        storage: UnavailablePronunciationAudioStorage,
+        storage: PronunciationAudioStorage,
       ) => new PronunciationAudioAccessService(repository, storage),
     },
     PrismaPronunciationDeletionRepository,
@@ -124,7 +169,7 @@ export { PRONUNCIATION_RUNTIME_CONFIG } from './governance/pronunciation-config.
       ],
       useFactory: (
         repository: PrismaPronunciationDeletionRepository,
-        storage: UnavailablePronunciationAudioStorage,
+        storage: PronunciationAudioStorage,
         learning: PronunciationLearningDeletionService,
       ) => new PronunciationDeletionService(repository, storage, learning),
     },
@@ -137,7 +182,7 @@ export { PRONUNCIATION_RUNTIME_CONFIG } from './governance/pronunciation-config.
       ],
       useFactory: (
         repository: PrismaPronunciationCleanupRepository,
-        storage: UnavailablePronunciationAudioStorage,
+        storage: PronunciationAudioStorage,
       ) => new PronunciationCleanupProcessor(repository, storage),
     },
     {
@@ -150,7 +195,7 @@ export { PRONUNCIATION_RUNTIME_CONFIG } from './governance/pronunciation-config.
       useFactory: (
         learningDeletion: LearningDataDeletionService,
         prisma: PrismaService,
-        storage: UnavailablePronunciationAudioStorage,
+        storage: PronunciationAudioStorage,
       ) =>
         new PronunciationAccountCleanupService(
           learningDeletion,
@@ -171,6 +216,7 @@ export { PRONUNCIATION_RUNTIME_CONFIG } from './governance/pronunciation-config.
         PRONUNCIATION_RUNTIME_CONFIG,
         PronunciationLearningShadowService,
         PronunciationLearningService,
+        PronunciationSubmitAdmissionService,
       ],
       useFactory: (
         repository: PronunciationRepository,
@@ -179,6 +225,7 @@ export { PRONUNCIATION_RUNTIME_CONFIG } from './governance/pronunciation-config.
         config: PronunciationRuntimeConfig,
         shadow: PronunciationLearningShadowService,
         learning: PronunciationLearningService,
+        admission: PronunciationSubmitAdmissionService,
       ) =>
         new PronunciationAssessmentService(
           repository,
@@ -186,11 +233,17 @@ export { PRONUNCIATION_RUNTIME_CONFIG } from './governance/pronunciation-config.
           sourceRights,
           config,
           randomUUID,
-          undefined,
+          admission,
           undefined,
           {
-            project: (input) => shadow.project(input),
-            save: (input) => learning.save(input),
+            project: async (input) => {
+              const result = await shadow.project(input);
+              return { ...result, changedItems: [...result.changedItems] };
+            },
+            save: async (input) => {
+              const result = await learning.save(input);
+              return { ...result, changedItems: [...result.changedItems] };
+            },
           },
         ),
     },
@@ -245,6 +298,7 @@ export { PRONUNCIATION_RUNTIME_CONFIG } from './governance/pronunciation-config.
   exports: [
     PRONUNCIATION_RUNTIME_CONFIG,
     PronunciationRepository,
+    PronunciationRuntimeAdapters,
     PronunciationAssessmentService,
     PronunciationRetryService,
     PronunciationCancellationService,

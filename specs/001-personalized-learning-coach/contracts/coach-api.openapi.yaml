@@ -602,6 +602,23 @@ components:
       properties:
         id:
           type: string
+        requestId:
+          type: [string, "null"]
+          description: Owning request identifier for feedback; never inferred from traceId.
+        feedback:
+          type: [object, "null"]
+          additionalProperties: false
+          required: [rating, category, comment]
+          properties:
+            rating:
+              type: string
+              enum: [UP, DOWN]
+            category:
+              type: [string, "null"]
+              enum: [INCORRECT, TOO_HARD, TOO_EASY, IRRELEVANT, UNSAFE, OTHER, null]
+            comment:
+              type: [string, "null"]
+              maxLength: 1000
         role:
           type: string
           enum: [USER, COACH]

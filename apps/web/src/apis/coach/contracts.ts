@@ -55,6 +55,8 @@ export type CoachConversation = {
 }
 
 export type CoachMessage = {
+  requestId?: string | null
+  feedback?: CoachFeedbackInput | null
   id: string
   role: 'USER' | 'COACH'
   content: string | null

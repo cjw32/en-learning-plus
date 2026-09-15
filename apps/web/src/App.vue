@@ -1,6 +1,6 @@
 <template>
   <el-config-provider :locale="zhCn">
-    <RouterView />
+    <RouterView :key="userStore.user?.id ?? 'anonymous'" />
     <Search />
     <Login />
   </el-config-provider>

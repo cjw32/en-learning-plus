@@ -111,7 +111,21 @@ function costGate() {
 }
 
 describe('AzurePronunciationAssessmentProvider', () => {
-  it('sends only canonical audio and the documented minimal assessment request', async () => {
+  it('accepts explicitly unversioned Azure-managed scoring without inventing vendor attestation', async () => {
+    const provider = new AzurePronunciationAssessmentProvider({ ...config,
+      modelIdentityMode: 'AZURE_MANAGED', modelVersion: 'azure-speech-managed:unversioned',
+      modelIdentityEvidenceVersion: null, modelIdentityVendorAttested: false,
+      modelIdentityImmutable: false, modelIdentityQueryable: false,
+    }, costGate(), jest.fn().mockResolvedValue(new Response(JSON.stringify(successfulAzureResponse()))));
+    expect(await provider.assess(input())).toMatchObject({ outcome: 'SUCCESS', modelVersion: 'azure-speech-managed:unversioned' });
+    expect(() => new AzurePronunciationAssessmentProvider({ ...config, modelIdentityMode: 'AZURE_MANAGED' }, costGate())).toThrow(AzurePronunciationApprovalError);
+  });
+
+  it.each([
+    [null, 'pronunciation-test', 'https://pronunciation-test.cognitiveservices.azure.com/stt'],
+    ['https://eastasia.api.cognitive.microsoft.com/', null, 'https://eastasia.stt.speech.microsoft.com'],
+    ['https://custom-resource.cognitiveservices.azure.com/', null, 'https://custom-resource.cognitiveservices.azure.com/stt'],
+  ])('sends the documented assessment request using endpoint %s and resource %s', async (endpoint, resourceName, baseUrl) => {
     const gate = costGate();
     const fetchMock = jest.fn().mockResolvedValue(
       new Response(JSON.stringify(successfulAzureResponse()), {
@@ -120,7 +134,7 @@ describe('AzurePronunciationAssessmentProvider', () => {
       }),
     );
     const provider = new AzurePronunciationAssessmentProvider(
-      config,
+      { ...config, endpoint, resourceName },
       gate,
       fetchMock,
     );
@@ -145,7 +159,7 @@ describe('AzurePronunciationAssessmentProvider', () => {
     );
     const [url, request] = fetchMock.mock.calls[0] as [string, RequestInit];
     expect(url).toBe(
-      'https://pronunciation-test.cognitiveservices.azure.com/stt/speech/recognition/conversation/cognitiveservices/v1?language=en-US&format=detailed',
+      `${baseUrl}/speech/recognition/conversation/cognitiveservices/v1?language=en-US&format=detailed`,
     );
     expect(request.method).toBe('POST');
     expect(request.body).toEqual(input().canonicalAudio);

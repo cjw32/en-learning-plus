@@ -4,7 +4,9 @@
 		"server": "pnpm --filter @en/server start:dev",
 		"ai": "pnpm --filter @en/server start:dev ai",
 		"all": "concurrently \"pnpm run web\" \"pnpm run server\" \"pnpm run ai\"",
-		"test:e2e": "playwright test"
+		"test:e2e": "playwright test",
+		"eval:ai": "node server/tools/run-ai-evaluation.cjs",
+		"eval:ai:synthetic": "node server/tools/run-ai-evaluation.cjs run --profile synthetic --tag business-regression"
 	},
 	"dependencies": {
 		"@types/md5": "^2.3.6",

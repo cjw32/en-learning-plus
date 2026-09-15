@@ -6,7 +6,7 @@ export async function runQuickCoach(
   runRoot: string,
   timeoutMs: number,
 ) {
-  const results = [];
+  const results: Awaited<ReturnType<typeof runRegisteredJest>>[] = [];
   for (const suiteId of ['coach-runtime', 'coach-executor'])
     results.push(
       await runRegisteredJest(suiteId, serverRoot, runRoot, timeoutMs),

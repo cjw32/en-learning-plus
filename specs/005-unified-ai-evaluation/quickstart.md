@@ -120,3 +120,7 @@ pnpm --filter @en/server exec tsx apps/ai/test/evals/unified/cli.ts verify --run
 ## Evidence to keep
 
 每个验证保留 runId、真实命令及退出状态、安全环境/版本快照、计划/实际项、报告 hash、失败证据、预算/清理和验收关联。上述示例中的 `$EVAL_RUN_DIR` 等变量由实际输出/维护者配置赋值，不能从文档示例猜造结果。本轮产物仅设计文档，暂无 V-001–V-008 执行结果。
+
+### 2026-09-15 当前可执行范围
+
+新增 synthetic 零付费全量离线检查；根目录入口、只读历史比较、verify/recover 与本地 CI 汇总的实际用法见 [使用指南](../../docs/ai-evaluation.md)，执行证据见 [验收记录](evidence/2026-09-15-synthetic-completion.md)。inspect 操作成功不代表评测通过；recover 无需凭证配置，仅生成不可覆盖的恢复快照，不执行业务、资源清理或预算释放。其余 full/真实质量/治理能力仍以待实现/待验收记录为准。

@@ -1,3 +1,4 @@
+import { recordStudyDay } from '@libs/shared/study/study-day';
 import { randomUUID } from 'node:crypto';
 import { Injectable } from '@nestjs/common';
 import type { ErrorType } from '@en/common/coach';
@@ -305,6 +306,7 @@ export class PrismaAttemptRepository implements AttemptRepository {
               savedAt: attempt.savedAt,
             },
           });
+          await recordStudyDay(database, attempt.subjectId, attempt.savedAt);
         },
         upsertItemState: async (state) => {
           const saved = await database.learningItemState.upsert({

@@ -17,9 +17,9 @@
             <div class="flex items-center gap-2 bg-blue-200 text-blue-700 rounded-full px-2 py-1"><el-icon>
                     <Sunny />
                 </el-icon> <span class="font-bold text-sm">{{ userStore.getUser?.wordNumber ?? 0 }}</span></div>
-            <div class="flex items-center gap-2 bg-amber-200 text-amber-700 rounded-full px-2 py-1"><el-icon>
+            <div :title="checkedInToday ? '今日已打卡（北京时间）' : '完成一次有效学习即可打卡（北京时间）'" class="flex items-center gap-2 bg-amber-200 text-amber-700 rounded-full px-2 py-1"><el-icon>
                     <Star />
-                </el-icon> <span class="font-bold text-sm">{{ userStore.getUser?.dayNumber ?? 0 }}</span></div>
+                </el-icon> <span class="font-bold text-sm">累计 {{ userStore.getUser?.dayNumber ?? 0 }} 天</span><span v-if="checkedInToday" class="text-xs">✓</span></div>
             <el-popover :width="340">
                 <template #reference>
                     <div class="flex items-center gap-2 border-l cursor-pointer border-gray-200 pl-4">
@@ -35,11 +35,13 @@
 
 
 <script setup lang="ts">
-import { Sunny, Star, HomeFilled, Notebook, MagicStick, Reading, Setting } from '@element-plus/icons-vue'
+import { Sunny, Star, HomeFilled, Notebook, MagicStick, Reading, Setting, Microphone } from '@element-plus/icons-vue'
 import { useRouter } from 'vue-router';
 import { watch, ref } from 'vue'
 import { useUserStore } from '@/stores/user';
 import Profile from '@/layout/Profile/index.vue'
+import { useStudyStats } from '@/hooks/useStudyStats'
+const { checkedInToday } = useStudyStats()
 import { useAvatar } from '@/hooks/useAvatar';
 import { useLogin } from '@/hooks/useLogin';
 const { login } = useLogin()
@@ -52,6 +54,8 @@ const routes = [
     { path: '/chat/index', name: 'AI', icon: MagicStick, isAuth: true},//需要登录
     { path: '/word-book/index', name: '词库', icon: Notebook, isAuth: false},//不需要登录
     { path: '/courses/index', name: '课程', icon: Reading, isAuth: false},//不需要登录
+    { path: '/coach/index', name: 'Coach', icon: MagicStick, isAuth: true},
+    { path: '/pronunciation', name: '发音', icon: Microphone, isAuth: true},
     { path: '/setting/index', name: '设置', icon: Setting, isAuth: true},//需要登录
 ]
 const isActive = (path: string) => {

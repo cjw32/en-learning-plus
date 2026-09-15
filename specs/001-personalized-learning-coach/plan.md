@@ -575,3 +575,13 @@ Phase 1 design remains compliant:
 - Existing behavior has a feature-flagged, additive rollback path.
 
 **Result**: PASS. Plan is ready for `$speckit-tasks`; implementation remains gated on approved tasks and the dependency/migration actions they identify.
+
+### 2026-09-15 历史与管理入口
+
+复用现有 REST/鉴权/删除处理器，不改变模型、预算与学习算法。Coach 页面增加会话侧栏、分页、标题输入和数据管理面板；组合函数管理列表/消息加载、删除、错误与会话世代号。页面在加载、删除或全量删除期间禁用输入；流请求期间禁用管理，取消完成后才切换。store 打开会话重置全部临时请求状态。历史 API 增补 requestId 与当前用户已保存反馈的公开投影，前端独立反馈组件支持提交、修改和失败重试。覆盖分页、跨会话迟到响应、失败恢复、取消后的管理和反馈重载；用浏览器验证实际入口，服务端验证归属及投影。
+
+真实数据库联调发现旧迁移将 CoachTrace.traceSubjectId 设为非空，而现有删除契约和 Prisma schema 要求清除主体映射后保留不可关联元数据。新增仅放宽该列空值约束的兼容迁移，验证反馈存在时的删除；仅在项目独立本地数据库执行。
+
+### 2026-09-15 引用定位与打卡实现
+
+词条新增按 ID 查询，复用 WordDictionaryService.get 的授权；独立词条详情区定位，课程列表按 ID 高亮。目标变化清除旧内容，缺失和失败可重试。UserStudyDay 使用用户/日期复合主键及 ON CONFLICT 插入，事务内首次插入才递增 dayNumber，接课程保存、Coach 作答及可靠发音结果；新增兼容迁移。GET learn/stats 返回累计与今日状态，前端以统一通知刷新顶栏。验证路由变更、内容权限、并发去重、跨日、回滚和账号隔离；真实联调只操作本机合成数据。

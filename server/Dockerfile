@@ -1,6 +1,9 @@
 # NestJS 后端 Docker 镜像（en-server + en-ai）
 FROM node:22-alpine
 
+# Pronunciation canonical audio conversion (no network protocols enabled at invocation).
+RUN apk add --no-cache ffmpeg
+
 # 安装 PM2 进程管理
 RUN npm install -g pm2
 

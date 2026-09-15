@@ -1,4 +1,5 @@
-import { computed, ref } from "vue";
+import { onLearningSessionChange } from '@/session/learning-session';
+import { computed, ref, onScopeDispose } from "vue";
 import { defineStore } from "pinia";
 import {
   pronunciationAssessmentResourceSchema,
@@ -351,6 +352,8 @@ export const usePronunciationStore = defineStore("pronunciation", () => {
     error.value = null;
     clearLocalRecording();
   }
+
+  onScopeDispose(onLearningSessionChange(reset));
 
   return {
     assessment,
