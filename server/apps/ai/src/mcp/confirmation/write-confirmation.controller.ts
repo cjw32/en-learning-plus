@@ -170,7 +170,7 @@ export class WriteConfirmationController {
     ) {
       throw new WriteConfirmationError('UNAUTHENTICATED');
     }
-    return user;
+    return { ...user, iat: user.iat };
   }
 
   private issueCsrf(userId: string, selector: string, nowMs: number): string {

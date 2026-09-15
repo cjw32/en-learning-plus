@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, ref } from "vue";
+import { notifyStudyProgress } from '@/session/study-progress';
+import { computed, onBeforeUnmount, ref, watch } from "vue";
 import type {
   PronunciationAssessmentResource,
   PronunciationLocale,
@@ -19,6 +20,7 @@ import {
   toPronunciationStoreError,
   type PronunciationStoreError,
 } from "@/stores/pronunciation";
+import { onLearningSessionChange } from '@/session/learning-session';
 import PronunciationAssessmentResult from "./PronunciationAssessmentResult.vue";
 import PronunciationFailure from "./PronunciationFailure.vue";
 import PronunciationRecorder from "./PronunciationRecorder.vue";
@@ -54,6 +56,7 @@ const props = withDefaults(
 
 const emit = defineEmits<{
   created: [assessment: PronunciationAssessmentResource];
+  completed: [assessment: PronunciationAssessmentResource];
 }>();
 
 const pending = ref(false);
@@ -71,6 +74,16 @@ let cancelKey = "";
 let lastRecording: LocalPronunciationRecording | null = null;
 let failedStage: "upload" | "submit" | null = null;
 let cancelledLocally = false;
+let generation = 0;
+const canSpeak = typeof window !== "undefined" && "speechSynthesis" in window;
+function listen() {
+  if (!assessment.value || !canSpeak) return;
+  window.speechSynthesis.cancel();
+  const utterance = new SpeechSynthesisUtterance(assessment.value.referenceText);
+  utterance.lang = assessment.value.locale;
+  utterance.rate = 0.85;
+  window.speechSynthesis.speak(utterance);
+}
 
 const statusLabel = computed(() => {
   if (!assessment.value) return "";
@@ -111,11 +124,13 @@ async function start(): Promise<void> {
   errorMessage.value = "";
   try {
     resetOperation();
+    const current = generation;
     const idempotencyKey = operationKey("create");
     const response = await createPronunciationAssessment(
       { locale: props.locale, target: props.target },
       idempotencyKey,
     );
+    if (current !== generation) return;
     assessment.value = response.data;
     emit("created", response.data);
   } catch {
@@ -130,6 +145,7 @@ function operationKey(operation: string): string {
 }
 
 function resetOperation(): void {
+  generation++;
   abortController.value?.abort();
   abortController.value = new AbortController();
   uploadKey = operationKey("upload");
@@ -163,20 +179,25 @@ function setTerminalFailure(resource: PronunciationAssessmentResource): void {
 async function submit(): Promise<void> {
   if (!assessment.value) return;
   failedStage = "submit";
+  const current = generation;
   const result = await submitAndPollPronunciationAssessment(
     assessment.value.assessmentId,
     submitKey,
     { signal: abortController.value?.signal },
   );
+  if (current !== generation || cancelledLocally) return;
   assessment.value = result;
   failedStage = null;
   setTerminalFailure(result);
+  notifyStudyProgress();
+  emit("completed", result);
 }
 
 async function useRecording(
   recording: LocalPronunciationRecording,
 ): Promise<void> {
   if (!assessment.value || pending.value) return;
+  const current = generation;
   lastRecording = recording;
   pending.value = true;
   failure.value = null;
@@ -191,6 +212,7 @@ async function useRecording(
         signal: abortController.value?.signal,
       },
     );
+    if (current !== generation || cancelledLocally) return;
     assessment.value = uploaded.data;
     if (uploaded.data.status !== "AUDIO_READY") {
       failedStage = null;
@@ -207,6 +229,7 @@ async function useRecording(
 
 async function cancel(): Promise<void> {
   if (!assessment.value || !pending.value) return;
+  const current = generation;
   cancelledLocally = true;
   abortController.value?.abort();
   try {
@@ -214,6 +237,7 @@ async function cancel(): Promise<void> {
       assessment.value.assessmentId,
       cancelKey,
     );
+    if (current !== generation) return;
     assessment.value = cancelled.data;
     setTerminalFailure(cancelled.data);
   } catch (error) {
@@ -225,6 +249,7 @@ async function cancel(): Promise<void> {
 
 async function retry(): Promise<void> {
   if (!assessment.value || pending.value) return;
+  if (abortController.value?.signal.aborted) abortController.value = new AbortController();
   if (failedStage === "upload" && lastRecording) {
     await useRecording(lastRecording);
     return;
@@ -243,15 +268,18 @@ async function retry(): Promise<void> {
   }
 
   pending.value = true;
+  const current = generation;
   try {
     const latest = await getPronunciationAssessment(
       assessment.value.assessmentId,
       abortController.value?.signal,
     );
+    if (current !== generation) return;
     const retried = await retryPronunciationAssessment(
       latest.data.assessmentId,
       retryKey,
     );
+    if (current !== generation) return;
     resetOperation();
     assessment.value = retried.data;
   } catch (error) {
@@ -262,6 +290,9 @@ async function retry(): Promise<void> {
 }
 
 function close(): void {
+  generation++;
+  pending.value = false;
+  if (canSpeak) window.speechSynthesis.cancel();
   abortController.value?.abort();
   abortController.value = null;
   assessment.value = null;
@@ -270,7 +301,9 @@ function close(): void {
   failedStage = null;
 }
 
-onBeforeUnmount(() => abortController.value?.abort());
+const unsubscribe = onLearningSessionChange(close);
+watch(() => props.target, close);
+onBeforeUnmount(() => { unsubscribe(); close(); });
 </script>
 
 <template>
@@ -298,7 +331,13 @@ onBeforeUnmount(() => abortController.value?.abort());
         <button v-if="pending" type="button" @click="cancel">取消</button>
         <button v-else type="button" @click="close">关闭</button>
       </header>
+      <p class="pronunciation-entry__reference">{{ assessment.referenceText }}</p>
+      <button v-if="canSpeak" type="button" :disabled="pending" @click="listen">听参考发音</button>
+      <p>提交后，录音将发送至 Azure Speech 评测；录音最多保留 24 小时，可随时在历史记录中删除。</p>
       <PronunciationRecorder
+        :key="assessment.assessmentId"
+        :disabled="pending"
+        :committed="assessment.audio.status === 'READY' || Boolean(assessment.result)"
         v-show="!assessment.result && !failure"
         ref="recorder"
         @ready="useRecording"
@@ -311,6 +350,7 @@ onBeforeUnmount(() => abortController.value?.abort());
         :result="assessment.result"
         @seek="recorder?.seek($event)"
       />
+      <button v-if="assessment.result" type="button" @click="start">再练一次</button>
       <PronunciationFailure v-if="failure" :error="failure" @retry="retry" />
     </section>
   </div>

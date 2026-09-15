@@ -1,3 +1,5 @@
+import { createHash } from 'node:crypto';
+import { safeDiagnostic } from '../core/redaction';
 import { spawn } from 'node:child_process';
 import { readFileSync, mkdtempSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
@@ -61,6 +63,7 @@ export async function runRegisteredJest(
   runRoot: string,
   timeoutMs: number,
   signal?: AbortSignal,
+  expected?: { sourceHash: string; configHash: string },
 ) {
   if (signal?.aborted) throw Error('CANCELLED');
   const entry = registry.entries.find((entry) => entry.id === id);
@@ -75,6 +78,16 @@ export async function runRegisteredJest(
   const cwd = assertCleanCwd(mkdtempSync(join(runRoot, 'jest-')));
   const reportPath = join(cwd, 'jest-result.json');
   const config = safePath(serverRoot, entry.config);
+  const hash = (path: string) =>
+    createHash('sha256').update(readFileSync(path)).digest('hex');
+  if (
+    expected &&
+    (hash(source) !== expected.sourceHash ||
+      hash(config) !== expected.configHash)
+  ) {
+    rmSync(cwd, { recursive: true, force: true });
+    throw Error('TRUSTED_TEST_MISMATCH');
+  }
   const args = [
     require.resolve('jest/bin/jest'),
     '--config',
@@ -127,7 +140,10 @@ export async function runRegisteredJest(
       });
     });
     const report = JSON.parse(readFileSync(reportPath, 'utf8'));
-    const results = parseJestResult(report, entry.tests);
+    const results = parseJestResult(report, entry.tests).map((row) => ({
+      ...row,
+      name: publicTestName(row.name),
+    }));
     return {
       suiteId: id,
       exitCode,
@@ -140,4 +156,11 @@ export async function runRegisteredJest(
   } finally {
     rmSync(cwd, { recursive: true, force: true });
   }
+}
+
+export function publicTestName(name: string) {
+  const safe = safeDiagnostic(name);
+  return safe === name
+    ? name
+    : `redacted-test-${createHash('sha256').update(name).digest('hex')}`;
 }

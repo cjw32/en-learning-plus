@@ -565,6 +565,7 @@ model User {
   isTimingTask             Boolean                   @default(false) // 是否开启定时任务 新增字段
   timingTaskTime           String                    @default("00:00:00") //定时任务时间默认晚上0点开始，每隔24小时执行一次 新增字段
   wordNumber               Int                       @default(0) // 单词数量
+  studyDays                UserStudyDay[]
   dayNumber                Int                       @default(0) // 打卡天数
   createdAt                DateTime                  @default(now()) // 创建时间
   updatedAt                DateTime                  @updatedAt // 更新时间
@@ -1927,4 +1928,13 @@ model ErrorEntry {
 
   @@index([visitorId, createdAt])
   @@index([error, createdAt])
+}
+
+// Fixed Asia/Shanghai dates; count actual participation, not consecutive streaks.
+model UserStudyDay {
+  userId String
+  studyDate String @db.VarChar(10)
+  createdAt DateTime @default(now())
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@id([userId, studyDate])
 }

@@ -9,6 +9,7 @@
             </div>
             <div class="text-sm text-gray-600">词典来源：牛津、柯林斯、BNC、FRQ、高考、中考、GRE、TOEFL、IELTS、大学英语六级、大学英语四级、考研</div>
         </div>
+        <CitedWord />
         <div class="flex items-center mb-10">
             <el-input @keyup.enter="searchWord" class="mr-10" v-model="query.word" placeholder="请输入单词"></el-input>
             <el-checkbox v-model="query.gk">高考</el-checkbox>
@@ -57,17 +58,16 @@
     </div>
 </template>
 <script setup lang="ts">
+import CitedWord from '@/components/Citation/CitedWord.vue'
 import { getWordBookList }from '@/apis/word-book/index'
 import { onMounted,ref  } from 'vue'
 import { Reading, VideoPlay } from '@element-plus/icons-vue'
 import type { WordQuery, WordList } from '@en/common/word'
 import { useAudio } from '@/hooks/useAudio'
 import PronunciationEntry from '@/components/Pronunciation/PronunciationEntry.vue'
-import { pronunciationRolloutCapabilities } from '@/stores/pronunciation'
+import { usePronunciationCapabilities } from '@/hooks/usePronunciationCapabilities'
 
-const pronunciationCaptureEnabled = pronunciationRolloutCapabilities(
-    import.meta.env,
-).recording
+const { available: pronunciationCaptureEnabled } = usePronunciationCapabilities()
 
 const { playAudio } = useAudio({
     rate: 0.7,

@@ -14,7 +14,7 @@ function envelope(data: unknown) {
 }
 
 async function installAuthenticatedLearner(page: Page) {
-  await page.addInitScript(() => {
+  await page.addInitScript((now) => {
     localStorage.setItem(
       "user",
       JSON.stringify({
@@ -39,11 +39,14 @@ async function installAuthenticatedLearner(page: Page) {
         },
       }),
     );
-  });
+  }, now);
 }
 
 async function installCommonRoutes(page: Page) {
   await page.route("**/socket.io/**", (route) => route.abort());
+  await page.route("**/api/v1/learn/stats", (route) =>
+    route.fulfill({ json: envelope({ wordNumber: 0, dayNumber: 0, checkedInToday: false, studyDate: '2026-09-15', timezone: 'Asia/Shanghai' }) }),
+  );
   await page.route("**/api/v1/tracker/**", (route) =>
     route.fulfill({
       status: 200,
@@ -158,4 +161,47 @@ test("settings and all five generic AI modes retain their existing routes", asyn
   await expect(page.getByPlaceholder("请输入内容")).toBeVisible();
   await expect(page.getByText("深度思考")).toBeVisible();
   await expect(page.getByText("联网搜索")).toBeVisible();
+});
+
+test('legacy chat authenticates streaming and renders malicious model HTML as text', async ({ page }) => {
+  let submitted: Record<string, unknown> | null = null;
+  let authorization: string | undefined;
+  await page.route('**/ai/v1/chat', async route => {
+    submitted = route.request().postDataJSON();
+    authorization = route.request().headers().authorization;
+    await route.fulfill({ status: 200, contentType: 'text/event-stream', body:
+      `data: ${JSON.stringify({ role: 'ai', type: 'chat', content: '<img src=x onerror="window.chatInjected=true"> **safe answer** [bad](javascript:alert%281%29)' })}\n\n` });
+  });
+  await page.goto('chat/index');
+  const input = page.getByPlaceholder('请输入内容');
+  await expect(page.getByText('💬 智能助手')).toBeVisible();
+  await input.fill('Explain a word');
+  await input.press('Enter');
+  await expect(page.getByText('safe answer', { exact: true })).toBeVisible();
+  expect(authorization).toBe('Bearer legacy-access-token');
+  expect(submitted).toMatchObject({ role: 'normal' });
+  expect(String(submitted?.['content']).trim()).toBe('Explain a word');
+  expect(submitted).not.toHaveProperty('userId');
+  await expect(page.locator('.deepseek-markdown img')).toHaveCount(0);
+  await expect(page.locator('.deepseek-markdown a')).toHaveCount(0);
+  expect(await page.evaluate(() => (window as unknown as { chatInjected?: boolean }).chatInjected)).toBeUndefined();
+});
+
+test('finishing the last course word saves before requesting another batch', async ({ page }) => {
+  const saved: unknown[] = [];
+  await page.route('**/api/v1/learn/word/legacy-course-1', route => route.fulfill({
+    status: 200, contentType: 'application/json', body: JSON.stringify(envelope([
+      { id: 'word-a', word: 'a', definition: 'one letter', translation: '一个字母' },
+    ])),
+  }));
+  await page.route('**/api/v1/learn/word/master', route => {
+    saved.push(route.request().postDataJSON());
+    return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(envelope({ wordNumber: 1 })) });
+  });
+  await page.goto('courses/learn/legacy-course-1/Legacy');
+  await page.locator('input[maxlength="1"]').fill('a');
+  await page.getByRole('button', { name: '下一个', exact: true }).click();
+  await expect(page.getByRole('status')).toHaveText('学习进度已保存');
+  expect(saved).toEqual([{ wordIds: ['word-a'] }]);
+  await expect(page.getByRole('button', { name: '再练一组' })).toBeVisible();
 });

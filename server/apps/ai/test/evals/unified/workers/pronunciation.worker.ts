@@ -6,7 +6,7 @@ export async function runQuickPronunciation(
   runRoot: string,
   timeoutMs: number,
 ) {
-  const results = [];
+  const results: Awaited<ReturnType<typeof runRegisteredJest>>[] = [];
   for (const suiteId of [
     'pronunciation-alignment',
     'pronunciation-application',

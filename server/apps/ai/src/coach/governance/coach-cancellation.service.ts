@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Optional } from '@nestjs/common';
 import { createHash } from 'node:crypto';
 import type { CoachRequestStatus } from '@en/common/coach';
 import type { CoachExecutionContext } from '@libs/shared';
@@ -139,7 +139,7 @@ export class CoachCancellationService {
     private readonly repository: CoachCancellationRepository,
     @Inject(COACH_CANCELLATION_SIGNAL_STORE)
     private readonly signals: CoachCancellationSignalStore,
-    private readonly now: () => Date = () => new Date(),
+    @Optional() private readonly now: () => Date = () => new Date(),
   ) {}
 
   abortSignalFor(requestId: string): AbortSignal {

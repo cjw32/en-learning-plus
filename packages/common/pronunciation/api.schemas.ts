@@ -70,6 +70,8 @@ export const pronunciationLearningWriteStatusSchema = z.enum([
   "COMPENSATED",
 ]);
 
+export type PronunciationLearningWriteStatus = z.infer<typeof pronunciationLearningWriteStatusSchema>;
+
 export const pronunciationNextActionSchema = z.enum([
   "retry",
   "review",
@@ -229,3 +231,17 @@ export type PronunciationPublicErrorCode = z.infer<
 export type PronunciationFailureCategory = z.infer<
   typeof pronunciationFailureCategorySchema
 >;
+
+export const pronunciationCapabilitiesSchema = z.object({
+  available: z.boolean(),
+  reason: z.enum(["FEATURE_DISABLED", "SERVICE_UNAVAILABLE"]).nullable(),
+  locales: z.array(pronunciationLocaleSchema),
+  sources: z.array(pronunciationTargetSourceSchema),
+  learningWrite: z.boolean(),
+  coachSummary: z.boolean(),
+  maxDurationMs: z.number().int().positive(),
+  maxBytes: z.number().int().positive(),
+  maxWords: z.number().int().positive(),
+  maxCharacters: z.number().int().positive(),
+}).strict();
+export type PronunciationCapabilities = z.infer<typeof pronunciationCapabilitiesSchema>;

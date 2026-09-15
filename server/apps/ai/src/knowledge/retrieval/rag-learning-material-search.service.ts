@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+import { ragAppliedFiltersSchema } from '@en/common/coach';
 import type {
   SearchLearningMaterialsV2Input,
   SearchLearningMaterialsV2Output,
@@ -188,7 +189,7 @@ export class RagLearningMaterialSearchService implements RagLearningMaterialSear
         schemaVersion: 'coach.tool.v2',
         ok: true,
         query: built.internal.query,
-        appliedFilters: built.appliedFilters,
+        appliedFilters: ragAppliedFiltersSchema.parse(built.appliedFilters),
         results: finalResults,
         citations: finalResults.length > 0 ? publicCitations : [],
         conflicts: evaluated.conflicts.map((conflict) => ({
@@ -204,7 +205,7 @@ export class RagLearningMaterialSearchService implements RagLearningMaterialSear
         schemaVersion: 'coach.tool.v2',
         ok: false,
         query: built.internal.query,
-        appliedFilters: built.appliedFilters,
+        appliedFilters: ragAppliedFiltersSchema.parse(built.appliedFilters),
         results: [],
         citations: [],
         conflicts: [],

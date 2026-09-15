@@ -19,7 +19,11 @@ export function countResults(input: readonly ItemResult[]) {
     uniqueCases: new Set(results.map((r) => r.caseId)).size,
     attempts: results.reduce((n, r) => n + r.allAttempts.length, 0),
     repetitions: results.reduce(
-      (n, r) => n + Math.min(r.expectedRepeatCount, r.allAttempts.length),
+      (n, r) =>
+        n +
+        (r.attemptLineage
+          ? new Set(r.attemptLineage.map((a) => a.repeatIndex)).size
+          : Math.min(r.expectedRepeatCount, r.allAttempts.length)),
       0,
     ),
   });

@@ -1,4 +1,6 @@
-import { computed, ref } from 'vue'
+import { notifyStudyProgress } from '@/session/study-progress'
+import { learningSessionVersion, isLearningSessionCurrent, onLearningSessionChange } from '@/session/learning-session'
+import { computed, ref, onScopeDispose } from 'vue'
 import { defineStore } from 'pinia'
 import {
   anyPublicCoachResultSchema,
@@ -91,6 +93,9 @@ export const useCoachStore = defineStore('coach', () => {
     conversation: CoachConversation,
     history: CoachMessage[] = [],
   ) {
+    resetRequestState()
+    failExerciseSubmission()
+    submissionKeys.clear()
     activeConversationId.value = conversation.id
     const index = conversations.value.findIndex(
       (item) => item.id === conversation.id,
@@ -153,6 +158,7 @@ export const useCoachStore = defineStore('coach', () => {
     const result = parsed.data
     finalResult.value = result
     if (result.responseType === 'grading') {
+      notifyStudyProgress()
       submissionPending.value = false
       pendingExerciseId.value = null
     }
@@ -160,6 +166,7 @@ export const useCoachStore = defineStore('coach', () => {
     error.value = null
     messages.value.push({
       id: `result-${result.traceId}`,
+      requestId: activeRequestId.value,
       role: 'COACH',
       content: null,
       structuredResult: result,
@@ -191,9 +198,10 @@ export const useCoachStore = defineStore('coach', () => {
     citationId: string,
     resolver: typeof getCoachCitation = getCoachCitation,
   ) {
+    const version = learningSessionVersion()
     try {
       const response = await resolver(citationId)
-      replaceCitation(response.data)
+      if (isLearningSessionCurrent(version)) replaceCitation(response.data)
       return response.data
     } catch {
       const unavailable = {
@@ -201,7 +209,7 @@ export const useCoachStore = defineStore('coach', () => {
         status: 'unavailable',
         reason: 'SOURCE_UNAVAILABLE',
       } as const
-      replaceCitation(unavailable)
+      if (isLearningSessionCurrent(version)) replaceCitation(unavailable)
       return unavailable
     }
   }
@@ -314,6 +322,26 @@ export const useCoachStore = defineStore('coach', () => {
     resultEventId = null
     serverStatusLabel.value = ''
   }
+
+  function closeConversation() {
+    activeConversationId.value = null
+    messages.value = []
+    resetRequestState()
+    failExerciseSubmission()
+    submissionKeys.clear()
+  }
+
+  function reset() {
+    profile.value = null
+    conversations.value = []
+    activeConversationId.value = null
+    messages.value = []
+    resetRequestState()
+    submissionPending.value = false
+    pendingExerciseId.value = null
+    submissionKeys.clear()
+  }
+  onScopeDispose(onLearningSessionChange(reset))
 
   function beginStream(requestId: string) {
     activeRequestId.value = requestId
@@ -436,11 +464,13 @@ export const useCoachStore = defineStore('coach', () => {
     setProfile,
     setConversations,
     openConversation,
+    closeConversation,
     appendProvisional,
     acceptResult,
     resolveCitation,
     refreshCitations,
     acceptEvent,
+    reset,
     resetRequestState,
     beginStream,
     markReplayExpired,

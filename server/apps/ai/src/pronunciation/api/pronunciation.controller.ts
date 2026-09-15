@@ -1,3 +1,4 @@
+import { PronunciationSubmitAdmissionService } from '../governance/pronunciation-submit-admission';
 import {
   Body,
   Controller,
@@ -96,6 +97,7 @@ export class PronunciationController {
     private readonly uploads: PronunciationAudioUploadWorkflow,
     @Optional() private readonly deletions?: PronunciationDeletionService,
     @Optional() private readonly retries?: PronunciationRetryService,
+    @Optional() private readonly admission?: PronunciationSubmitAdmissionService,
   ) {}
 
   @Post('assessments')
@@ -198,6 +200,7 @@ export class PronunciationController {
           idempotencyKey,
         ),
       });
+      await this.admission?.release(owner, id).catch(() => undefined);
       return this.assessments.get(owner, id);
     });
   }

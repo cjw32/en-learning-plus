@@ -13,9 +13,14 @@ export class DigestProcessor extends WorkerHost {
   }
   async process(job: Job) {
     if (job.name === digestQueueName.task.emailDigest) {
-      const { text, email } = job.data;
-      await this.emailService.sendEmail(email, '每日单词记忆报告', text);
-      console.log('邮件发送成功');
+      const digest = await this.digestService.prepareEmailDigest(job.data);
+      if (!digest) return;
+      const sent = await this.emailService.sendEmail(
+        digest.email,
+        '每日单词记忆报告',
+        digest.text,
+      );
+      if (sent === false) throw new Error('Digest delivery failed');
     }
     if (job.name === digestQueueName.task.everyDayDigest) {
       await this.digestService.handleEmailDigest();

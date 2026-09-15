@@ -11,13 +11,15 @@ import {
 const MAX_RETENTION_MS = 24 * 60 * 60 * 1_000;
 const MAX_AUDIO_BYTES = 8 * 1024 * 1024;
 
+type PronunciationLifecycleRule = Readonly<{
+  Status?: unknown;
+  Prefix?: unknown;
+  Filter?: Readonly<{ Prefix?: unknown }>;
+  Expiration?: Readonly<{ Days?: unknown }>;
+}>;
+
 type PronunciationLifecycleConfig = Readonly<{
-  Rule: readonly Readonly<{
-    Status?: unknown;
-    Prefix?: unknown;
-    Filter?: Readonly<{ Prefix?: unknown }>;
-    Expiration?: Readonly<{ Days?: unknown }>;
-  }>[];
+  Rule: PronunciationLifecycleRule | readonly PronunciationLifecycleRule[];
 }>;
 
 export interface PronunciationMinioClient {
@@ -52,7 +54,7 @@ function unavailable(): PronunciationStorageUnavailableError {
   return new PronunciationStorageUnavailableError();
 }
 
-function grantsAnonymousRead(policyText: string): boolean {
+function grantsAnonymousAccess(policyText: string): boolean {
   let policy: unknown;
   try {
     policy = JSON.parse(policyText);
@@ -83,7 +85,7 @@ function grantsAnonymousRead(policyText: string): boolean {
     return (
       statement.Effect === 'Allow' &&
       anonymous &&
-      actions.some((action) => action === 's3:GetObject' || action === 's3:*')
+      actions.length > 0
     );
   });
 }
@@ -124,10 +126,23 @@ export class MinioPronunciationAudioStorage implements PronunciationAudioStorage
     ) {
       throw unavailable();
     }
-    const policy = await this.client.getBucketPolicy(this.config.bucket);
-    if (grantsAnonymousRead(policy)) throw unavailable();
+    let policy: string;
+    try {
+      policy = await this.client.getBucketPolicy(this.config.bucket);
+    } catch (error) {
+      // MinIO returns NoSuchBucketPolicy for a private bucket with no policy.
+      // Permission errors and outages are not evidence of private access.
+      if (!error || typeof error !== 'object' || !('code' in error) || error.code !== 'NoSuchBucketPolicy') throw unavailable();
+      policy = '{"Statement":[]}';
+    }
+    if (grantsAnonymousAccess(policy)) throw unavailable();
     const lifecycle = await this.client.getBucketLifecycle(this.config.bucket);
-    const hasExpiry = lifecycle?.Rule.some((rule) => {
+    // MinIO's XML parser returns an object for a single Rule, despite SDK typings.
+    const rules = lifecycle?.Rule
+      ? Array.isArray(lifecycle.Rule) ? lifecycle.Rule : [lifecycle.Rule]
+      : [];
+    const hasExpiry = rules.some((rule: PronunciationLifecycleRule) => {
+      if (!rule || typeof rule !== 'object') return false;
       const configuredPrefix = rule.Filter?.Prefix ?? rule.Prefix;
       const prefix =
         typeof configuredPrefix === 'string' ? configuredPrefix : '';

@@ -1,4 +1,5 @@
-import { Injectable } from '@nestjs/common';
+import { recordStudyDay } from '@libs/shared/study/study-day';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '@libs/shared';
 import { scheduleSm2Review } from './sm2-review-scheduler';
 
@@ -10,6 +11,15 @@ export class LegacyReviewInitializerService {
   ) {}
 
   async saveWordMaster(subjectId: string, wordIds: readonly string[]) {
+    if (
+      !Array.isArray(wordIds) ||
+      wordIds.length === 0 ||
+      wordIds.length > 100 ||
+      wordIds.some(
+        (id) => typeof id !== 'string' || !/^[A-Za-z0-9_-]{1,128}$/.test(id),
+      )
+    )
+      throw new BadRequestException('请选择有效的学习单词');
     const uniqueWordIds = [...new Set(wordIds)];
     return this.prisma.$transaction(async (database) => {
       const created = await database.wordBookRecord.createMany({
@@ -71,10 +81,12 @@ export class LegacyReviewInitializerService {
           update: { wordId },
         });
       }
+      if (created.count > 0)
+        await recordStudyDay(database, subjectId, reviewedAt);
       return database.user.update({
         where: { id: subjectId },
         data: { wordNumber: { increment: created.count } },
-        select: { wordNumber: true },
+        select: { wordNumber: true, dayNumber: true },
       });
     });
   }

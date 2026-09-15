@@ -8,7 +8,10 @@
       "config": "apps/ai/test/jest-e2e.json",
       "mode": "mock",
       "profile": "quick",
-      "requirements": ["FR-005", "FR-006"],
+      "requirements": [
+        "FR-005",
+        "FR-006"
+      ],
       "tests": [
         "Coach controlled runtime graph runs the owned answer path and captures actual model usage and cost",
         "Coach controlled runtime graph propagates the cancellation signal to the model and does not run tools",
@@ -22,7 +25,10 @@
       "config": "apps/ai/test/jest-e2e.json",
       "mode": "mock",
       "profile": "full",
-      "requirements": ["FR-005", "FR-006"],
+      "requirements": [
+        "FR-005",
+        "FR-006"
+      ],
       "tests": [
         "RAG exact retrieval applies status, rights, version, dimensions, threshold and filters before stable Top K",
         "RAG exact retrieval does not mix incompatible embedding versions or expand invalid filters",
@@ -36,7 +42,10 @@
       "config": "package.json",
       "mode": "deterministic",
       "profile": "quick",
-      "requirements": ["FR-005", "FR-006"],
+      "requirements": [
+        "FR-005",
+        "FR-006"
+      ],
       "tests": [
         "pronunciation deterministic alignment evaluation normalizes Unicode/punctuation without losing target positions",
         "pronunciation deterministic alignment evaluation normalizes Unicode/punctuation without losing target positions",
@@ -58,7 +67,10 @@
       "config": "package.json",
       "mode": "deterministic",
       "profile": "quick",
-      "requirements": ["FR-005", "FR-006"],
+      "requirements": [
+        "FR-005",
+        "FR-006"
+      ],
       "tests": [
         "MCP protocol-date negotiation contract accepts exactly modern discovery",
         "MCP protocol-date negotiation contract accepts exactly modern request",
@@ -82,10 +94,13 @@
       "config": "package.json",
       "mode": "mock",
       "profile": "quick",
-      "requirements": ["FR-005", "FR-006"],
+      "requirements": [
+        "FR-005",
+        "FR-006"
+      ],
       "tests": [
         "RAG learning material runtime orchestration orders only explicit versions and never infers recency from opaque hashes",
-        "RAG learning material runtime orchestration runs embedding \u2192 permission-first exact search \u2192 ranking \u2192 server citation issue",
+        "RAG learning material runtime orchestration runs embedding → permission-first exact search → ranking → server citation issue",
         "RAG learning material runtime orchestration fails closed before embedding when the internal request identity is absent"
       ]
     },
@@ -96,7 +111,10 @@
       "config": "apps/ai/test/jest-e2e.json",
       "mode": "mock",
       "profile": "quick",
-      "requirements": ["FR-005", "FR-006"],
+      "requirements": [
+        "FR-005",
+        "FR-006"
+      ],
       "tests": [
         "Coach production workflow executor uses only the server-recorded owner and persists before terminal SSE",
         "Coach production workflow executor propagates cancellation, rejects the late result, and never persists it",
@@ -111,7 +129,10 @@
       "config": "package.json",
       "mode": "mock",
       "profile": "quick",
-      "requirements": ["FR-005", "FR-006"],
+      "requirements": [
+        "FR-005",
+        "FR-006"
+      ],
       "tests": [
         "PronunciationAssessmentService creates an owned immutable target and replays the same intent once",
         "PronunciationAssessmentService orchestrates upload metadata without exposing the object key",
@@ -129,7 +150,10 @@
       "config": "package.json",
       "mode": "mock",
       "profile": "quick",
-      "requirements": ["FR-005", "FR-006"],
+      "requirements": [
+        "FR-005",
+        "FR-006"
+      ],
       "tests": [
         "MCP authenticated request pipeline runs the security stages in order and always releases admission",
         "MCP authenticated request pipeline stops after a authentication failure and emits only a safe error",
@@ -142,6 +166,455 @@
         "MCP authenticated request pipeline rejects whitespace in token Authorization before token verification",
         "MCP authenticated request pipeline rejects combined duplicate Authorization before token verification",
         "MCP authenticated request pipeline rejects query/cookie token channels and oversized bodies at the boundary"
+      ]
+    },
+    {
+      "id": "coach-exercises",
+      "module": "coach",
+      "path": "apps/ai/test/workflow/coach-exercise.workflow.spec.ts",
+      "config": "package.json",
+      "mode": "mock",
+      "profile": "synthetic",
+      "requirements": [
+        "FR-005",
+        "FR-016",
+        "FR-050"
+      ],
+      "tests": [
+        "Coach CREATE_EXERCISE workflow runs the explicit personalized path within tool budget and never grades/saves",
+        "Coach CREATE_EXERCISE workflow does not create a submittable exercise when materials fail"
+      ]
+    },
+    {
+      "id": "coach-grading",
+      "module": "coach",
+      "path": "apps/ai/test/workflow/coach-grading.workflow.spec.ts",
+      "config": "package.json",
+      "mode": "mock",
+      "profile": "synthetic",
+      "requirements": [
+        "FR-005",
+        "FR-016",
+        "FR-050"
+      ],
+      "tests": [
+        "Coach GRADE_ANSWER workflow runs owned exercise -> grade -> validate -> save -> recommend in order",
+        "Coach GRADE_ANSWER workflow retries an invalid grade once, then saves only the validated fact",
+        "Coach GRADE_ANSWER workflow degrades after the schema retry and never invokes save_attempt",
+        "Coach GRADE_ANSWER workflow does not retry a validated tool failure",
+        "Coach GRADE_ANSWER workflow returns valid grading with not_saved when persistence fails",
+        "Coach GRADE_ANSWER workflow forbids save-before-grade at the workflow guard"
+      ]
+    },
+    {
+      "id": "coach-grading-ownership",
+      "module": "coach",
+      "path": "apps/ai/test/security/coach-grading-ownership.e2e-spec.ts",
+      "config": "apps/ai/test/jest-e2e.json",
+      "mode": "mock",
+      "profile": "synthetic",
+      "requirements": [
+        "FR-005",
+        "FR-016",
+        "FR-050"
+      ],
+      "tests": [
+        "Coach grading ownership and integrity boundaries returns the same not-found error for another user/resource and writes nothing",
+        "Coach grading ownership and integrity boundaries rejects an idempotency key whose stored answer version differs",
+        "Coach grading ownership and integrity boundaries rejects a forged grading hash before creating an attempt"
+      ]
+    },
+    {
+      "id": "coach-attempts",
+      "module": "coach",
+      "path": "apps/ai/test/integration/coach-attempt.e2e-spec.ts",
+      "config": "apps/ai/test/jest-e2e.json",
+      "mode": "mock",
+      "profile": "synthetic",
+      "requirements": [
+        "FR-005",
+        "FR-016",
+        "FR-050"
+      ],
+      "tests": [
+        "AttemptService atomic save and replay writes one attempt and one event per target, then replays all retries",
+        "AttemptService atomic save and replay rejects hash mismatch and cancellation before any write",
+        "AttemptService atomic save and replay rolls back attempt, events, aggregates, and statuses on an injected failure"
+      ]
+    },
+    {
+      "id": "coach-history",
+      "module": "coach",
+      "path": "apps/ai/test/integration/coach-history-management.spec.ts",
+      "config": "package.json",
+      "mode": "mock",
+      "profile": "synthetic",
+      "requirements": [
+        "FR-005",
+        "FR-016",
+        "FR-050"
+      ],
+      "tests": [
+        "Coach history feedback projection only exposes the owning request id and public feedback fields in history",
+        "Coach history feedback projection scopes feedback by subject and expiry and rejects inaccessible conversation cursors"
+      ]
+    },
+    {
+      "id": "coach-auth",
+      "module": "coach",
+      "path": "apps/ai/test/security/coach-auth.e2e-spec.ts",
+      "config": "apps/ai/test/jest-e2e.json",
+      "mode": "mock",
+      "profile": "synthetic",
+      "requirements": [
+        "FR-005",
+        "FR-016",
+        "FR-050"
+      ],
+      "tests": [
+        "Coach authentication and ownership (e2e) rejects missing authentication before profile data or model access",
+        "Coach authentication and ownership (e2e) rejects invalid authentication before profile data or model access",
+        "Coach authentication and ownership (e2e) rejects refresh authentication before profile data or model access",
+        "Coach authentication and ownership (e2e) allows an access token and always derives profile identity from context",
+        "Coach authentication and ownership (e2e) returns the same safe 404 for foreign conversation/history and request IDs",
+        "Coach authentication and ownership (e2e) rejects a body userId and keeps Prompt identity text non-authoritative",
+        "Coach authentication and ownership (e2e) protects cancel/retry and derives their owner only from the access token"
+      ]
+    },
+    {
+      "id": "rag-injection",
+      "module": "rag",
+      "path": "apps/ai/test/security/rag-injection-citation.spec.ts",
+      "config": "package.json",
+      "mode": "mock",
+      "profile": "synthetic",
+      "requirements": [
+        "FR-005",
+        "FR-016",
+        "FR-050"
+      ],
+      "tests": [
+        "RAG injection and forged citation security rejects identity, budget and tool overrides at the strict tool boundary",
+        "RAG injection and forged citation security keeps document instructions inside the untrusted knowledge delimiter",
+        "RAG injection and forged citation security rejects and removes a forged citationId with no supported factual claim"
+      ]
+    },
+    {
+      "id": "rag-rights",
+      "module": "rag",
+      "path": "apps/ai/test/security/rag-source-rights.spec.ts",
+      "config": "package.json",
+      "mode": "mock",
+      "profile": "synthetic",
+      "requirements": [
+        "FR-005",
+        "FR-016",
+        "FR-050"
+      ],
+      "tests": [
+        "RAG source rights policy authorizes only explicitly allowed source fields and uses",
+        "RAG source rights policy does not treat the oxford field name as authorization evidence",
+        "RAG source rights policy does not treat the collins field name as authorization evidence",
+        "RAG source rights policy does not treat the bnc field name as authorization evidence",
+        "RAG source rights policy does not treat the frq field name as authorization evidence",
+        "RAG source rights policy rejects missing source",
+        "RAG source rights policy rejects draft source",
+        "RAG source rights policy rejects expired source",
+        "RAG source rights policy rejects embedding disabled"
+      ]
+    },
+    {
+      "id": "rag-grounding",
+      "module": "rag",
+      "path": "apps/ai/test/security/rag-context-citations.spec.ts",
+      "config": "package.json",
+      "mode": "mock",
+      "profile": "synthetic",
+      "requirements": [
+        "FR-005",
+        "FR-016",
+        "FR-050"
+      ],
+      "tests": [
+        "RAG context and citation safety trims by the approved token budget and marks knowledge as untrusted data",
+        "RAG context and citation safety issues unpredictable server IDs and ignores a caller-proposed citation ID",
+        "RAG context and citation safety rejects unsupported, expired, forged, or text-mismatched claim bindings",
+        "RAG context and citation safety repairs once by removing forged evidence and safely downgrading",
+        "RAG context and citation safety tells the model generated examples are not source excerpts",
+        "RAG context and citation safety allows one controlled grounded-output retry and never accepts a forged ID"
+      ]
+    },
+    {
+      "id": "rag-content",
+      "module": "rag",
+      "path": "apps/ai/test/security/rag-content-validator.spec.ts",
+      "config": "package.json",
+      "mode": "mock",
+      "profile": "synthetic",
+      "requirements": [
+        "FR-005",
+        "FR-016",
+        "FR-050"
+      ],
+      "tests": [
+        "RAG content validator normalizes safe learning content without changing its meaning",
+        "RAG content validator rejects blank content",
+        "RAG content validator rejects title only content",
+        "RAG content validator rejects link only content",
+        "RAG content validator rejects template content",
+        "RAG content validator rejects too short content",
+        "RAG content validator rejects contact content",
+        "RAG content validator keeps instruction-like text classified as untrusted data",
+        "RAG content validator rejects inconsistent private ownership"
+      ]
+    },
+    {
+      "id": "rag-embedding",
+      "module": "rag",
+      "path": "apps/ai/test/integration/rag-embedding-gateway.spec.ts",
+      "config": "package.json",
+      "mode": "mock",
+      "profile": "synthetic",
+      "requirements": [
+        "FR-005",
+        "FR-016",
+        "FR-050"
+      ],
+      "tests": [
+        "RAG embedding gateway contract returns deterministic finite non-zero vectors from the fake",
+        "RAG embedding gateway contract sends only texts and approved model to the HTTP provider",
+        "RAG embedding gateway contract rejects wrong count responses",
+        "RAG embedding gateway contract rejects wrong dimensions responses",
+        "RAG embedding gateway contract rejects non-finite vector responses",
+        "RAG embedding gateway contract rejects zero vector responses",
+        "RAG embedding gateway contract rejects unapproved providers before network access",
+        "RAG embedding gateway contract sends an approved private projection without eligibility or identity metadata",
+        "RAG embedding gateway contract fails closed for private content with missing eligibility",
+        "RAG embedding gateway contract fails closed for private content with identity or technical payload",
+        "RAG embedding gateway contract retries one approved rate limit and then succeeds within the finite limit",
+        "RAG embedding gateway contract does not start or retry after cancellation or the caller deadline"
+      ]
+    },
+    {
+      "id": "pronunciation-provider",
+      "module": "pronunciation",
+      "path": "apps/ai/test/integration/pronunciation-provider.integration.spec.ts",
+      "config": "package.json",
+      "mode": "mock",
+      "profile": "synthetic",
+      "requirements": [
+        "FR-005",
+        "FR-016",
+        "FR-050"
+      ],
+      "tests": [
+        "pronunciation Provider executor makes one normal call and records one unique billable attempt",
+        "pronunciation Provider executor does not automatically retry timeout with unknown acceptance",
+        "pronunciation Provider executor does not automatically retry accepted 429",
+        "pronunciation Provider executor does not automatically retry accepted 5xx",
+        "pronunciation Provider executor does not automatically retry no match",
+        "pronunciation Provider executor does not retry malformed or thrown unknown-acceptance responses",
+        "pronunciation Provider executor allows at most one automatic retry after proven non-acceptance",
+        "pronunciation Provider executor allows one retry only when Provider idempotency is explicitly approved"
+      ]
+    },
+    {
+      "id": "pronunciation-cancellation",
+      "module": "pronunciation",
+      "path": "apps/ai/test/integration/pronunciation-cancel-races.integration.spec.ts",
+      "config": "package.json",
+      "mode": "mock",
+      "profile": "synthetic",
+      "requirements": [
+        "FR-005",
+        "FR-016",
+        "FR-050"
+      ],
+      "tests": [
+        "pronunciation cancellation boundaries rejects cancellation at the UPLOAD boundary with zero learning writes",
+        "pronunciation cancellation boundaries rejects cancellation at the QUEUE boundary with zero learning writes",
+        "pronunciation cancellation boundaries rejects cancellation at the PRE_PROVIDER boundary with zero learning writes",
+        "pronunciation cancellation boundaries rejects cancellation at the POST_PROVIDER boundary with zero learning writes",
+        "pronunciation cancellation boundaries rejects cancellation at the PRE_LEARNING boundary with zero learning writes",
+        "pronunciation cancellation boundaries discards a late Provider result while retaining its unavoidable cost ledger",
+        "pronunciation cancellation boundaries uses the same not-found result for a cross-owner boundary check"
+      ]
+    },
+    {
+      "id": "pronunciation-finalization",
+      "module": "pronunciation",
+      "path": "apps/ai/test/integration/pronunciation-learning-finalization.integration.spec.ts",
+      "config": "package.json",
+      "mode": "mock",
+      "profile": "synthetic",
+      "requirements": [
+        "FR-005",
+        "FR-016",
+        "FR-050"
+      ],
+      "tests": [
+        "pronunciation result-to-learning finalization persists a reliable result while learning gates remain off",
+        "pronunciation result-to-learning finalization returns a proposal in shadow mode without a learning write",
+        "pronunciation result-to-learning finalization writes once behind the write gate and reports failure independently",
+        "pronunciation result-to-learning finalization keeps the result and exposes a failed learning state when shadow projection fails",
+        "pronunciation result-to-learning finalization revalidates immediately before a learning write and fails closed on cancellation",
+        "pronunciation result-to-learning finalization recovers completed learning writes after the provider deadline without reassessing audio"
+      ]
+    },
+    {
+      "id": "pronunciation-ownership",
+      "module": "pronunciation",
+      "path": "apps/ai/test/security/pronunciation-ownership.security.spec.ts",
+      "config": "package.json",
+      "mode": "mock",
+      "profile": "synthetic",
+      "requirements": [
+        "FR-005",
+        "FR-016",
+        "FR-050"
+      ],
+      "tests": [
+        "pronunciation two-subject ownership boundary makes cross-owner and random audio reads indistinguishable",
+        "pronunciation two-subject ownership boundary returns no successful cross-owner delete and never leaks the target",
+        "pronunciation two-subject ownership boundary makes cross-owner and random retry attempts indistinguishable",
+        "pronunciation two-subject ownership boundary makes cross-owner and random cancellation attempts indistinguishable"
+      ]
+    },
+    {
+      "id": "pronunciation-audio-quality",
+      "module": "pronunciation",
+      "path": "apps/ai/src/pronunciation/audio/pronunciation-audio-quality.policy.spec.ts",
+      "config": "package.json",
+      "mode": "mock",
+      "profile": "synthetic",
+      "requirements": [
+        "FR-005",
+        "FR-016",
+        "FR-050"
+      ],
+      "tests": [
+        "PronunciationAudioQualityPolicy classifies the calibrated SILENT boundary deterministically",
+        "PronunciationAudioQualityPolicy classifies the calibrated LOW_VOLUME boundary deterministically",
+        "PronunciationAudioQualityPolicy classifies the calibrated INSUFFICIENT_SPEECH boundary deterministically",
+        "PronunciationAudioQualityPolicy classifies the calibrated READY boundary deterministically",
+        "PronunciationAudioQualityPolicy rejects clipping only beyond the one-percent threshold",
+        "PronunciationAudioQualityPolicy does not mutate caller-owned PCM"
+      ]
+    },
+    {
+      "id": "mcp-atomicity",
+      "module": "mcp",
+      "path": "apps/ai/test/integration/mcp-submit-atomicity.integration.spec.ts",
+      "config": "package.json",
+      "mode": "mock",
+      "profile": "synthetic",
+      "requirements": [
+        "FR-005",
+        "FR-016",
+        "FR-050"
+      ],
+      "tests": [
+        "MCP submit_answer authoritative transaction atomicity rolls back every write when after_confirmation_claim fails",
+        "MCP submit_answer authoritative transaction atomicity rolls back every write when after_submission fails",
+        "MCP submit_answer authoritative transaction atomicity rolls back every write when after_attempt fails",
+        "MCP submit_answer authoritative transaction atomicity rolls back every write when after_item_state fails",
+        "MCP submit_answer authoritative transaction atomicity rolls back every write when after_review_event fails",
+        "MCP submit_answer authoritative transaction atomicity rolls back every write when after_confirmation_consume fails",
+        "MCP submit_answer authoritative transaction atomicity rolls back every write when after_idempotency_complete fails",
+        "MCP submit_answer authoritative transaction atomicity rolls back every write when before_commit fails",
+        "MCP submit_answer authoritative transaction atomicity exposes only a fully linked state if the response path fails after commit",
+        "MCP submit_answer authoritative transaction atomicity commits every authoritative row together on success"
+      ]
+    },
+    {
+      "id": "mcp-submit",
+      "module": "mcp",
+      "path": "apps/ai/test/integration/mcp-submit-answer-tool.integration.spec.ts",
+      "config": "package.json",
+      "mode": "mock",
+      "profile": "synthetic",
+      "requirements": [
+        "FR-005",
+        "FR-016",
+        "FR-050"
+      ],
+      "tests": [
+        "MCP submit_answer orchestration prepares without a write, waits for Web confirmation, then finalizes once and replays",
+        "MCP submit_answer orchestration does no downstream work when cancellation is already visible"
+      ]
+    },
+    {
+      "id": "mcp-confirmation",
+      "module": "mcp",
+      "path": "apps/ai/test/integration/mcp-write-confirmation.integration.spec.ts",
+      "config": "package.json",
+      "mode": "mock",
+      "profile": "synthetic",
+      "requirements": [
+        "FR-005",
+        "FR-016",
+        "FR-050"
+      ],
+      "tests": [
+        "MCP write-confirmation state machine creates a PENDING confirmation with exactly five minutes TTL",
+        "MCP write-confirmation state machine uses CAS for PENDING → CONFIRMED → CLAIMED → CONSUMED",
+        "MCP write-confirmation state machine makes rejection terminal and permits no claim or learning write",
+        "MCP write-confirmation state machine expires at the exact five-minute boundary and cannot confirm or claim",
+        "MCP write-confirmation state machine rejects consume-before-claim and repeat consume with zero side effects"
+      ]
+    },
+    {
+      "id": "mcp-resource-isolation",
+      "module": "mcp",
+      "path": "apps/ai/test/security/mcp-resource-isolation.security.spec.ts",
+      "config": "package.json",
+      "mode": "mock",
+      "profile": "synthetic",
+      "requirements": [
+        "FR-005",
+        "FR-016",
+        "FR-050"
+      ],
+      "tests": [
+        "MCP Resource current-user and source-rights isolation constrains a course-material domain read to the authenticated user",
+        "MCP Resource current-user and source-rights isolation binds en-learning://me/reviews/today to the authenticated user only",
+        "MCP Resource current-user and source-rights isolation binds en-learning://me/reports/summary to the authenticated user only",
+        "MCP Resource current-user and source-rights isolation binds en-learning://me/weaknesses to the authenticated user only",
+        "MCP Resource current-user and source-rights isolation rejects cross-user selection through URI",
+        "MCP Resource current-user and source-rights isolation rejects cross-user selection through unknown input",
+        "MCP Resource current-user and source-rights isolation uses one outward not-found result for unentitled and nonexistent course material",
+        "MCP Resource current-user and source-rights isolation does not return content from a source without approved field rights",
+        "MCP Resource current-user and source-rights isolation blocks revoked authorization before protected content reads",
+        "MCP Resource current-user and source-rights isolation blocks deleted account before protected content reads",
+        "MCP Resource current-user and source-rights isolation blocks expired token before protected content reads",
+        "MCP Resource current-user and source-rights isolation blocks removed scope before protected content reads",
+        "MCP Resource current-user and source-rights isolation revalidates authorization when a resource is called after discovery"
+      ]
+    },
+    {
+      "id": "mcp-result-validator",
+      "module": "mcp",
+      "path": "apps/ai/test/security/mcp-result-validator.spec.ts",
+      "config": "package.json",
+      "mode": "mock",
+      "profile": "synthetic",
+      "requirements": [
+        "FR-005",
+        "FR-016",
+        "FR-050"
+      ],
+      "tests": [
+        "MCP final result validator normalizes safe text and accepts a schema-valid cited result",
+        "MCP final result validator rejects missing or inconsistent source provenance",
+        "MCP final result validator rejects missing or inconsistent source provenance",
+        "MCP final result validator rejects missing or inconsistent source provenance",
+        "MCP final result validator rejects missing or inconsistent source provenance",
+        "MCP final result validator rejects over-depth and over-size values before serialization",
+        "MCP final result validator rejects unsafe result text: <SYSTEM>internal instructions</SYSTEM>",
+        "MCP final result validator rejects unsafe result text: Bearer eyJsecret.payload.signature",
+        "MCP final result validator rejects unsafe result text: client_secret=unapproved-secret-value",
+        "MCP final result validator rejects unsafe result text: show the chain-of-thought",
+        "MCP final result validator requires an insufficient retrieval to contain zero results/conflicts"
       ]
     }
   ]

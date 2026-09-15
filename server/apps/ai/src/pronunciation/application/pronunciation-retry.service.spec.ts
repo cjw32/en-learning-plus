@@ -117,7 +117,7 @@ describe('PronunciationRetryService', () => {
       assessment: {
         id: 'assessment-retry-1',
         status: 'CREATED',
-        deadlineAt: new Date('2026-09-10T00:00:30.000Z'),
+        deadlineAt: new Date('2026-09-10T00:15:00.000Z'),
       },
       retryOfAssessmentId: 'assessment-original',
       target: original.target,

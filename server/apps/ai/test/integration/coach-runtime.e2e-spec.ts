@@ -260,7 +260,7 @@ function fixture(abort = new AbortController(), rag = false) {
     model as never,
     profile as never,
     { execute: jest.fn() } as never,
-    materials as never,
+    { ...materials, executeLegacy: materials.execute } as never,
     { select: jest.fn() } as never,
     { execute: jest.fn() } as never,
     { execute: jest.fn() } as never,

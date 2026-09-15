@@ -6,7 +6,7 @@ export async function runQuickMcp(
   runRoot: string,
   timeoutMs: number,
 ) {
-  const results = [];
+  const results: Awaited<ReturnType<typeof runRegisteredJest>>[] = [];
   for (const suiteId of ['mcp-protocol', 'mcp-pipeline'])
     results.push(
       await runRegisteredJest(suiteId, serverRoot, runRoot, timeoutMs),

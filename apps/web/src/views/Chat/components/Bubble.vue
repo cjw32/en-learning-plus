@@ -47,9 +47,9 @@
             <!-- 输入框 -->
             <div class="flex">
                 <el-input @keyup.enter="sendMessage" type="textarea" :rows="2" v-model="message" placeholder="请输入内容" />
-                <el-button class="ml-2" :icon="Position" type="primary" @click="sendMessage"></el-button>
-                <el-button v-if="!isRecording" class="ml-2" :icon="Mic" type="primary" @click="startRecording"></el-button>
-                <el-button v-else class="ml-2" :icon="VideoPause" type="primary" @click="stopRecording"></el-button>
+                <el-button class="ml-2" :disabled="pending" :icon="Position" type="primary" @click="sendMessage"></el-button>
+                <el-button v-if="supported && !isRecording" class="ml-2" :icon="Mic" type="primary" @click="startRecording"></el-button>
+                <el-button v-else-if="supported" class="ml-2" :icon="VideoPause" type="primary" @click="stopRecording"></el-button>
             </div>
         </div>
     </div>
@@ -59,29 +59,29 @@
 import { ref, useTemplateRef, watch, nextTick } from 'vue'
 import { Position, Mic, VideoPause} from '@element-plus/icons-vue'
 import type { ChatMessageList } from '@en/common/chat'
-import { marked } from 'marked'
+import { parseSafeChatMarkdown } from '../safe-chat-markdown'
 import '@/assets/css/deep-seek.css'
 import { useVoiceToText } from '@/hooks/useVoiceToText'
 const deepThink = ref(false)//深度思考
 const webSearch = ref(false)//网络搜索
 const emits = defineEmits(['onSendMessage'])
 const chatRef = useTemplateRef<HTMLDivElement>('chatRef')
-const props = defineProps<{ list?: ChatMessageList }>()//消息列表
+const props = defineProps<{ list?: ChatMessageList; pending?: boolean }>()//消息列表
 const message = ref<string>('')
-const { isRecording, start, stop } = useVoiceToText({
+const { isRecording, supported, start, stop } = useVoiceToText({
     lang: 'zh-CN',
     continuous: true,
 })
 //发送消息
 const sendMessage = () => {
-    if (!message.value) return
+    if (!message.value.trim() || props.pending) return
     emits('onSendMessage', message.value, deepThink.value, webSearch.value)
     message.value = ''
 }
 //解析markdown
 const parseMarkdown = (content: string) => {
     if (!content) return ''
-    return marked.parse(content)
+    return parseSafeChatMarkdown(content)
 }
 //开始录音
 const startRecording = () => {

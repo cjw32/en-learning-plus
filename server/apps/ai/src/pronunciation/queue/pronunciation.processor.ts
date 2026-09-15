@@ -1,4 +1,4 @@
-import { Inject } from '@nestjs/common';
+import { Inject, Optional } from '@nestjs/common';
 import { Processor, WorkerHost } from '@nestjs/bullmq';
 import type { Job } from 'bullmq';
 import { PronunciationRepository } from '../application/pronunciation.repository';
@@ -17,13 +17,13 @@ export interface PronunciationAssessmentExecutor {
   executeAssessment(assessmentId: string): Promise<void>;
 }
 
-@Processor(PRONUNCIATION_QUEUE_NAME)
+@Processor(PRONUNCIATION_QUEUE_NAME, { autorun: false, concurrency: 2 })
 export class PronunciationProcessor extends WorkerHost {
   constructor(
     private readonly repository: PronunciationRepository,
     @Inject(PRONUNCIATION_ASSESSMENT_EXECUTOR)
     private readonly executor: PronunciationAssessmentExecutor,
-    private readonly now: () => Date = () => new Date(),
+    @Optional() private readonly now: () => Date = () => new Date(),
   ) {
     super();
   }

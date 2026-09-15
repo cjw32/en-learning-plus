@@ -73,3 +73,7 @@ run 在启动真实客户端项前输出受限会话说明，至少含 sessionId
 证据输入必须含 schemaVersion、session/run/item IDs、challenge、候选和控制 hash、产品/OS/模型/协议/能力、操作人/时间、脱敏配置/转录 hash、服务端 Trace/request IDs、工具选择及参数观测、已知/未知费用和上界履行证据。字段 schema/hash 校验后还要核对服务端独立记录；缺配对、过期、篡改、其它产品代跑均拒绝/未完成。
 
 会话只等待 runTimeout 内的操作，超过期限保留 not_run/error。结束后的补交必须发起有 parentRunId 的新运行并获得对应新 challenge；原轮证据不覆盖。客户端无法约束模型费用/Token/超时或获知必要用量时，不自动开展真实任务。
+
+### 2026-09-15 当前可执行范围
+
+新增 synthetic 零付费全量离线检查；根目录入口、只读历史比较、verify/recover 与本地 CI 汇总的实际用法见 [使用指南](../../../docs/ai-evaluation.md)，执行证据见 [验收记录](../evidence/2026-09-15-synthetic-completion.md)。inspect 操作成功不代表评测通过；recover 无需凭证配置，仅生成不可覆盖的恢复快照，不执行业务、资源清理或预算释放。其余 full/真实质量/治理能力仍以待实现/待验收记录为准。

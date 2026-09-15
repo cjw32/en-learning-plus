@@ -4,7 +4,7 @@ import type { PronunciationResult } from "@en/common/pronunciation";
 import PronunciationLearningUpdate from "./PronunciationLearningUpdate.vue";
 import PronunciationCoachAction from "./PronunciationCoachAction.vue";
 import PronunciationWordFeedback from "./PronunciationWordFeedback.vue";
-import { pronunciationRolloutCapabilities } from "@/stores/pronunciation";
+import { usePronunciationCapabilities } from "@/hooks/usePronunciationCapabilities";
 
 const props = defineProps<{
   result: PronunciationResult;
@@ -26,9 +26,8 @@ const confidenceLabel = computed(() =>
     : "结果仅供参考，不会据此更新学习进度",
 );
 
-const coachSummaryEnabled = pronunciationRolloutCapabilities(
-  import.meta.env,
-).coachSummary;
+const { capabilities } = usePronunciationCapabilities();
+const coachSummaryEnabled = computed(() => capabilities.value?.coachSummary === true);
 </script>
 
 <template>

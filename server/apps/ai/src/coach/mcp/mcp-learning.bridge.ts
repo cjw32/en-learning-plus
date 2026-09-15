@@ -251,7 +251,7 @@ function isActiveOutput(
 }
 
 function assertQuizExecutionOpen(
-  request: McpCreateQuizBridgeInput,
+  request: Pick<McpCreateQuizBridgeInput, 'signal' | 'deadline'>,
   now: () => Date,
 ): void {
   if (request.signal?.aborted) throw new McpLearningBridgeError('CANCELLED');

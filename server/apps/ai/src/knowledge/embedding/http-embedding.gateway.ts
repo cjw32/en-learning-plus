@@ -188,7 +188,7 @@ export class HttpEmbeddingGateway implements EmbeddingGateway {
     } catch {
       throw new EmbeddingGatewayError('EMBEDDING_RESPONSE_INVALID');
     }
-    if (body.model !== this.config.model || !Array.isArray(body.data)) {
+    if (typeof body.model !== 'string' || body.model !== this.config.model || !Array.isArray(body.data)) {
       throw new EmbeddingGatewayError('EMBEDDING_RESPONSE_INVALID');
     }
 
@@ -206,9 +206,9 @@ export class HttpEmbeddingGateway implements EmbeddingGateway {
         vectors.map((vector) => Object.freeze([...vector])),
       ),
       provider: 'http-approved',
-      model: this.config.model,
-      dimensions: this.config.dimensions,
-      embeddingVersion: this.config.embeddingVersion,
+      model: body.model,
+      dimensions: request.expectedDimensions,
+      embeddingVersion: request.embeddingVersion,
       usage: Object.freeze({
         inputTokens: asUsage(body.usage?.prompt_tokens),
         totalTokens: asUsage(body.usage?.total_tokens),

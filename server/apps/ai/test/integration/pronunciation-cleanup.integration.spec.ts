@@ -170,7 +170,7 @@ describe('PronunciationCleanupProcessor clustered recovery', () => {
 
     expect(updateMany).toHaveBeenCalledWith({
       where: { id: 'audio-1', status: 'PURGING' },
-      data: { status: 'READY' },
+      data: { status: 'REVOKED' },
     });
   });
 });

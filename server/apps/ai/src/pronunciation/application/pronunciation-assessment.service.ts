@@ -161,7 +161,7 @@ export class PronunciationAssessmentService {
       clientIdempotencyKey: input.idempotencyKey,
       requestBodyHash,
       exerciseType: target.exerciseType,
-      deadlineAt: new Date(this.now().getTime() + 30_000),
+      deadlineAt: new Date(this.now().getTime() + 15 * 60_000),
       target,
     });
     return this.get(input.subjectId, created.assessment.id);
@@ -233,6 +233,7 @@ export class PronunciationAssessmentService {
       assessmentId,
       from: ['AUDIO_READY'],
       to: 'QUEUED',
+      deadlineAt: new Date(this.now().getTime() + 60_000),
     });
     if (!transitioned) {
       const raced = await this.repository.findOwnedWithTarget(
@@ -436,6 +437,50 @@ export class PronunciationAssessmentService {
     }
   }
 
+  async recoverLearning(
+    subjectId: string,
+    assessmentId: string,
+  ): Promise<void> {
+    if (!this.config.learningWriteEnabled || !this.learning) return;
+    const owned = await this.repository.findOwnedWithTarget(
+      subjectId,
+      assessmentId,
+    );
+    if (
+      !owned ||
+      owned.assessment.status !== 'COMPLETED' ||
+      !['PENDING', 'FAILED'].includes(owned.learningWriteStatus ?? '')
+    )
+      return;
+    try {
+      await this.assertExecutionBoundary({
+        subjectId,
+        assessmentId,
+        boundary: 'PRE_LEARNING',
+      });
+      const result = await this.learning.save({
+        subjectId,
+        assessmentId,
+        sourceValid: true,
+        reviewedAt: owned.assessment.finishedAt ?? owned.assessment.updatedAt,
+      });
+      await this.repository.setLearningWriteStatus(
+        subjectId,
+        assessmentId,
+        result.status === 'not_eligible' ? 'NOT_ELIGIBLE' : 'SAVED',
+      );
+    } catch (error) {
+      const code = mapPronunciationFailure(error).code;
+      await this.repository.setLearningWriteStatus(
+        subjectId,
+        assessmentId,
+        ['SOURCE_UNAVAILABLE', 'CANCELLED', 'RESOURCE_NOT_FOUND'].includes(code)
+          ? 'NOT_ELIGIBLE'
+          : 'FAILED',
+      );
+    }
+  }
+
   /**
    * Re-reads authoritative state at every externally meaningful boundary.
    * Callers must never carry an earlier authorization or rollout decision
@@ -461,7 +506,10 @@ export class PronunciationAssessmentService {
     ) {
       throw new PronunciationAssessmentRuleError('CANCELLED');
     }
-    if (this.now().getTime() >= owned.assessment.deadlineAt.getTime()) {
+    if (
+      this.now().getTime() >= owned.assessment.deadlineAt.getTime() &&
+      !['COMPLETED', 'REFERENCE_ONLY'].includes(owned.assessment.status)
+    ) {
       await this.repository.transitionOwned({
         subjectId: input.subjectId,
         assessmentId: input.assessmentId,

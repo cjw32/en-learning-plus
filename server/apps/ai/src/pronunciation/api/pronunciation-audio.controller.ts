@@ -8,6 +8,7 @@ import {
   Param,
   Req,
   Res,
+  StreamableFile,
   UseGuards,
 } from '@nestjs/common';
 import { Injectable } from '@nestjs/common';
@@ -194,6 +195,6 @@ export class PronunciationAudioController {
     for (const [name, value] of Object.entries(opened.headers)) {
       response.setHeader(name, value);
     }
-    return Buffer.from(opened.bytes);
+    return new StreamableFile(Buffer.from(opened.bytes));
   }
 }

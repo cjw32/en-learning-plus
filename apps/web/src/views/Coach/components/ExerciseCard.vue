@@ -82,6 +82,7 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
 import type { AnyPublicCoachResult } from '@en/common/coach';
+import { usePronunciationCapabilities } from '@/hooks/usePronunciationCapabilities';
 import PronunciationEntry from '@/components/Pronunciation/PronunciationEntry.vue';
 
 type Exercise = NonNullable<AnyPublicCoachResult['exercise']>;
@@ -94,8 +95,7 @@ const props = withDefaults(
   }>(),
   { degradedMessage: '', submitting: false, coachRequestId: null },
 );
-const pronunciationCaptureEnabled =
-  import.meta.env.VITE_PRONUNCIATION_CAPTURE_ENABLED === 'true';
+const { available: pronunciationCaptureEnabled } = usePronunciationCapabilities();
 const emit = defineEmits<{
   submit: [answers: Array<{ itemId: string; answer: string }>];
 }>();

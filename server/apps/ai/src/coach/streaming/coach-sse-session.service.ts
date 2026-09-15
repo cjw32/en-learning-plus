@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Optional } from '@nestjs/common';
 import type {
   AnyPublicCoachResult,
   CoachRequestStatus,
@@ -39,7 +39,7 @@ export class CoachSseSessionService {
     @Inject(COACH_SSE_ACCESS_REPOSITORY)
     private readonly requests: CoachSseAccessRepository,
     private readonly stream: CoachEventStreamService,
-    private readonly nowEpochSeconds: () => number = () =>
+    @Optional() private readonly nowEpochSeconds: () => number = () =>
       Math.floor(Date.now() / 1000),
   ) {}
 

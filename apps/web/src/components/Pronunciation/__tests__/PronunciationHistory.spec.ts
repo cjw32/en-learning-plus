@@ -1,4 +1,4 @@
-import { mount } from "@vue/test-utils";
+import { flushPromises, mount } from "@vue/test-utils";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import PronunciationHistory from "../PronunciationHistory.vue";
 import {
@@ -94,5 +94,25 @@ describe("PronunciationHistory", () => {
     await vi.waitFor(() => expect(wrapper.text()).toContain("hello"));
     await wrapper.get('[data-action="delete-assessment"]').trigger("click");
     expect(deletePronunciationAssessment).not.toHaveBeenCalled();
+  });
+
+  it("discards playback and list responses started before audio deletion", async () => {
+    const wrapper = mount(PronunciationHistory);
+    await flushPromises();
+    let finishAudio!: (blob: Blob) => void;
+    let finishList!: (response: any) => void;
+    vi.mocked(getPronunciationAudio).mockImplementationOnce(() => new Promise((resolve) => { finishAudio = resolve; }));
+    vi.mocked(listPronunciationAssessments).mockImplementationOnce(() => new Promise((resolve) => { finishList = resolve; }));
+    await wrapper.get('[data-action="play"]').trigger('click');
+    void wrapper.vm.load();
+    await wrapper.get('[data-action="delete-audio"]').trigger('click');
+    await flushPromises();
+    finishAudio(new Blob(['stale-audio']));
+    finishList({ data: { items: [structuredClone(item)], nextCursor: null } });
+    await flushPromises();
+    expect(wrapper.find('audio').exists()).toBe(false);
+    expect(wrapper.find('[data-action="play"]').exists()).toBe(false);
+    expect(URL.createObjectURL).not.toHaveBeenCalled();
+    wrapper.unmount();
   });
 });

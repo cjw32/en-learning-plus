@@ -20,7 +20,7 @@ export class ChatService implements OnModuleInit {
     //初始化
     this.checkpointer = await createCheckpoint();
   }
-  async streamCompletion(createChatDto: ChatDto) {
+  async streamCompletion(createChatDto: ChatDto, userId: string, signal?: AbortSignal) {
     const promptObj = chatMode.find((item) => item.role === createChatDto.role);
     if (!promptObj) throw new Error('模式不存在');
     //拿到基础提示词
@@ -42,13 +42,14 @@ export class ChatService implements OnModuleInit {
       throw new Error('角色不存在');
     }
     //组装消息格式
-    const id = `${createChatDto.userId}-${createChatDto.role}`;
+    const id = `${userId}-${createChatDto.role}`;
     const stream = agent.stream(
       {
         messages: [{ role: 'human', content: createChatDto.content }], //消息
       },
       {
         configurable: { thread_id: id }, //用于做会话隔离 + 历史记录存储
+        signal,
         streamMode: 'messages', //流式输出模式
       },
     );

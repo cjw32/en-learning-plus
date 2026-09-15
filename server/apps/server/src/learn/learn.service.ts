@@ -1,4 +1,5 @@
-import { Injectable } from '@nestjs/common';
+import { studyDate, STUDY_TIMEZONE } from '@libs/shared/study/study-day';
+import { NotFoundException, Injectable } from '@nestjs/common';
 import { CreateLearnDto } from './dto/create-learn.dto';
 import { UpdateLearnDto } from './dto/update-learn.dto';
 import { PrismaService, ResponseService } from '@libs/shared';
@@ -51,6 +52,30 @@ export class LearnService {
     const user = await this.legacyReview.saveWordMaster(userId, wordIds);
     return this.response.success({
       wordNumber: user.wordNumber,
+      dayNumber: user.dayNumber,
     });
+  }
+  async getStudyStats(userId: string) {
+    const date = studyDate();
+    return this.prisma.$transaction(
+      async (database) => {
+        const user = await database.user.findUnique({
+          where: { id: userId },
+          select: { wordNumber: true, dayNumber: true },
+        });
+        if (!user) throw new NotFoundException('账号不可用');
+        const today = await database.userStudyDay.findUnique({
+          where: { userId_studyDate: { userId, studyDate: date } },
+          select: { userId: true },
+        });
+        return this.response.success({
+          ...user,
+          checkedInToday: Boolean(today),
+          studyDate: date,
+          timezone: STUDY_TIMEZONE,
+        });
+      },
+      { isolationLevel: 'RepeatableRead' },
+    );
   }
 }

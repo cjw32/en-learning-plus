@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Optional } from '@nestjs/common';
 import type { PronunciationAssessmentResource } from '@en/common/pronunciation';
 import {
   PRONUNCIATION_AUDIO_INSPECTOR,
@@ -46,7 +46,7 @@ export class PronunciationAudioService {
     private readonly inspector: PronunciationAudioInspector,
     private readonly assessments: PronunciationAssessmentService,
     private readonly repository: PronunciationRepository,
-    private readonly now: () => Date = () => new Date(),
+    @Optional() private readonly now: () => Date = () => new Date(),
   ) {}
 
   async upload(

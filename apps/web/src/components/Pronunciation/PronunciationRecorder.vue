@@ -6,6 +6,8 @@ import {
   type LocalPronunciationRecording,
 } from "@/hooks/usePronunciationRecorder";
 
+const props = defineProps<{ disabled?: boolean; committed?: boolean }>();
+
 const emit = defineEmits<{
   ready: [recording: LocalPronunciationRecording];
 }>();
@@ -34,6 +36,7 @@ const elapsedLabel = computed(() => {
 });
 
 function hasUnsavedAudio(): boolean {
+  if (props.committed) return false;
   return (
     recorder.state.value === "requesting_permission" ||
     recorder.state.value === "recording" ||
@@ -66,6 +69,7 @@ onBeforeRouteLeave(() => {
 </script>
 
 <template>
+  <fieldset :disabled="disabled" style="border: 0; padding: 0; margin: 0">
   <section
     class="pronunciation-recorder"
     aria-labelledby="pronunciation-recorder-title"
@@ -150,6 +154,7 @@ onBeforeRouteLeave(() => {
       </template>
     </div>
   </section>
+  </fieldset>
 </template>
 
 <style scoped>

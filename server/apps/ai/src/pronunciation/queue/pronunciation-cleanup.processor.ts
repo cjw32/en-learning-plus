@@ -1,5 +1,5 @@
 import { createHmac } from 'node:crypto';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Optional } from '@nestjs/common';
 import { PrismaService } from '@libs/shared';
 import type { PronunciationAudioStorage } from '../storage/pronunciation-audio.storage';
 
@@ -46,7 +46,7 @@ function resourceHash(pepper: string, assessmentId: string): string {
 export class PrismaPronunciationCleanupRepository implements PronunciationCleanupRepository {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly pepper = process.env.PRONUNCIATION_TRACE_PEPPER ??
+    @Optional() private readonly pepper = process.env.PRONUNCIATION_TRACE_PEPPER ??
       process.env.JWT_SECRET ??
       '',
   ) {}
@@ -110,7 +110,7 @@ export class PrismaPronunciationCleanupRepository implements PronunciationCleanu
           expiresAt: { lte: now },
           purgedAt: null,
           OR: [
-            { status: 'READY' },
+            { status: { in: ['READY', 'INVALID', 'QUARANTINED', 'UPLOADING', 'VALIDATING', 'REVOKED'] } },
             {
               status: 'PURGING',
               accessRevokedAt: {
@@ -207,7 +207,7 @@ export class PrismaPronunciationCleanupRepository implements PronunciationCleanu
     if (tombstoneId.startsWith('audio:')) {
       await this.prisma.pronunciationAudioAsset.updateMany({
         where: { id: tombstoneId.slice(6), status: 'PURGING' },
-        data: { status: 'READY' },
+        data: { status: 'REVOKED' },
       });
       return;
     }

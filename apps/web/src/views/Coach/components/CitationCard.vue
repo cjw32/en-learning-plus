@@ -21,7 +21,7 @@
         </ul>
       </section>
       <button
-        v-if="citation.locator"
+        v-if="citation.locator && ['word', 'course'].includes(citation.locator.kind)"
         type="button"
         data-open-citation
         class="mt-3 text-xs font-medium text-blue-700 hover:text-blue-900"

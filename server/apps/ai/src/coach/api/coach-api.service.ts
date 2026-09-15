@@ -251,6 +251,8 @@ export class CoachApiService {
       messages: await Promise.all(
         page.map(async (message) => ({
           id: message.id,
+          requestId: message.requestId ?? null,
+          feedback: message.role === 'COACH' ? message.request?.feedback[0] ?? null : null,
           role: message.role,
           content: message.content,
           structuredResult: await this.projectStoredResult(

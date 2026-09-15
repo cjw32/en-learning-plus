@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Redis, { type RedisOptions } from 'ioredis';
+import type { PronunciationAtomicRedisClient } from './pronunciation-admission.service';
 
 export const PRONUNCIATION_REDIS_CLIENT_FACTORY = Symbol(
   'PRONUNCIATION_REDIS_CLIENT_FACTORY',
@@ -110,6 +111,12 @@ export class PronunciationRedisConnection implements OnModuleDestroy {
       );
     }
     return this.redis;
+  }
+
+  getAtomicClient(): PronunciationAtomicRedisClient {
+    const client = this.getClient();
+    if (!('eval' in client) || typeof client.eval !== 'function') throw new PronunciationRedisUnavailableError();
+    return client as PronunciationRedisClient & PronunciationAtomicRedisClient;
   }
 
   async assertReady(): Promise<void> {

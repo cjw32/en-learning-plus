@@ -1,3 +1,6 @@
+import { PronunciationBudgetError } from '../governance/pronunciation-budget.service';
+import { PronunciationAdmissionError } from '../governance/pronunciation-admission.service';
+import { PronunciationPriceUnavailableError } from '../governance/pronunciation-price.catalog';
 import { createHash } from 'node:crypto';
 import {
   PRONUNCIATION_PROVIDER_RESULT_SCHEMA_VERSION,
@@ -141,10 +144,34 @@ export class PronunciationProviderExecutor {
         priceVersion: this.config.priceVersion,
       });
 
-      const result = await this.invoke(
-        { ...input, applicationConnectionId },
-        signal,
-      );
+      let result: PronunciationProviderResult;
+      try {
+        result = await this.invoke(
+          { ...input, applicationConnectionId },
+          signal,
+        );
+      } catch (error) {
+        await this.ledger.finish({
+          assessmentId: input.assessmentId,
+          attemptNo,
+          status: 'FAILED',
+          providerAccepted: false,
+          providerRequestId: null,
+          finishedAt: this.now(),
+          latencyMs: 0,
+          billableDurationMs: 0,
+          actualCostMicros: 0,
+          failureCode:
+            error instanceof PronunciationBudgetError ||
+            error instanceof PronunciationAdmissionError ||
+            error instanceof PronunciationPriceUnavailableError
+              ? error.code
+              : 'INTERNAL_ERROR',
+          retryDecision: 'NOT_NEEDED',
+          responseHash: sha256('admission-rejected'),
+        });
+        throw error;
+      }
       const retryDecision = this.retryDecision(result, attemptNo);
       await this.ledger.finish({
         assessmentId: input.assessmentId,
@@ -179,7 +206,13 @@ export class PronunciationProviderExecutor {
         await this.provider.assess(input, signal),
       );
       return parsed.success ? parsed.data : this.invalidResponse();
-    } catch {
+    } catch (error) {
+      if (
+        error instanceof PronunciationBudgetError ||
+        error instanceof PronunciationAdmissionError ||
+        error instanceof PronunciationPriceUnavailableError
+      )
+        throw error;
       return this.invalidResponse();
     }
   }

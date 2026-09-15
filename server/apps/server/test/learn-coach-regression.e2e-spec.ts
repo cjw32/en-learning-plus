@@ -6,7 +6,14 @@ function fixture() {
   const records = new Set<string>();
   const states = new Map<string, Record<string, unknown>>();
   let wordNumber = 0;
+  let dayNumber = 0;
+  const days = new Set<string>();
   const transaction = {
+    $executeRaw: jest.fn(async (sql: any) => {
+      const key = sql.values.slice(0, 2).join(":");
+      if (days.has(key)) return 0;
+      days.add(key); return 1;
+    }),
     wordBookRecord: {
       createMany: jest.fn(
         async ({
@@ -38,8 +45,9 @@ function fixture() {
     },
     user: {
       update: jest.fn(async ({ data }: any) => {
-        wordNumber += data.wordNumber.increment;
-        return { wordNumber };
+        wordNumber += data.wordNumber?.increment ?? 0;
+        dayNumber += data.dayNumber?.increment ?? 0;
+        return { wordNumber, dayNumber };
       }),
     },
   };
@@ -74,7 +82,7 @@ describe('legacy learn flow remains compatible with Coach state', () => {
     await expect(
       test.service.saveWordMaster(wordIds, 'user-a'),
     ).resolves.toEqual({
-      data: { wordNumber: 10 },
+      data: { wordNumber: 10, dayNumber: 1 },
       code: 0,
       message: 'Success',
     });
@@ -96,9 +104,11 @@ describe('legacy learn flow remains compatible with Coach state', () => {
     const ids = ['word-1', 'word-1', 'word-2'];
     expect((await test.service.saveWordMaster(ids, 'user-a')).data).toEqual({
       wordNumber: 2,
+      dayNumber: 1,
     });
     expect((await test.service.saveWordMaster(ids, 'user-a')).data).toEqual({
       wordNumber: 2,
+      dayNumber: 1,
     });
     expect(test.records.size).toBe(2);
     expect(test.states.size).toBe(2);

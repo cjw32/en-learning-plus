@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref } from "vue";
+import { onBeforeUnmount, onMounted, ref, nextTick } from "vue";
 import type { PronunciationAssessmentResource } from "@en/common/pronunciation";
 import {
   deletePronunciationAssessment,
@@ -8,6 +8,14 @@ import {
   listPronunciationAssessments,
 } from "@/apis/pronunciation";
 
+import PronunciationAssessmentResult from './PronunciationAssessmentResult.vue';
+import { onLearningSessionChange } from '@/session/learning-session';
+const nextCursor = ref<string | null>(null);
+const selectedId = ref<string | null>(null);
+let active = true;
+let generation = 0;
+let listGeneration = 0;
+let playGeneration = 0;
 const items = ref<PronunciationAssessmentResource[]>([]);
 const loading = ref(true);
 const statusMessage = ref("");
@@ -25,36 +33,49 @@ function revoke(assessmentId: string): void {
   if (playingId.value === assessmentId) playingId.value = null;
 }
 
-async function load(): Promise<void> {
+async function load(more = false): Promise<void> {
+  const current = generation;
+  const sequence = ++listGeneration;
   loading.value = true;
+  statusMessage.value = "";
   try {
-    const response = await listPronunciationAssessments({ limit: 50 });
-    items.value = [...response.data.items];
+    const response = await listPronunciationAssessments({ limit: 20, cursor: more ? nextCursor.value ?? undefined : undefined });
+    if (!active || current !== generation || sequence !== listGeneration) return;
+    items.value = more ? [...items.value, ...response.data.items] : [...response.data.items];
+    nextCursor.value = response.data.nextCursor;
   } catch {
-    statusMessage.value = "暂时无法读取发音评测历史。";
+    if (active && current === generation && sequence === listGeneration)
+      statusMessage.value = "暂时无法读取发音评测历史。";
   } finally {
-    loading.value = false;
+    if (active && current === generation && sequence === listGeneration) loading.value = false;
   }
 }
 
 async function play(assessmentId: string): Promise<void> {
-  revoke(assessmentId);
+  const current = generation;
+  const sequence = ++playGeneration;
+  for (const id of audioUrls.keys()) revoke(id);
   try {
     const blob = await getPronunciationAudio(assessmentId);
+    if (!active || current !== generation || sequence !== playGeneration) return;
     audioUrls.set(assessmentId, URL.createObjectURL(blob));
     playingId.value = assessmentId;
   } catch {
-    statusMessage.value = "录音已过期、已撤销或暂不可播放。";
+    if (active && current === generation && sequence === playGeneration)
+      statusMessage.value = "录音已过期、已撤销或暂不可播放。";
   }
 }
 
 async function deleteAudio(assessmentId: string): Promise<void> {
   if (!window.confirm("仅删除录音并保留评测结果与学习历史？")) return;
+  const current = generation;
   try {
     await deletePronunciationAudio(
       assessmentId,
       key("pronunciation-delete-audio"),
     );
+    if (!active || current !== generation) return;
+    invalidateReads();
     revoke(assessmentId);
     items.value = items.value.map((item) =>
       item.assessmentId === assessmentId
@@ -77,11 +98,16 @@ async function deleteAssessment(assessmentId: string): Promise<void> {
     )
   )
     return;
+  const current = generation;
   try {
     await deletePronunciationAssessment(
       assessmentId,
       key("pronunciation-delete-assessment"),
     );
+    if (!active || current !== generation) return;
+    invalidateReads();
+    nextCursor.value = null;
+    if (selectedId.value === assessmentId) selectedId.value = null;
     revoke(assessmentId);
     items.value = items.value.filter(
       (item) => item.assessmentId !== assessmentId,
@@ -92,10 +118,30 @@ async function deleteAssessment(assessmentId: string): Promise<void> {
   }
 }
 
-onMounted(load);
-onBeforeUnmount(() => {
-  for (const assessmentId of [...audioUrls.keys()]) revoke(assessmentId);
-});
+async function seek(assessmentId: string, milliseconds: number) {
+  if (playingId.value !== assessmentId) await play(assessmentId);
+  await nextTick();
+  const audio = document.getElementById(`pronunciation-audio-${assessmentId}`) as HTMLAudioElement | null;
+  if (!audio) return;
+  const position = () => { audio.currentTime = milliseconds / 1000; void audio.play().catch(() => {}); };
+  if (audio.readyState >= 1) position();
+  else audio.addEventListener('loadedmetadata', position, { once: true });
+}
+function invalidateReads() {
+  listGeneration++;
+  playGeneration++;
+  loading.value = false;
+}
+function reset() {
+  generation++; invalidateReads(); items.value = []; selectedId.value = null;
+  nextCursor.value = null;
+  statusMessage.value = "";
+  for (const id of [...audioUrls.keys()]) revoke(id);
+}
+const unsubscribe = onLearningSessionChange(reset);
+onMounted(() => load());
+defineExpose({ load });
+onBeforeUnmount(() => { active = false; unsubscribe(); reset(); });
 </script>
 
 <template>
@@ -116,10 +162,15 @@ onBeforeUnmount(() => {
         </div>
         <audio
           v-if="playingId === item.assessmentId"
+          :id="`pronunciation-audio-${item.assessmentId}`"
           controls
           :src="audioUrls.get(item.assessmentId)"
         />
+        <p v-if="item.result">{{ Math.round(item.result.scores.overall) }} 分 · {{ item.result.confidenceTier === 'RELIABLE' ? '结果可靠' : '仅供参考' }}</p>
+        <p v-else>{{ item.diagnostic?.message ?? '尚未完成评测' }}</p>
+        <PronunciationAssessmentResult v-if="selectedId === item.assessmentId && item.result" :result="item.result" @seek="seek(item.assessmentId, $event)" />
         <div class="pronunciation-history__actions">
+          <button v-if="item.result" type="button" @click="selectedId = selectedId === item.assessmentId ? null : item.assessmentId">{{ selectedId === item.assessmentId ? '收起结果' : '查看结果' }}</button>
           <button
             v-if="item.audio.available"
             type="button"
@@ -146,6 +197,8 @@ onBeforeUnmount(() => {
         </div>
       </li>
     </ul>
+    <button v-if="nextCursor" type="button" :disabled="loading" @click="load(true)">加载更多</button>
+    <button type="button" :disabled="loading" @click="load()">刷新记录</button>
     <p v-if="statusMessage" role="status">{{ statusMessage }}</p>
   </section>
 </template>

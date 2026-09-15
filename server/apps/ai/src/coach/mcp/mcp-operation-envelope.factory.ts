@@ -1,5 +1,5 @@
 import { createHash, createHmac } from 'node:crypto';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Optional } from '@nestjs/common';
 
 export type McpCoachOperation = 'create_quiz' | 'submit_answer';
 
@@ -61,7 +61,7 @@ function assertText(value: string, maximum: number): void {
 export class McpOperationEnvelopeFactory {
   private readonly options: Options;
 
-  constructor(options: Options = defaultOptions) {
+  constructor(@Optional() options: Options = defaultOptions) {
     if (
       Buffer.byteLength(options.hmacKey, 'utf8') < 32 ||
       !Number.isSafeInteger(options.envelopeTtlMs) ||

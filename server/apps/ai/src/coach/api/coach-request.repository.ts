@@ -378,6 +378,13 @@ export class CoachRequestRepository
             }
           : {}),
       },
+      include: {
+        request: { select: { feedback: {
+          where: { userId: input.subjectId, expiresAt: { gt: new Date() } },
+          select: { rating: true, category: true, comment: true },
+          take: 1,
+        } } },
+      },
       orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
       take: input.limit + 1,
     });

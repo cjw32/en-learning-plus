@@ -16,10 +16,10 @@
                 <!-- 本组已学完 -->
                 <div v-if="currentIndex >= list.length"
                     class="text-center py-16 px-6 bg-white rounded-2xl border border-zinc-100 shadow-sm">
-                    <p class="text-zinc-600 mb-6">本组 10 个词已学完</p>
-                    <el-button type="primary" size="large" @click="saveWordMaster">
-                        再练一组
-                    </el-button>
+                    <p class="text-zinc-600 mb-6">本组 {{ list.length }} 个词已学完</p>
+                    <p class="mb-4" role="status">{{ saving ? '正在保存学习进度…' : saved ? '学习进度已保存' : '保存失败，请重试后再离开' }}</p>
+                    <el-button v-if="!saved" type="primary" size="large" :loading="saving" @click="saveWordMaster">重试保存</el-button>
+                    <el-button v-else type="primary" size="large" :loading="isLoading" @click="nextBatch">再练一组</el-button>
                 </div>
 
                 <!-- 当前单词卡片 -->
@@ -94,14 +94,20 @@
 </template>
 
 <script setup lang="ts">
+import { notifyStudyProgress } from '@/session/study-progress';
 import { useAudio } from '@/hooks/useAudio';
 import type { Word } from '@en/common/word';
-import { computed, nextTick, onMounted, ref, useTemplateRef, watch } from 'vue';
-import { useRoute } from 'vue-router';
+import { computed, nextTick, onMounted, onBeforeUnmount, ref, useTemplateRef, watch } from 'vue';
+import { useRoute, onBeforeRouteLeave } from 'vue-router';
 import { VideoPlay, View, Hide } from '@element-plus/icons-vue';
 import { getWordList, saveWordMaster as saveWordMasterApi } from '@/apis/learn';
 import { ElMessage } from 'element-plus';
 import { useUserStore } from '@/stores/user';
+import { learningSessionVersion, isLearningSessionCurrent } from '@/session/learning-session';
+const sessionVersion = learningSessionVersion();
+let disposed = false;
+onBeforeUnmount(() => { disposed = true; });
+const isCurrentSession = () => !disposed && isLearningSessionCurrent(sessionVersion);
 interface WordItem {
     word: string;
     input: string;
@@ -114,6 +120,8 @@ const route = useRoute();
 const title = route.params.title || '我的课程';
 const isLoading = ref(false);//默认不加载
 const list = ref<Word[]>([]);//单词列表
+const saving = ref(false);
+const saved = ref(false);
 const currentIndex = ref(0);//当前索引
 const isWordBlurred = ref(true);//是否隐藏单词
 const currentWord = computed<Word | undefined>(() => list.value[currentIndex.value]);//当前单词
@@ -129,7 +137,6 @@ watch(currentWord, () => {
             isTrue:undefined
         }
     })
-    console.log(wordList.value)
 }, { immediate: true })
 
 
@@ -140,28 +147,43 @@ const pagePrev = () => {
 }
 
 //下一个
-const pageNext = () => {
+const pageNext = async () => {
+    if (saving.value || currentIndex.value >= list.value.length) return
     if(wordList.value.some(item => !item.isTrue)){
         ElMessage.warning('请完成当前单词的拼写')
         return
     }
     currentIndex.value++
+    if (currentIndex.value === list.value.length) await saveWordMaster()
 }
 
 //保存的方法
 const saveWordMaster = async () => {
-    //找到单词所有的id并且是一个数组
-    const wordIds = list.value.map((item) => item.id);
-    const res = await saveWordMasterApi(wordIds);
-    if(res.success){
-        currentIndex.value = 0;
-        getWordListData();
-        userStore.updateUserWordNumber(res.data.wordNumber)
-        ElMessage.success(res.message)
-    }else{
-        ElMessage.error(res.message)
-    }
+    if (saving.value || saved.value || !list.value.length) return;
+    saving.value = true;
+    try {
+        const res = await saveWordMasterApi(list.value.map(item => item.id));
+        if (!isCurrentSession()) return;
+        if (!res.success || typeof res.data?.wordNumber !== 'number') throw new Error('保存失败');
+        userStore.updateUserWordNumber(res.data.wordNumber);
+        if (typeof res.data.dayNumber === 'number') userStore.updateStudyStats({wordNumber:res.data.wordNumber,dayNumber:res.data.dayNumber});
+        notifyStudyProgress();
+        saved.value = true;
+        ElMessage.success('学习进度已保存');
+    } catch {
+        if (isCurrentSession()) ElMessage.error('学习进度尚未保存，请重试');
+    } finally { saving.value = false; }
 }
+const nextBatch = async () => {
+    if (!saved.value || isLoading.value) return;
+    await getWordListData();
+}
+onBeforeRouteLeave(() => {
+    if (list.value.length && currentIndex.value >= list.value.length && !saved.value) {
+        ElMessage.warning(saving.value ? '正在保存，请稍候' : '请先重试保存学习进度');
+        return false;
+    }
+})
 
 //输入的方法
 const onInput = (index: number) => {
@@ -205,13 +227,18 @@ const onKeyDown = (index: number, event: KeyboardEvent) => {
 
 const getWordListData = async () => {
     isLoading.value = true;
+    try {
     const res = await getWordList(route.params.courseId as string);
-    isLoading.value = false;
+    if (!isCurrentSession()) return;
     if(res.success){
         list.value = res.data
+        currentIndex.value = 0
+        saved.value = false
     }else{
         ElMessage.error(res.message)
     }
+    } catch { ElMessage.error('读取单词失败，请重试'); }
+    finally { isLoading.value = false; }
 }
 onMounted(() => {
     getWordListData();

@@ -12,7 +12,7 @@
 
 在现有 Vue/NestJS/PostgreSQL/Redis/MinIO 学习平台上增加一次性浏览器录音、异步发音评测与学习闭环。前端使用浏览器原生 `MediaRecorder`、Web Audio 与现有 Axios/Pinia；AI 服务复用现有 JWT 主体、BullMQ、Redis 治理、Prisma、MinIO 客户端和学习调度能力，但以独立 `pronunciation` 模块、队列、Trace 和 Provider 适配边界承载语音敏感数据，不让原始音频进入 Coach/LangGraph。
 
-首发 Provider 的实现候选为 Azure Speech Pronunciation Assessment 短音频 REST，使用 Node 原生 `fetch` 调用，避免引入 Provider SDK。浏览器上传的 WebM/Opus 与 MP4/AAC 必须在调用 Provider 前由受限的音频工具链验证并转换为 16 kHz、单声道、16-bit PCM WAV；仓库当前没有该工具链，因此 `ffmpeg`/`ffprobe` 运行时能力属于后续需要用户明确授权的依赖门槛。Provider 地域、零留存/禁训、动态价格预算及不可伪造的底层模型身份未全部批准前，功能与学习写入均默认关闭并 fail closed。
+首发 Provider 的实现候选为 Azure Speech Pronunciation Assessment 短音频 REST，使用 Node 原生 `fetch` 调用，避免引入 Provider SDK。浏览器上传的 WebM/Opus 与 MP4/AAC 必须在调用 Provider 前由受限的音频工具链验证并转换为 16 kHz、单声道、16-bit PCM WAV；仓库当前没有该工具链，因此 `ffmpeg`/`ffprobe` 运行时能力属于后续需要用户明确授权的依赖门槛。Provider 地域、隐私、价格预算及显式模型身份模式未配置前默认关闭。按 FR-093，Azure REST 可使用明确标注版本未公开的 managed 模式；学习写入仍独立受质量批准约束。
 
 ## Technical Context
 
@@ -55,7 +55,7 @@
 设计产物维持以上门禁，且增加了以下实现前阻断项：
 
 1. 获得用户对 `ffmpeg`/`ffprobe` 运行时依赖及沙箱资源上限的明确授权，或批准一个同等安全、已审计且兼容两种浏览器容器的既有能力。
-2. 取得可审计的 Provider 底层模型/评分引擎身份；不得用 REST API 版本冒充 `modelVersion`。无法取得时生产调用保持关闭。
+2. 明确 Provider 模型身份模式：有实际证据时使用供应商版本；Azure REST 使用 FR-093 的 managed/unversioned 标记，不得用 REST API 版本冒充模型 revision。
 3. 批准 Provider 区域、分包/隐私条款、零留存/禁训证据，以及版本化的单次、用户日、系统日、系统月预算和区域价格目录。
 4. 批准创建私有音频 bucket 及其生命周期/备份排除配置；现有 `avatar` 公共读 bucket 不得复用为音频存储。
 5. 授权并完成专项数据集评测；零容忍安全项、错误学习写入、取消后写入、伪造维度或口音公平门槛任一失败均阻断发布。
@@ -142,7 +142,7 @@ Planned Azure mode:
 - prosody requested only for supported `en-US` assessments and only after its separate price is approved; otherwise `prosodyScore = null`;
 - `en-US`/`en-GB` come from the authoritative target, not browser locale alone;
 - Provider API/adapter versions, response request IDs and application connection IDs are recorded separately;
-- underlying model identity must be vendor-backed and immutable/queryable. If Azure cannot provide it, the production Provider gate cannot open.
+- model identity uses explicit managed/unversioned mode for Azure REST, or the existing vendor-attested mode when real immutable identity evidence exists (FR-093 supersedes the original gate).
 
 Feature rollout uses independent default-off gates: capture UI, Provider call, structured result display, and learning write. Production-oriented config names are design placeholders only; they are not created or changed in this phase.
 
@@ -155,7 +155,7 @@ These decisions turn the product/engineering recommendations accepted by the use
 | D-001 | Keep pronunciation inside the existing Web + AI app + learning library, but outside Coach LangGraph  | Reuse platform infrastructure without making prompts or LLMs part of scoring                                                                  |
 | D-002 | Production MVP starts with `WORD_BOOK`, `MANUAL` and platform-owned `COACH_EXERCISE` targets         | `COURSE_WORD` and `RAG_CITATION` remain contract-compatible but disabled until explicit third-party pronunciation-use rights exist            |
 | D-003 | Azure short-audio REST is the only first adapter candidate; Google/AWS are not fallback scorers      | No provider averaging or hidden fallback; failure is explicit                                                                                 |
-| D-004 | `modelVersion` means vendor-attested scoring-engine identity/revision or enforceable release channel | REST API version, region and local labels cannot satisfy the requirement; missing identity keeps production calls closed                      |
+| D-004 | FR-093 supersedes the original identity gate: explicit managed/unversioned mode or vendor-attested identity | Managed mode records `azure-speech-managed:unversioned`; API/adapter versions remain separate and learning write still requires quality approval |
 | D-005 | Browser formats are accepted only after real server decode validation and canonicalization           | No MIME/magic-only downgrade; absent approved audio runtime fails before Provider invocation                                                  |
 | D-006 | Learning starts in shadow mode after result quality approval                                         | The system computes and traces proposed changes without mutating mastery; persisted writes open only after quality/fairness/security approval |
 | D-007 | Audio playback is a freshly authorized backend stream                                                | No public or permanent object URL, simpler immediate revocation, no MinIO CORS dependency                                                     |
@@ -211,7 +211,7 @@ The plan is complete without guessing these external values. They are explicit e
 | ------------------------ | ----------------------------------------------------------------------------- | ------------------------------------------ | -------------------------------------------- |
 | Audio runtime            | Approved binary identity/version and fixed resource policy                    | startup + every worker execution           | upload/scoring unavailable; no Provider call |
 | Private audio storage    | Existing private bucket, lifecycle/backup evidence                            | startup + upload + playback                | server audio persistence unavailable         |
-| Provider engine identity | Vendor-attested scoring engine/release channel                                | startup + response validation              | live Provider gate closed                    |
+| Provider engine identity | Managed/unversioned marker or vendor-attested scoring engine identity                                | startup + response validation              | live Provider gate closed                    |
 | Region/privacy           | approved region, subprocessor and zero-retention/no-training evidence version | admission                                  | live Provider gate closed                    |
 | Content usage right      | rights-policy version permitting third-party pronunciation assessment         | target create + admission + learning write | affected course/RAG target unavailable       |
 | Price catalog            | regional, dated version for base assessment and optional prosody              | admission + settlement                     | new call rejected                            |
@@ -312,3 +312,18 @@ Requirement-to-design/test/evaluation coverage is recorded in [requirements-trac
 ## Complexity Tracking
 
 没有项目 Constitution 规则可判定为已违反。新增独立 pronunciation 模块、队列与 Trace 是由音频敏感性、外部调用计费、取消竞态和既有 `CoachTrace` 强绑定 `CoachRequest` 所要求；它们仍位于现有 AI 服务和数据库内，不构成新服务或平行学习系统。
+
+## 2026-09-14 实现收敛计划
+
+用户已请求完成实现，本轮复用现有方案与契约，不再等待旧规划阶段的确认。补齐生产工厂、队列消费者/调度器和独立练习/历史入口；无新增 JavaScript 依赖，不执行线上迁移或部署。
+
+1. 配置工厂按实际 gate 选择 MinIO/ffmpeg/Azure 适配器，禁用时保留 unavailable；能力接口只返回安全状态、语言和允许来源，不泄露内部配置。ffmpeg/ffprobe 路径由部署配置指定，不伪造本机存在或自动安装。
+2. 评测执行器从数据库按任务 ID 取得不可变主体/目标，逐边界复查取消与权限，读取 canonical WAV，经 Provider 调用台账、确定性 assembler 和已有学习服务保存；Redis 原子预算同时约束单次、用户日、系统日/月，未知受理保持已占预算。
+3. 提交与并发约束在持久化状态转换处完成；周期恢复处理 QUEUED outbox、已超时状态、PENDING 学习保存和删除补偿，禁止重启后自动重复计费。
+4. 草稿 15 分钟、首次提交 60 秒、Provider 30 秒。按状态区分过期处理；已完成结果不能在后续学习保存时被改写为超时。
+5. 页面接入手动目标、历史分页、结构化结果、认证音频回放、删除与重新录制；完整客户端链路继续使用既有上传/轮询契约和录音授权提示。
+6. 使用合成媒体/受控 HTTP Provider、持久化替身与真实模块装配测试验证从入口到终态；现有安全、学习原子性、取消、质量/对齐评测、浏览器与构建均回归。真实 Provider 配置/付费联调和实体录音结果单独记录，不与模拟证据混淆。
+
+2026-09-15：新增共享基础终结点解析器，优先读取 `AZURE_SPEECH_ENDPOINT`。门户区域域名转换为对应区域的短音频 STT 地址；资源专属域名保留 `/stt` 代理路径。运行工厂与本地检查共同使用解析器，以模拟请求验证最终 URL，不调用 Azure 或改变上线开关。
+
+真实服务接通（FR-093–095）：配置解析统一归一化 Azure managed 身份与 F0 零单价，保留 S0 价格审批。新增按时长预留的 Redis 配额与资源锁，挂入现有调用费用边界；预调用失败释放，未知受理不退时长，资源锁使用短期租约。补齐本机独立 PostgreSQL 和共享队列 Redis 密码装配；用生产模块与真实 HTTP/API 完成合成英文录音的评分、历史和删除验证，再启动可用的本地页面。业务数据库仅在新建本地实例上迁移，不读取或迁移其他项目数据。

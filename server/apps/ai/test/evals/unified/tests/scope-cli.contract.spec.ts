@@ -27,20 +27,22 @@ describe('T020 scope and CLI contract', () => {
       limits: { budgetMicros: 0, concurrency: 1 },
     });
   });
-  test.each([
-    ['run', '--unknown', 'yes'],
-    ['run', '--modules', 'all,coach'],
-    ['run', '--modules', 'bad'],
-    ['run', '--concurrency', '0'],
-    ['run', '--repeat', '1.5'],
-    ['run', '--budget-micros', 'NaN'],
-    ['run', '--profile', 'quick', '--mode', 'live'],
-    ['run', '--profile', 'quick', '--budget-micros', '2'],
-    ['run', '--modules', 'coach', '--modules', 'rag'],
-    ['run', '--api-key', 'not-allowed'],
-    ['run', '--baseline', 'one', '--baseline-candidate', 'two'],
-    ['run', '--baseline-config', 'orphan'],
-  ])('rejects invalid configuration %#', (args) =>
+  test.each(
+    [
+      ['run', '--unknown', 'yes'],
+      ['run', '--modules', 'all,coach'],
+      ['run', '--modules', 'bad'],
+      ['run', '--concurrency', '0'],
+      ['run', '--repeat', '1.5'],
+      ['run', '--budget-micros', 'NaN'],
+      ['run', '--profile', 'quick', '--mode', 'live'],
+      ['run', '--profile', 'quick', '--budget-micros', '2'],
+      ['run', '--modules', 'coach', '--modules', 'rag'],
+      ['run', '--api-key', 'not-allowed'],
+      ['run', '--baseline', 'one', '--baseline-candidate', 'two'],
+      ['run', '--baseline-config', 'orphan'],
+    ].map((args) => ({ args })),
+  )('rejects invalid configuration %#', ({ args }) =>
     expect(() =>
       cli.parseOptions?.([...args, '--output', '/tmp/test-run']),
     ).toThrow(),

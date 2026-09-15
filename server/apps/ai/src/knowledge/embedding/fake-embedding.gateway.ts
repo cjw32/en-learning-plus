@@ -67,7 +67,7 @@ export class FakeEmbeddingGateway implements EmbeddingGateway {
       }
       counter += 1;
     }
-    if (values.every((value) => value === 0)) {
+    if (values.every((value): boolean => value === 0)) {
       values[0] = 1;
     }
     return Object.freeze(values);
