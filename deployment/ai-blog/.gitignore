@@ -1,0 +1,7 @@
+secrets/
+state/
+publisher-data/
+openclaw.json
+.env
+workspace/drafts/
+__pycache__/

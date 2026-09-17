@@ -1,0 +1,7 @@
+.env
+.env.*
+backups/
+*.log
+*.tar
+compose.override.yaml
+.prepare-images.lock

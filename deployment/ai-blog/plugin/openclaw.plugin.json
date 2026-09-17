@@ -1,0 +1,24 @@
+{
+  "id": "cjw-blog-tools",
+  "name": "CJW Blog Tools",
+  "description": "Blog search, full article reading, reviewed edits, publication, confirmed deletion and OCR.",
+  "version": "1.4.3",
+  "contracts": {
+    "tools": [
+      "cjw_blog_publish",
+      "cjw_blog_status",
+      "cjw_blog_ocr",
+      "cjw_blog_list",
+      "cjw_blog_delete_preview",
+      "cjw_blog_delete_confirm",
+      "cjw_blog_read",
+      "cjw_blog_edit_preview",
+      "cjw_blog_edit_confirm"
+    ]
+  },
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {}
+  }
+}

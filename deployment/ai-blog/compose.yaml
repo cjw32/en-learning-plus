@@ -1,0 +1,82 @@
+name: cjw-ai-blog
+services:
+  openclaw:
+    image: cjw-ai-blog-openclaw:2026.9.4
+    build:
+      context: ./openclaw-runtime
+      args:
+        OPENCLAW_BASE_IMAGE: ${OPENCLAW_BASE_IMAGE:-ghcr.io/openclaw/openclaw:2026.9.4}
+        APP_UID: ${DEPLOY_UID:-1000}
+        APP_GID: ${DEPLOY_GID:-1000}
+    init: true
+    restart: unless-stopped
+    user: "${DEPLOY_UID:-1000}:${DEPLOY_GID:-1000}"
+    env_file: ./secrets/openclaw.env
+    environment:
+      HOME: /home/node
+      OPENCLAW_STATE_DIR: /home/node/.openclaw
+      OPENCLAW_CONFIG_PATH: /home/node/.openclaw/openclaw.json
+      OPENCLAW_WORKSPACE_DIR: /home/node/.openclaw/workspace
+      OPENCLAW_DISABLE_BONJOUR: "1"
+      XDG_CONFIG_HOME: /home/node/.openclaw/config
+      XDG_CACHE_HOME: /home/node/.openclaw/cache
+      NPM_CONFIG_CACHE: /home/node/.openclaw/npm-cache
+      NODE_OPTIONS: --max-old-space-size=512
+      TZ: Asia/Shanghai
+    volumes:
+      - ./state:/home/node/.openclaw
+      - ./openclaw.json:/home/node/.openclaw/openclaw.json:ro
+      - ./workspace:/home/node/.openclaw/workspace
+      - ./plugin:/opt/cjw-blog-tools:ro
+    # Feishu uses an outbound WebSocket. There are no public listening ports.
+    command: [node, dist/index.js, gateway, --bind, loopback, --port, "18789"]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 768m
+    cpus: 1.0
+    pids_limit: 256
+    tmpfs: ["/tmp:size=128m,mode=1777"]
+    healthcheck:
+      test: [CMD, node, dist/docker-healthcheck.js]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
+    logging:
+      driver: json-file
+      options: {max-size: 5m, max-file: "2"}
+    depends_on:
+      publisher: {condition: service_healthy}
+  publisher:
+    build:
+      context: ./publisher
+      dockerfile: Dockerfile.runtime
+      args:
+        APP_UID: ${DEPLOY_UID:-1000}
+        APP_GID: ${DEPLOY_GID:-1000}
+    image: cjw-ai-blog-publisher-runtime:5
+    init: true
+    restart: unless-stopped
+    user: "${DEPLOY_UID:-1000}:${DEPLOY_GID:-1000}"
+    read_only: true
+    env_file: ./secrets/publisher.env
+    environment:
+      GIT_SSH_COMMAND: ssh -i /run/secrets/blog_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes -o UserKnownHostsFile=/run/secrets/github_known_hosts -o ConnectTimeout=15
+    volumes:
+      - ./publisher-data:/data
+      - ./secrets/blog_key:/run/secrets/blog_key:ro
+      - ./secrets/github_known_hosts:/run/secrets/github_known_hosts:ro
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 256m
+    cpus: 0.5
+    pids_limit: 64
+    tmpfs: ["/tmp:size=64m,mode=1777"]
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://localhost:8080/healthz', timeout=3)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    logging:
+      driver: json-file
+      options: {max-size: 5m, max-file: "2"}

@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<!-- 【SEO优化】：添加正确的语言标签，有助于搜索引擎定位受众 -->
+<html class="scroll-smooth" lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    
+    <!-- 【SEO优化】：更具描述性的 Title -->
+    <title>CAIN 的服务器门户 | 个人项目与作品集</title>
+    
+    <!-- 【视觉体验优化】：添加网站图标 (Favicon) -->
+    <link rel="icon" href="./assets/avatar.jpg" type="image/png">
+    <link rel="apple-touch-icon" href="./assets/favicon.png">
+    
+    <!-- 【SEO优化】：添加 Meta Description，这是搜索引擎结果页中显示在标题下方的摘要 -->
+    <meta name="description" content="欢迎来到 CAIN 的个人服务器门户。这里部署了我的独立开发项目、摄影作品与架构设计等在线应用。">
+    
+    <!-- 【SEO优化】：添加关键词 (虽然现代搜索引擎权重降低，但依然有辅助作用) -->
+    <meta name="keywords" content="CAIN, 个人服务器, 作品集, 全栈开发, 摄影, 独立项目, Nginx">
+    
+    <!-- 【SEO优化】：Open Graph 标签，让你把网址发给朋友或发到社交平台时，能显示漂亮的卡片预览 -->
+    <meta property="og:title" content="CAIN 的服务器门户">
+    <meta property="og:description" content="探索我的个人项目、在线应用与摄影作品集。">
+    <meta property="og:type" content="website">
+    <!-- 未来等你有域名了，可以把下面的 URL 换成你的真实域名 -->
+    <meta property="og:url" content="http://你的服务器IP/"> 
+    
+    <!-- 【SEO优化】：添加 canonical 标签，防止未来域名和 IP 同时存在导致搜索引擎认为内容重复 -->
+    <link rel="canonical" href="http://你的服务器IP/">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect">
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=Hanken+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind Custom Configuration -->
+    <script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              colors: {
+                  "surface-tint": "#5f5e5e",
+                  "surface-variant": "#e5e2de",
+                  "surface-bright": "#fcf9f5",
+                  "on-tertiary-fixed": "#1c1c19",
+                  "outline": "#747878",
+                  "background": "#fcf9f5",
+                  "on-surface-variant": "#444748",
+                  "surface-container-high": "#eae8e4",
+                  "on-tertiary-fixed-variant": "#474743",
+                  "on-primary": "#ffffff",
+                  "on-error": "#ffffff",
+                  "tertiary-container": "#1c1c19",
+                  "on-primary-container": "#858383",
+                  "surface-container-lowest": "#ffffff",
+                  "primary": "#000000",
+                  "surface-dim": "#dcdad6",
+                  "on-primary-fixed": "#1c1b1b",
+                  "on-tertiary": "#ffffff",
+                  "surface-container-highest": "#e5e2de",
+                  "on-primary-fixed-variant": "#474746",
+                  "surface-container": "#f0ede9",
+                  "on-tertiary-container": "#85847f",
+                  "on-error-container": "#93000a",
+                  "error-container": "#ffdad6",
+                  "tertiary": "#000000",
+                  "outline-variant": "#c4c7c7",
+                  "secondary-fixed": "#e3e2e0",
+                  "on-surface": "#1c1c1a",
+                  "tertiary-fixed-dim": "#c9c6c1",
+                  "on-secondary-fixed-variant": "#464746",
+                  "inverse-on-surface": "#f3f0ec",
+                  "primary-fixed-dim": "#c8c6c5",
+                  "on-secondary-fixed": "#1a1c1b",
+                  "inverse-surface": "#31302e",
+                  "secondary": "#5e5e5d",
+                  "secondary-fixed-dim": "#c7c6c5",
+                  "on-secondary-container": "#626361",
+                  "tertiary-fixed": "#e5e2dd",
+                  "primary-container": "#1c1b1b",
+                  "on-secondary": "#ffffff",
+                  "surface": "#fcf9f5",
+                  "surface-container-low": "#f6f3ef",
+                  "inverse-primary": "#c8c6c5",
+                  "primary-fixed": "#e5e2e1",
+                  "on-background": "#1c1c1a",
+                  "error": "#ba1a1a",
+                  "secondary-container": "#e0dfde"
+              },
+              borderRadius: {
+                  "DEFAULT": "0.125rem",
+                  "lg": "0.25rem",
+                  "xl": "0.5rem",
+                  "full": "0.75rem"
+              },
+              spacing: {
+                  "margin-mobile": "20px",
+                  "unit": "4px",
+                  "margin-desktop": "64px",
+                  "gutter": "24px",
+                  "container-max": "1280px"
+              },
+              fontFamily: {
+                  "display-lg": ["DM Sans"],
+                  "body-md": ["Hanken Grotesk"],
+                  "label-sm": ["Hanken Grotesk"],
+                  "headline-lg-mobile": ["DM Sans"],
+                  "headline-lg": ["DM Sans"],
+                  "body-lg": ["Hanken Grotesk"],
+                  "label-md": ["Hanken Grotesk"]
+              },
+              fontSize: {
+                  "display-lg": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.03em", "fontWeight": "500" }],
+                  "body-md": ["16px", { "lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400" }],
+                  "label-sm": ["12px", { "lineHeight": "1", "letterSpacing": "0.03em", "fontWeight": "500" }],
+                  "headline-lg-mobile": ["24px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "500" }],
+                  "headline-lg": ["32px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "500" }],
+                  "body-lg": ["18px", { "lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400" }],
+                  "label-md": ["14px", { "lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "600" }]
+              }
+            }
+          }
+        }
+    </script>
+    
+    <!-- Custom Styles -->
+    <style>
+        body {
+            background-color: #fcf9f5;
+            color: #1c1c1a;
+        }
+
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+
+        .fade-in-up.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .project-card {
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #E5E2DD;
+            background: linear-gradient(180deg, rgba(255,255,255,0.8) 0%, rgba(245,245,245,0.4) 100%);
+            border-radius: 16px; /* 【修改】：将圆角改大，匹配设计感 */
+        }
+
+        .project-card-image-container {
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* 视频预览的基础与过渡样式 */
+        .project-card-video {
+            transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.5s ease;
+        }
+
+        .project-card-image {
+            transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.5s ease;
+        }
+
+        /* Hover时：底图透明消失，视频出现并播放 */
+        .project-card:hover .project-card-image,
+        .project-card:active .project-card-image {
+            opacity: 0;
+        }
+
+        .project-card:hover .project-card-video,
+        .project-card:active .project-card-video {
+            opacity: 1;
+        }
+
+        .project-card-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.4);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: flex-end;
+            padding: 20px;
+            opacity: 0;
+            transition: opacity 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+            z-index: 20; /* 确保悬浮信息层在视频和图片之上 */
+        }
+
+        .project-card:hover .project-card-overlay,
+        .project-card:active .project-card-overlay {
+            opacity: 1;
+        }
+
+        .project-card-info {
+            position: absolute;
+            bottom: 24px;
+            left: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            color: white;
+            transform: translateY(20px);
+            opacity: 0;
+            transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1) 0.1s, opacity 0.5s ease 0.1s;
+        }
+
+        .project-card:hover .project-card-info,
+        .project-card:active .project-card-info {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .project-btn {
+            transform: scale(0.9) translateY(10px);
+            opacity: 0;
+            transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1) 0.1s, opacity 0.5s ease 0.1s, background-color 0.2s, color 0.2s;
+        }
+
+        .project-card:hover .project-btn,
+        .project-card:active .project-btn {
+            transform: scale(1) translateY(0);
+            opacity: 1;
+        }
+
+        #loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background-color: #fcf9f5;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 1s cubic-bezier(0.77, 0, 0.175, 1);
+            will-change: transform;
+        }
+
+        .pulse-text {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+            -webkit-font-smoothing: antialiased;
+            backface-visibility: hidden;
+            transform: translateZ(0); 
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .5; }
+        }
+
+        .loader-slide-up {
+            transform: translateY(-100%);
+        }
+
+        /* ====== Vinyl Card（严格复刻 React 源码）====== */
+        .vinyl-card {
+            position: relative;
+            width: 288px;
+            height: 288px;
+            cursor: pointer;
+            border-radius: 16px;
+            background: rgba(255,255,255,.7);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(0,0,0,.05);
+            transition: all .15s ease-out;
+            z-index: 10;
+            transform-style: preserve-3d;
+        }
+        .vinyl-bg-glow {
+            position: absolute;
+            inset: 0;
+            border-radius: 16px;
+            overflow: hidden;
+            z-index: -10;
+            transition: transform .1s ease-out;
+            opacity: .4;
+            pointer-events: none;
+        }
+        .vinyl-bg-glow::before {
+            content: '';
+            position: absolute;
+            inset: -40px;
+            background: linear-gradient(135deg, rgba(229,229,229,.5), rgba(231,229,228,.5), rgba(212,212,212,.5));
+            filter: blur(40px);
+            border-radius: 50%;
+        }
+        .vinyl-wrap {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 0;
+            pointer-events: none;
+        }
+        .vinyl-disc {
+            width: 224px;
+            height: 224px;
+            border-radius: 50%;
+            background: #000;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            border: 1px solid rgba(255,255,255,.1);
+            transition: transform .6s ease-out;
+        }
+        .vinyl-disc.intro { transition: transform 1s ease-in-out; }
+        .vinyl-disc .groove { position: absolute; border-radius: 50%; border: 1px solid rgba(255,255,255,.05); }
+        .vinyl-disc .groove:nth-child(1) { inset: 4px; }
+        .vinyl-disc .groove:nth-child(2) { inset: 12px; border-color: rgba(255,255,255,.1); }
+        .vinyl-disc .groove:nth-child(3) { inset: 24px; }
+        .vinyl-disc .groove:nth-child(4) { inset: 40px; border-color: rgba(255,255,255,.1); }
+        .vinyl-disc .groove:nth-child(5) { inset: 56px; }
+        .vinyl-label {
+            width: 96px; height: 96px;
+            border-radius: 50%;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,.5);
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,.2);
+            position: relative;
+            z-index: 1;
+        }
+        .vinyl-label img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: .9; }
+        .vinyl-label::after { content: ''; width: 12px; height: 12px; background: #fff; border-radius: 50%; z-index: 10; position: relative; box-shadow: 0 1px 2px rgba(0,0,0,.3); }
+        .vinyl-gloss {
+            position: absolute; inset: 0; background: linear-gradient(135deg, transparent, rgba(255,255,255,.1), transparent);
+            transform: rotate(45deg); pointer-events: none; z-index: 2;
+        }
+        .vinyl-cover {
+            position: absolute; inset: 24px;
+            z-index: 10;
+            pointer-events: none;
+            transition: transform .1s ease-out, filter .1s ease-out;
+        }
+        .vinyl-cover-inner {
+            width: 100%; height: 100%;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 4px 12px rgba(0,0,0,.08);
+        }
+        .vinyl-cover-inner img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .vinyl-cover-inner::after {
+            content: '';
+            position: absolute; inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,.2), transparent 60%);
+            pointer-events: none; border-radius: 12px;
+        }
+        .vinyl-badge {
+            position: absolute; top: 32px; right: -16px; z-index: 20;
+            pointer-events: none;
+            transition: transform .1s ease-out;
+        }
+        .vinyl-badge span {
+            display: block;
+            background: rgba(0,0,0,.9);
+            color: #fff;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: .05em;
+            padding: 6px 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,.15);
+            transform: rotate(3deg);
+        }
+        .vinyl-badge::after {
+            content: '';
+            display: block;
+            width: 32px; height: 16px;
+            background: rgba(0,0,0,.3);
+            transform: rotate(-45deg);
+            transform-origin: bottom right;
+            z-index: -10;
+            position: absolute;
+            bottom: -4px; left: -8px;
+        }
+        .vinyl-title {
+            position: absolute; bottom: 40px; left: 12px; z-index: 20;
+            pointer-events: none;
+            transition: transform .1s ease-out;
+        }
+        .vinyl-title .t1 {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px; font-weight: 900;
+            color: rgba(0,0,0,.9);
+            letter-spacing: .08em;
+            line-height: 1.2;
+            text-shadow: 0 1px 2px rgba(0,0,0,.05);
+        }
+        .vinyl-title .t2 {
+            font-family: 'Hanken Grotesk', monospace;
+            font-size: 12px; font-weight: 400;
+            color: rgba(0,0,0,.5);
+            letter-spacing: .08em;
+            margin-top: 4px;
+            transform: scale(.75);
+            transform-origin: left;
+            white-space: nowrap;
+        }
+        @media (min-width: 768px) {
+            .vinyl-card { width: 320px; height: 320px; }
+            .vinyl-disc { width: 256px; height: 256px; }
+        }
+
+        /* 卡片整体可点击的拉伸链接 */
+        .card-link {
+            position: absolute;
+            inset: 0;
+            z-index: 30;
+        }
+        .project-card .project-btn {
+            z-index: 35;
+            pointer-events: auto;
+        }
+    </style>
+</head>
+<body class="antialiased min-h-screen relative font-body-md text-body-md">
+    <!-- Loader -->
+    <div class="" id="loader">
+        <div class="font-display-lg text-headline-lg font-medium tracking-tighter text-primary pulse-text">请稍等...</div>
+    </div>
+    
+    <!-- Shader Background -->
+    <div class="fixed inset-0 z-[-1] pointer-events-none opacity-40"></div>
+    
+    <!-- Top Navigation Portal -->
+    <header class="fixed top-0 w-full z-50 bg-surface/80 dark:bg-surface-container/80 backdrop-blur-md bg-surface-container-low/50 dark:bg-surface-container-highest/20 flat no shadows">
+        <div class="flex justify-between items-center w-full px-6 md:px-margin-desktop py-6 max-w-container-max mx-auto">
+            <div class="font-display-lg text-headline-lg-mobile md:text-headline-lg font-medium tracking-tighter text-primary dark:text-on-surface">CAIN</div>
+            <!-- 【SEO/无障碍优化】：给菜单按钮添加 aria-label -->
+            <button aria-label="打开移动端菜单" class="md:hidden text-primary p-2">
+                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">menu</span>
+            </button>
+        </div>
+    </header>
+    
+    <main class="pt-[120px] pb-24 px-6 md:px-margin-desktop max-w-container-max mx-auto relative z-10">
+        <!-- Hero Section -->
+        <section class="min-h-[50vh] flex justify-center items-start fade-in-up mt-12 mb-32 w-full">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-gutter items-center w-full">
+                <div class="flex flex-col justify-center items-start">
+                    <h1 class="font-display-lg text-display-lg text-primary mb-6 max-w-3xl">欢迎</h1>
+                    <p class="font-body-lg text-body-lg text-secondary max-w-2xl leading-relaxed">你可以点击下方卡片跳转到我的其他作品。</p>
+                </div>
+                <div class="relative h-[300px] md:h-[400px] flex items-center justify-center overflow-visible">
+                    <!-- Vinyl Card（严格复刻 React 源码结构） -->
+                    <div class="vinyl-card" id="vinylCard">
+                        <div class="vinyl-bg-glow"></div>
+                        <div class="vinyl-wrap">
+                            <div class="vinyl-disc" id="vinylDisc">
+                                <div class="groove"></div>
+                                <div class="groove"></div>
+                                <div class="groove"></div>
+                                <div class="groove"></div>
+                                <div class="groove"></div>
+                                <div class="vinyl-label">
+                                    <img src="./assets/song.jpg" alt="Label" onerror="this.src='https://placehold.co/100x100/111/fff?text=Vinyl'">
+                                </div>
+                                <div class="vinyl-gloss"></div>
+                            </div>
+                        </div>
+                        <div class="vinyl-cover" id="vinylCover">
+                            <div class="vinyl-cover-inner">
+                                <img src="./assets/song.jpg" alt="Cover" onerror="this.src='https://placehold.co/300x300/222/fff?text=Cover'">
+                            </div>
+                        </div>
+                        <div class="vinyl-badge" id="vinylBadge"><span>NOW PLAYING</span></div>
+                        <div class="vinyl-title" id="vinylTitle">
+                            <div class="t1">MINIMALIST</div>
+                            <div class="t2">ART COLLECTION</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Project Grid -->
+        <!-- 【修改】：将 md:grid-cols-3 改为 md:grid-cols-2（一排两个卡片） -->
+        <section class="grid grid-cols-1 gap-gutter mb-32 md:grid-cols-2">
+            <!-- Card 1: English Learning -->
+            <!-- 【修改】：将 aspect-[4/5] 改为 aspect-video (16:9 标准比例) -->
+            <article class="project-card fade-in-up group aspect-video">
+                <div class="project-card-image-container w-full h-full bg-surface-container-high relative">
+                    <a class="card-link" href="/en/"></a>
+                    <!-- 【新增】：展示视频，默认透明度为0，悬浮时播放 -->
+                    <video class="project-card-video object-cover w-full h-full absolute inset-0 z-0 opacity-0" muted loop playsinline>
+                        <source src="./assets/en_video.mp4" type="video/mp4">
+                    </video>
+                    
+                    <!-- 原预览底图 -->
+                    <img alt="AI英语学习平台" class="project-card-image object-cover w-full h-full absolute inset-0 mix-blend-multiply z-10" src="./assets/en_img.png" onerror="this.src='https://placehold.co/800x450/e0dfde/1c1c1a?text=Project+1'">
+                    
+                    <div class="project-card-overlay opacity-100 md:opacity-0">
+                        <a class="project-btn bg-white text-black font-body-md text-label-md px-8 py-3 rounded-full hover:bg-gray-200 transition-colors duration-200 flex items-center gap-2 opacity-100 scale-100 translate-y-0 md:opacity-0 md:scale-90 md:translate-y-10" href="/en/">
+                            访问项目 <span class="material-symbols-outlined" style="font-size: 18px;">arrow_forward</span>
+                        </a>
+                        <div class="project-card-info pointer-events-none opacity-100 translate-y-0 md:opacity-0 md:translate-y-20">
+                            <span class="font-display-lg text-label-md uppercase tracking-widest opacity-80">I. AI LEARNING</span>
+                            <h2 class="font-display-lg text-headline-lg-mobile">AI英语学习平台</h2>
+                        </div>
+                    </div>
+                </div>
+            </article>
+            
+            <!-- Card 2 -->
+            <article class="project-card fade-in-up group aspect-video">
+                <div class="project-card-image-container w-full h-full bg-surface-container-high relative">
+                    <a class="card-link" href="/work/"></a>
+                    <!-- 【新增】：展示视频 -->
+                    <video class="project-card-video object-cover w-full h-full absolute inset-0 z-0 opacity-0" muted loop playsinline>
+                        <source src="./assets/work_video.mp4" type="video/mp4">
+                    </video>
+
+                    <img alt="协同思维导图编辑平台" class="project-card-image object-cover w-full h-full absolute inset-0 mix-blend-multiply z-10" src="./assets/work_img.png" onerror="this.src='https://placehold.co/800x450/e0dfde/1c1c1a?text=MindMap'">
+                    <div class="project-card-overlay opacity-100 md:opacity-0">
+                        <a class="project-btn bg-white text-black font-body-md text-label-md px-8 py-3 rounded-full hover:bg-gray-200 transition-colors duration-200 flex items-center gap-2 opacity-100 scale-100 translate-y-0 md:opacity-0 md:scale-90 md:translate-y-10" href="/work/">
+                            访问项目 <span class="material-symbols-outlined" style="font-size: 18px;">arrow_forward</span>
+                        </a>
+                        <div class="project-card-info pointer-events-none opacity-100 translate-y-0 md:opacity-0 md:translate-y-20">
+                            <span class="font-display-lg text-label-md uppercase tracking-widest opacity-80">II. COLLAB</span>
+                            <h2 class="font-display-lg text-headline-lg-mobile">协同思维导图</h2>
+                        </div>
+                    </div>
+                </div>
+            </article>
+            
+            <!-- Card 3 -->
+            <article class="project-card fade-in-up group aspect-video">
+                <div class="project-card-image-container w-full h-full bg-surface-container-high relative">
+                    <a class="card-link" href="/tool/"></a>
+                    <!-- 【新增】：展示视频 -->
+                    <video class="project-card-video object-cover w-full h-full absolute inset-0 z-0 opacity-0" muted loop playsinline>
+                        <source src="./assets/tool_video.mp4" type="video/mp4">
+                    </video>
+
+                    <img alt="协同表格工具" class="project-card-image object-cover w-full h-full absolute inset-0 mix-blend-multiply z-10" src="./assets/tool_img.png" onerror="this.src='https://placehold.co/800x450/e0dfde/1c1c1a?text=Project+3'">
+                    <div class="project-card-overlay opacity-100 md:opacity-0">
+                        <a class="project-btn bg-white text-black font-body-md text-label-md px-8 py-3 rounded-full hover:bg-gray-200 transition-colors duration-200 flex items-center gap-2 opacity-100 scale-100 translate-y-0 md:opacity-0 md:scale-90 md:translate-y-10" href="/tool/">
+                            访问项目 <span class="material-symbols-outlined" style="font-size: 18px;">arrow_forward</span>
+                        </a>
+                        <div class="project-card-info pointer-events-none opacity-100 translate-y-0 md:opacity-0 md:translate-y-20">
+                            <span class="font-display-lg text-label-md uppercase tracking-widest opacity-80">III. TOOLS</span>
+                            <h2 class="font-display-lg text-headline-lg-mobile">协同表格工具</h2>
+                        </div>
+                    </div>
+                </div>
+            </article>
+            
+            <!-- Card 4: 个人博客 -->
+            <article class="project-card fade-in-up group aspect-video">
+                <div class="project-card-image-container w-full h-full bg-surface-container-high relative">
+                    <!-- 整卡可点击链接 -->
+                    <a class="card-link" href="/blog/"></a>
+                    <!-- 【新增】：展示视频 -->
+                    <video class="project-card-video object-cover w-full h-full absolute inset-0 z-0 opacity-0" muted loop playsinline>
+                        <source src="./assets/blog_video.mp4" type="video/mp4">
+                    </video>
+
+                    <img alt="个人博客" class="project-card-image object-cover w-full h-full absolute inset-0 mix-blend-multiply z-10" src="./assets/blog_img.png" onerror="this.src='https://placehold.co/800x450/e0dfde/1c1c1a?text=Blog'">
+                    <div class="project-card-overlay opacity-100 md:opacity-0">
+                        <a class="project-btn bg-white text-black font-body-md text-label-md px-8 py-3 rounded-full hover:bg-gray-200 transition-colors duration-200 flex items-center gap-2 opacity-100 scale-100 translate-y-0 md:opacity-0 md:scale-90 md:translate-y-10" href="/blog/">
+                            访问项目 <span class="material-symbols-outlined" style="font-size: 18px;">arrow_forward</span>
+                        </a>
+                        <div class="project-card-info pointer-events-none opacity-100 translate-y-0 md:opacity-0 md:translate-y-20">
+                            <span class="font-display-lg text-label-md uppercase tracking-widest opacity-80">IV. BLOG</span>
+                            <h2 class="font-display-lg text-headline-lg-mobile">个人博客</h2>
+                        </div>
+                    </div>
+                </div>
+            </article>
+        </section>
+    </main>
+    
+    <!-- Footer -->
+    <footer class="w-full py-12 bg-surface dark:bg-surface-container-lowest border-t border-outline-variant/30 dark:border-outline/20 flat no shadows font-body-md text-label-sm tracking-normal relative z-10">
+        <div class="flex flex-col md:flex-row justify-between items-center px-6 md:px-margin-desktop max-w-container-max mx-auto gap-gutter">
+            <div class="font-display-lg text-headline-lg text-primary dark:text-on-surface mb-6 md:mb-0">CAIN</div>
+            <nav class="flex gap-6 items-center text-secondary dark:text-outline"></nav>
+        </div>
+    </footer>
+    
+    <!-- Scripts -->
+    <script>
+        // Loader logic
+        window.addEventListener('load', () => {
+            const loader = document.getElementById('loader');
+            setTimeout(() => {
+                loader.classList.add('loader-slide-up');
+                triggerVinylIntro();
+                setTimeout(() => {
+                    handleScrollAnimations();
+                }, 500);
+            }, 1500);
+        });
+
+        // Intersection Observer for scroll animations
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.15
+        };
+
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        function handleScrollAnimations() {
+            const elements = document.querySelectorAll('.fade-in-up');
+            elements.forEach(el => observer.observe(el));
+        }
+
+        // ====== Video Hover Playback Logic (新增交互逻辑) ======
+        document.querySelectorAll('.project-card').forEach(card => {
+            const video = card.querySelector('.project-card-video');
+            if (video) {
+                // 鼠标移入时尝试播放视频
+                card.addEventListener('mouseenter', () => {
+                    // 判断是否有配置好的视频链接
+                    if (video.currentSrc || video.querySelector('source').src) {
+                        const playPromise = video.play();
+                        if (playPromise !== undefined) {
+                            playPromise.catch(error => {
+                                // 静默处理由于 src 为空产生的报错
+                            });
+                        }
+                    }
+                });
+                
+                // 鼠标移出时暂停并重置视频
+                card.addEventListener('mouseleave', () => {
+                    if (!video.paused) {
+                        video.pause();
+                        video.currentTime = 0; // 重置视频回到起点
+                    }
+                });
+            }
+        });
+
+        // ====== Vinyl Card 3D Tilt ======
+        (function() {
+            const card = document.getElementById('vinylCard');
+            if (!card) return;
+            const disc = document.getElementById('vinylDisc');
+            const cover = document.getElementById('vinylCover');
+            const badge = document.getElementById('vinylBadge');
+            const title = document.getElementById('vinylTitle');
+            const bgGlow = card.querySelector('.vinyl-bg-glow');
+            let centerX = 0, centerY = 0, isHovering = false;
+            let introDone = false;
+
+            function updateCenter() {
+                const r = card.getBoundingClientRect();
+                centerX = r.left + r.width / 2;
+                centerY = r.top + r.height / 2;
+            }
+            updateCenter();
+            window.addEventListener('resize', updateCenter);
+
+            function rotate(cursorPosition, centerPosition, threshold) {
+                threshold = threshold || 20;
+                var delta = cursorPosition - centerPosition;
+                return delta >= 0
+                    ? (delta >= threshold ? threshold : delta)
+                    : (delta <= -threshold ? -threshold : delta);
+            }
+            function brightness(cursorPositionY, centerPositionY, strength) {
+                strength = strength || 20;
+                return 1 - rotate(cursorPositionY, centerPositionY) / strength * 0.05;
+            }
+
+            window.triggerVinylIntro = function() {
+                if (!disc) return;
+                disc.style.transition = 'none';
+                disc.style.transform = 'translate(160px, 0px) rotate(30deg)';
+                disc.offsetHeight;
+                disc.style.transition = '';
+                setTimeout(function() {
+                    if (!isHovering) {
+                        disc.style.transform = 'translate(20px, 0px) rotate(0deg)';
+                    }
+                    introDone = true;
+                }, 1500);
+            };
+
+            card.addEventListener('mouseenter', function() {
+                isHovering = true;
+                updateCenter();
+            });
+
+            card.addEventListener('mouseleave', function() {
+                isHovering = false;
+                if (!introDone) return;
+                card.style.transform = 'perspective(1000px) rotateY(0deg) rotateX(0deg) scale(1)';
+                card.style.filter = 'brightness(1) drop-shadow(0 10px 20px rgba(0,0,0,.05))';
+                card.style.boxShadow = '0 0 0 0 rgba(0,0,0,0)';
+                disc.style.transform = 'translate(20px, 0px) rotate(0deg)';
+                cover.style.transform = 'translate(0px, 0px)';
+                cover.style.filter = 'drop-shadow(0 8px 12px rgba(0,0,0,.08))';
+                badge.style.transform = 'translate(0px, 0px)';
+                title.style.transform = 'translate(0px, 0px)';
+                if (bgGlow) bgGlow.style.transform = 'translate(0px, 0px)';
+            });
+
+            card.addEventListener('mousemove', function(e) {
+                if (!introDone) return;
+                var calcX = rotate(e.clientX, centerX, 15);
+                var calcY = rotate(e.clientY, centerY, 15);
+                var calcX2 = e.clientX - centerX;
+                var calcY2 = e.clientY - centerY;
+
+                card.style.transform = 'translateZ(0) perspective(1000px) rotateY(' + calcX + 'deg) rotateX(' + (-calcY/2) + 'deg) scale(1.05)';
+                card.style.filter = 'brightness(' + brightness(e.clientY, centerY, 30) + ')';
+                card.style.boxShadow = (-calcX*1.5) + 'px ' + (-calcY*1.5) + 'px 30px rgba(0,0,0,.08)';
+
+                disc.style.transform = 'translate(' + (calcX2/10 + 160) + 'px, ' + (calcY2/15) + 'px) rotate(' + (calcX2/4) + 'deg)';
+                cover.style.transform = 'translate(' + (calcX2/20) + 'px, ' + (calcY2/20) + 'px)';
+                cover.style.filter = 'drop-shadow(' + (-calcX) + 'px ' + (-calcY) + 'px 15px rgba(0,0,0,.1))';
+                badge.style.transform = 'translate(' + (calcX2/8) + 'px, ' + (calcY2/12) + 'px)';
+                title.style.transform = 'translate(' + (calcX2/8) + 'px, ' + (calcY2/12) + 'px)';
+                if (bgGlow) bgGlow.style.transform = 'translate(' + (calcX2/20) + 'px, ' + (calcY2/20) + 'px)';
+            });
+        })();
+    </script>
+</body>
+</html>

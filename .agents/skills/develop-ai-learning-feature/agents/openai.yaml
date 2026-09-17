@@ -1,0 +1,6 @@
+interface:
+  display_name: "Develop AI Learning Feature"
+  short_description: "Develop AI English-learning features with SDD"
+  default_prompt: "Use $develop-ai-learning-feature to implement a substantive AI English-learning change in en-learning-plus through the required SDD workflow."
+policy:
+  allow_implicit_invocation: true

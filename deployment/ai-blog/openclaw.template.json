@@ -1,0 +1,164 @@
+{
+  "gateway": {
+    "mode": "local",
+    "bind": "loopback",
+    "auth": {
+      "mode": "token",
+      "token": "${OPENCLAW_GATEWAY_TOKEN}"
+    },
+    "controlUi": {
+      "enabled": false
+    }
+  },
+  "agents": {
+    "defaults": {
+      "workspace": "/home/node/.openclaw/workspace",
+      "model": {
+        "primary": "deepseek/deepseek-v4-flash"
+      },
+      "thinkingDefault": "off",
+      "compaction": {
+        "enabled": true,
+        "mode": "safeguard",
+        "thinkingLevel": "off",
+        "keepRecentTokens": 20000,
+        "recentTurnsPreserve": 0,
+        "identifierPolicy": "strict",
+        "qualityGuard": {
+          "enabled": true,
+          "maxRetries": 3
+        },
+        "midTurnPrecheck": {
+          "enabled": true
+        }
+      },
+      "maxConcurrent": 1,
+      "timeoutSeconds": 900,
+      "heartbeat": {
+        "every": "0m"
+      },
+      "blockStreamingDefault": "off",
+      "blockStreamingBreak": "text_end",
+      "blockStreamingChunk": {
+        "minChars": 200,
+        "maxChars": 1200,
+        "breakPreference": "paragraph"
+      },
+      "typingMode": "instant",
+      "toolProgressDetail": "explain"
+    }
+  },
+  "models": {
+    "mode": "merge",
+    "providers": {
+      "deepseek": {
+        "baseUrl": "https://api.deepseek.com",
+        "apiKey": "${DEEPSEEK_API_KEY}",
+        "api": "openai-completions",
+        "models": [
+          {
+            "id": "deepseek-v4-flash",
+            "name": "DeepSeek Flash",
+            "reasoning": true,
+            "input": [
+              "text"
+            ],
+            "contextWindow": 1000000,
+            "maxTokens": 8192,
+            "compat": {
+              "supportsReasoningEffort": true,
+              "maxTokensField": "max_tokens"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "channels": {
+    "feishu": {
+      "enabled": true,
+      "connectionMode": "websocket",
+      "dmPolicy": "pairing",
+      "allowFrom": [],
+      "groupPolicy": "disabled",
+      "streaming": {
+        "mode": "partial",
+        "block": {
+          "enabled": false
+        }
+      },
+      "accounts": {
+        "main": {
+          "appId": "${FEISHU_APP_ID}",
+          "appSecret": "${FEISHU_APP_SECRET}"
+        }
+      },
+      "typingIndicator": true,
+      "renderMode": "card"
+    }
+  },
+  "plugins": {
+    "allow": [
+      "feishu",
+      "cjw-blog-tools",
+      "deepseek"
+    ],
+    "load": {
+      "paths": [
+        "/opt/cjw-blog-tools"
+      ]
+    },
+    "slots": {
+      "memory": "none"
+    },
+    "entries": {
+      "feishu": {
+        "enabled": true
+      },
+      "cjw-blog-tools": {
+        "enabled": true
+      },
+      "deepseek": {
+        "enabled": true
+      },
+      "memory-core": {
+        "enabled": false
+      }
+    }
+  },
+  "cron": {
+    "enabled": false
+  },
+  "skills": {
+    "allowBundled": []
+  },
+  "tools": {
+    "allow": [
+      "read",
+      "write",
+      "edit",
+      "session_status",
+      "cjw_blog_publish",
+      "cjw_blog_status",
+      "cjw_blog_ocr",
+      "cjw_blog_list",
+      "cjw_blog_delete_preview",
+      "cjw_blog_delete_confirm",
+      "cjw_blog_read",
+      "cjw_blog_edit_preview",
+      "cjw_blog_edit_confirm"
+    ],
+    "fs": {
+      "workspaceOnly": true
+    },
+    "elevated": {
+      "enabled": false
+    }
+  },
+  "browser": {
+    "enabled": false
+  },
+  "session": {
+    "dmScope": "per-channel-peer"
+  }
+}

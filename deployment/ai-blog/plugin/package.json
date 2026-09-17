@@ -1,0 +1,11 @@
+{
+  "name": "cjw-blog-tools",
+  "version": "1.4.3",
+  "type": "module",
+  "private": true,
+  "openclaw": {
+    "extensions": [
+      "./index.mjs"
+    ]
+  }
+}
